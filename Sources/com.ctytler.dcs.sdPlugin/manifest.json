@@ -1,0 +1,35 @@
+{
+  "Actions": [
+    {
+      "Icon": "icon", 
+      "Name": "DCS", 
+      "States": [
+        {
+          "Image": "defaultImage",
+          "TitleAlignment": "middle", 
+          "FontSize": "17"
+        }
+      ], 
+      "SupportedInMultiActions": false,
+      "Tooltip": "Counts for now", 
+      "UUID": "com.ctytler.dcs.switch"
+    }
+  ], 
+  "SDKVersion": 2,
+  "Author": "Charlie Tytler", 
+  "CodePathWin": "dcs_interface.exe", 
+  "Description": "Allows buttons with triggers from DCS", 
+  "Name": "DCS", 
+  "Icon": "pluginIcon", 
+  "Version": "0.1",
+  "OS": [
+    {
+        "Platform": "windows", 
+        "MinimumVersion" : "10"
+    }
+  ],
+  "Software": 
+    {
+        "MinimumVersion" : "4.1"
+    }
+}
