@@ -7,6 +7,7 @@
 #include <iostream>
 #include <WS2tcpip.h>
 
+constexpr int MAX_SIZE = 1024; // Maximum UDP buffer size to read.
 namespace DcsInterface
 {
 
@@ -49,30 +50,55 @@ DcsSocket::~DcsSocket()
     WSACleanup();
 }
 
-int DcsSocket::dcs_receive(char *msg, const size_t max_size)
+int DcsSocket::dcs_receive(const char *delimiter, const char *header_delimiter, std::queue<std::string> &tokens)
 {
-    int bytes_received = recv(socket_id_, msg, (int)max_size, 0);
-    return bytes_received;
+    // Sender address - dummy variable as it is unused outside recvfrom.
+    sockaddr_in dummy_sender_addr;
+    int dummy_sender_addr_size = sizeof(dummy_sender_addr);
+
+    int bytes_received;
+    char msg[MAX_SIZE] = {};
+    bytes_received = recvfrom(socket_id_, msg, MAX_SIZE, 0, (SOCKADDR *)&dummy_sender_addr, &dummy_sender_addr_size);
+    std::cout << "MSG: " << msg << std::endl;
+    char *new_token;
+    char *next_token = NULL;
+    new_token = strtok_s(msg, header_delimiter, &next_token);
+    int count = 0;
+    if (new_token != NULL)
+    {
+        new_token = strtok_s(NULL, delimiter, &next_token);
+    }
+    while (new_token != NULL)
+    {
+        tokens.push(new_token);
+        //std::cout << "Token: " << new_token << std::endl;
+        new_token = strtok_s(NULL, delimiter, &next_token);
+    }
+    return 0;
 }
 } // namespace DcsInterface
 
 /*
 FOR TESTING:
-
+*/
 int main()
 {
     int rx_port = 1625;
     int tx_port = 26027;
     DcsInterface::DcsSocket dcs_socket(rx_port, tx_port);
 
+    std::cout << "start" << std::endl;
     // Read 10 messages from UDP port.
-    for (int i = 0; i < 10; i++)
+    std::queue<std::string> recvd_msgs;
+    for (int i = 0; i < 50; i++)
     {
-        char recvbuf[1024] = {};
-        dcs_socket.dcs_receive(recvbuf, 1024);
-        std::cout << recvbuf << std::endl;
+        dcs_socket.dcs_receive(":", "*", recvd_msgs);
+        while (!recvd_msgs.empty())
+        {
+            std::cout << recvd_msgs.front() << std::endl;
+            recvd_msgs.pop();
+        }
     }
 
     return 0;
 }
-*/

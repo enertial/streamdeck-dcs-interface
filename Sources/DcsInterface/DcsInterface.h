@@ -3,6 +3,7 @@
 #pragma once
 
 #include <string>
+#include <queue>
 #include <winsock2.h>
 namespace DcsInterface
 {
@@ -28,11 +29,12 @@ public:
     /**
      * @brief Reads the UDP buffer.
      * 
-     * @param buffer      Character buffer to read into.
-     * @param buffer_size Maximum size of character buffer.
-     * @return int        Number of bytes read into buffer.
+     * @param delimiter Character used to separate tokens from received buffer.
+     * @param ignore_header_count Number of tokens to ignore at beginnin of each buffer.
+     * @param tokens Vector of tokens that received content is pushed to.
+     * @return int        Return 0 if successful.
      */
-    int dcs_receive(char *buffer, const size_t buffer_size);
+    int dcs_receive(const char *delimiter, const char *header_delimiter, std::queue<std::string> &tokens);
 
 private:
     SOCKET socket_id_;             ///< Socket which is binded to the rx port.
