@@ -11,11 +11,7 @@ DcsInterface::DcsInterface(const int rx_port, const int tx_port)
 {
 }
 
-DcsInterface::~DcsInterface()
-{
-}
-
-void DcsInterface::register_dcs_monitor(const int dcs_id, const std::string context)
+void DcsInterface::register_dcs_monitor(const int dcs_id, const std::string &context)
 {
     if (dcs_monitor_map_.find(dcs_id) == dcs_monitor_map_.end())
     {
@@ -34,15 +30,15 @@ void DcsInterface::process_next_dcs_events()
         tokens.pop();
 
         // Parse dcs_event string of the form:
-        //   "<dcs_id>=<value>"
-        auto delim_loc = dcs_event.find("=");
+        //   "<dcs_id>=<reported_value>"
+        const std::string delim = "=";
+        const auto delim_loc = dcs_event.find(delim);
         const int dcs_id = std::stoi(dcs_event.substr(0, delim_loc));
-        dcs_event.erase(0, delim_loc + 1);
-        const std::string value = dcs_event;
+        const std::string reported_value = dcs_event.substr(delim_loc + delim.size(), dcs_event.size());
 
         if (dcs_monitor_map_.find(dcs_id) != dcs_monitor_map_.end())
         {
-            handle_dcs_event(dcs_id, value);
+            handle_dcs_event(dcs_id, reported_value);
         }
     }
 }

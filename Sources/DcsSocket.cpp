@@ -6,18 +6,19 @@
 
 #include "DcsSocket.h"
 
-#include <iostream> //TODO: delete after testing
 #include <WS2tcpip.h>
 
-constexpr int MAX_SIZE = 1024; // Maximum UDP buffer size to read.
+constexpr int MAX_UDP_MSG_SIZE = 1024; // Maximum UDP buffer size to read.
 
 DcsSocket::DcsSocket(const int rx_port, const int tx_port)
 {
     // Initialize Windows Sockets DLL to version 2.2.
     WSADATA wsaData;
-    if (WSAStartup(MAKEWORD(2, 2), &wsaData))
+    const auto err = WSAStartup(MAKEWORD(2, 2), &wsaData);
+    if (err != 0)
     {
-        fprintf(stderr, "Could not startup Windows socket library -- WSA Error: %d\n", WSAGetLastError());
+        const std::string error_msg = "Could not startup Windows socket library -- WSA Error: " + std::to_string(WSAGetLastError());
+        throw std::runtime_error(error_msg);
     }
 
     // Define local receive port.
@@ -29,11 +30,14 @@ DcsSocket::DcsSocket(const int rx_port, const int tx_port)
 
     // Bind local socket to receive port.
     socket_id_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    if (bind(socket_id_, (const struct sockaddr *)&local_port, sizeof(local_port)) == SOCKET_ERROR)
+    const auto result = bind(socket_id_, reinterpret_cast<const sockaddr *>(&local_port), sizeof(local_port));
+
+    if (result == SOCKET_ERROR)
     {
-        fprintf(stderr, "Could not bind UDP address to socket -- WSA Error: %d\n", WSAGetLastError());
+        const std::string error_msg = "Could not bind UDP address to socket -- WSA Error: " + std::to_string(WSAGetLastError());
         closesocket(socket_id_);
         WSACleanup();
+        throw std::runtime_error(error_msg);
     }
 
     // Define destination port for transmit.
@@ -50,29 +54,29 @@ DcsSocket::~DcsSocket()
     WSACleanup();
 }
 
-void DcsSocket::DcsReceive(const char *delimiter, const char *header_delimiter, std::queue<std::string> &tokens)
+void DcsSocket::DcsReceive(const char *token_delimiter, const char *header_delimiter, std::queue<std::string> &tokens)
 {
     // Sender address - dummy variable as it is unused outside recvfrom.
-    sockaddr_in dummy_sender_addr;
-    int dummy_sender_addr_size = sizeof(dummy_sender_addr);
+    sockaddr_in sender_addr;
+    int sender_addr_size = sizeof(sender_addr);
 
     // Receive next UDP message.
-    char msg[MAX_SIZE] = {};
-    recvfrom(socket_id_, msg, MAX_SIZE, 0, (SOCKADDR *)&dummy_sender_addr, &dummy_sender_addr_size);
+    char msg[MAX_UDP_MSG_SIZE] = {};
+    (void)recvfrom(socket_id_, msg, MAX_UDP_MSG_SIZE, 0, (SOCKADDR *)&sender_addr, &sender_addr_size);
 
     // First remove header (up to header_delimiter) from received msg.
-    char *new_token;
-    char *next_token = NULL;
-    new_token = strtok_s(msg, header_delimiter, &next_token);
+    char *extracted_token;
+    char *dummy_token_storage = NULL;
+    extracted_token = strtok_s(msg, header_delimiter, &dummy_token_storage);
 
-    // Parse message and push to tokens.
-    if (new_token != NULL)
+    if (extracted_token != NULL)
     {
-        new_token = strtok_s(NULL, delimiter, &next_token);
-    }
-    while (new_token != NULL)
-    {
-        tokens.push(new_token);
-        new_token = strtok_s(NULL, delimiter, &next_token);
+        // Parse message and push to tokens.
+        extracted_token = strtok_s(NULL, token_delimiter, &dummy_token_storage);
+        while (extracted_token != NULL)
+        {
+            tokens.push(extracted_token);
+            extracted_token = strtok_s(NULL, token_delimiter, &dummy_token_storage);
+        }
     }
 }

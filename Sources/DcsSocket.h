@@ -24,16 +24,22 @@ public:
      */
     ~DcsSocket();
 
+    // Disable copy and move constructors.
+    DcsSocket(const DcsSocket &) = delete;
+    DcsSocket(DcsSocket &&) = delete;
+    DcsSocket &operator=(const DcsSocket &) = delete;
+    DcsSocket &operator=(DcsSocket &&) = delete;
+
     /**
      * @brief Reads the UDP buffer from DCS and adds received data to the queue of tokens.
      *
-     * @param delimiter Character used to separate tokens from received buffer.
-     * @param ignore_header_count Number of tokens to ignore at beginnin of each buffer.
+     * @param token_delimiter Character used to separate tokens from received buffer.
+     * @param header_delimiter Character used to separate header from message contents in buffer.
      * @param tokens Vector of tokens that received content is pushed to.
      */
-    void DcsReceive(const char *delimiter, const char *header_delimiter, std::queue<std::string> &tokens);
+    void DcsReceive(const char *token_delimiter, const char *header_delimiter, std::queue<std::string> &tokens);
 
 private:
-    SOCKET socket_id_;             ///< Socket which is binded to the rx port.
-    struct sockaddr_in dest_port_; ///< UDP port address which will be transmitted to.
+    SOCKET socket_id_;      ///< Socket which is binded to the rx port.
+    sockaddr_in dest_port_; ///< UDP port address which will be transmitted to.
 };

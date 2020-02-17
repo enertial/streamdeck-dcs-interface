@@ -18,15 +18,13 @@ class DcsInterface
 public:
     DcsInterface(const int rx_port, const int tx_port);
 
-    ~DcsInterface();
-
     /**
      * @brief Registers a new instance of a StreamDeck button that wishes to monitor the value of a given DCS ID.
      *
      * @param dcs_id  DCS ID to monitor.
      * @param context Context identification of StreamDeck button registered to DCS ID updates.
      */
-    void register_dcs_monitor(const int dcs_id, const std::string context);
+    void register_dcs_monitor(const int dcs_id, const std::string &context);
 
     /**
      * @brief Monitors DCS events and processes them, updating registered StreamDeck button instances.
@@ -38,18 +36,18 @@ public:
     /**
      * @brief Handles key press using desired action and attributes specified from StreamDeck property instpector.
      * 
-     * @param action    StreamDeck button instance type implying desired type of action.
-     * @param inPayload User-defined attributes extracted from StreamDeck button property inspector.
+     * @param action     StreamDeck button instance type implying desired type of action.
+     * @param in_payload User-defined attributes extracted from StreamDeck button property inspector.
      */
-    void handle_key_down(const std::string action, const char *inPayload);
+    void handle_key_down(const std::string action, const char *in_payload);
 
     /**
      * @brief Handles key release using desired action and attributes specified from StreamDeck property instpector.
      * 
-     * @param action    StreamDeck button instance type implying desired type of action.
-     * @param inPayload User-defined attributes extracted from StreamDeck button property inspector.
+     * @param action     StreamDeck button instance type implying desired type of action.
+     * @param in_payload User-defined attributes extracted from StreamDeck button property inspector.
      */
-    void handle_key_up(const std::string action, const char *inPayload);
+    void handle_key_up(const std::string action, const char *in_payload);
 
 private:
     /**
