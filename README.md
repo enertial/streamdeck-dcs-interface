@@ -15,12 +15,15 @@ In the Release folder, you can find the file `com.ctytler.dcs.streamDeckPlugin`.
 
 # Source code
 
-The Sources/DCS directory contains the library for communicating with DCS.  
 The Sources folder contains the source code of the plugin.  
+ - Sources/MyStreamDeckPlugin.{cpp,h} - StreamDeck C++ API (based on the streamdeck-cpu example)
+ - Sources/DcsInterface.{cpp,h} - Interface between plugin and DCS
+ - Sources/DcsInterfaceParams.h - Defines the UDP ports to communicate with DCS
 The Streamdeck plugin details are modified via `Sources\com.ctytler.dcs.sdPlugin\manifest.json`.
 
-# Build instructions
+# Build from source instructions
+A build script is included which will build both the C++ executable which handles the communcation with DCS as well as the package for the StreamDeck plugin:  
+`build_plugin.bat`  
+You must call this file from the "Developer Command Prompt for VS" in order for the Visual C++ target build step to work.
 
-To build the C++ `dcs_interface.exe` target you must open the solution file `Sources\Windows\com.ctytler.dcs.sdPlugin.sln` with Visual Studio C++ and Build the project in the Release configuration.  
-  
-To build the Streamdeck plugin you can run the `build_release_plugin.bat` to generate the Streamdeck plugin `Release\com.ctytler.dcs.streamDeckPlugin`.
+You may also need to install the Boost C++ library.
