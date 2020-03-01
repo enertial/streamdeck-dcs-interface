@@ -1,16 +1,16 @@
 {
   "Actions": [
     {
-      "Icon": "switch_down",
+      "Icon": "images/switch_down",
       "Name": "DCS Two-State Switch",
       "States": [
         {
-          "Image": "switch_down",
+          "Image": "images/switch_down",
           "TitleAlignment": "middle",
           "FontSize": "17"
         },
         {
-          "Image": "switch_up",
+          "Image": "images/switch_up",
           "TitleAlignment": "middle",
           "FontSize": "17"
         }
@@ -21,16 +21,16 @@
       "ShowTitle": false
     },
     {
-      "Icon": "button_light_on",
+      "Icon": "images/button_light_on",
       "Name": "DCS Two-State Button",
       "States": [
         {
-          "Image": "button_light_off",
+          "Image": "images/button_light_off",
           "TitleAlignment": "middle",
           "FontSize": "17"
         },
         {
-          "Image": "button_light_on",
+          "Image": "images/button_light_on",
           "TitleAlignment": "middle",
           "FontSize": "17"
         }
@@ -40,11 +40,11 @@
       "UUID": "com.ctytler.dcs.button"
     },
     {
-      "Icon": "display_icon",
+      "Icon": "images/display_icon",
       "Name": "DCS Static Button/Display",
       "States": [
         {
-          "Image": "display_icon",
+          "Image": "images/display_icon",
           "TitleAlignment": "middle",
           "FontSize": "17"
         }
@@ -60,9 +60,9 @@
   "PropertyInspectorPath": "propertyinspector/index.html",
   "Description": "Allows buttons with triggers from DCS",
   "Name": "DCS",
-  "Icon": "ufc_key_icon",
+  "Icon": "images/ufc_key_icon",
   "Category": "DCS Interface",
-  "CategoryIcon": "dcs_icon",
+  "CategoryIcon": "images/dcs_icon",
   "Version": "0.2",
   "OS": [
     {
