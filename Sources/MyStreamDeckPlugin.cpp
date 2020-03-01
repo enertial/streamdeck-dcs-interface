@@ -14,6 +14,7 @@
 #include <atomic>
 
 #include "Common/ESDConnectionManager.h"
+#include "Common/EPLJSONUtils.h"
 
 class CallBackTimer
 {
@@ -90,7 +91,7 @@ void MyStreamDeckPlugin::UpdateTimer()
 		mVisibleContextsMutex.lock();
 		for (const std::string &context : mVisibleContexts)
 		{
-			mConnectionManager->SetTitle(std::to_string(internal_counter++), context, kESDSDKTarget_HardwareAndSoftware);
+			mConnectionManager->SetTitle(button_title_, context, kESDSDKTarget_HardwareAndSoftware);
 		}
 		mVisibleContextsMutex.unlock();
 	}
@@ -99,7 +100,9 @@ void MyStreamDeckPlugin::UpdateTimer()
 void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
 	// Nothing to do
-	internal_counter = 0;
+	json jsonSettings;
+	EPLJSONUtils::GetObjectByName(inPayload, "settings", jsonSettings);
+	button_title_ = EPLJSONUtils::GetStringByName(jsonSettings, "dcs_group_string_input");
 }
 
 void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
