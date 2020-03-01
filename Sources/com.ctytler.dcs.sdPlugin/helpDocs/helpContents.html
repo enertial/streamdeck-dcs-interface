@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>DCS Interface Streamdeck Plugin</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body>
+        <h1 id="dcs-interface-streamdeck-plugin">DCS Interface Streamdeck Plugin</h1>
+<h5 id="developed-by-charles-tytler-2020"><em>Developed by Charles Tytler, 2020.</em></h5>
+<ul>
+<li><a href="#dcs-interface-streamdeck-plugin">DCS Interface Streamdeck Plugin</a>
+- <a href="#developed-by-charles-tytler-2020"><em>Developed by Charles Tytler, 2020.</em></a></li>
+<li><a href="#description-of-settings">Description of Settings</a>
+<ul>
+<li><a href="#dcs-command-on-button-press-settings">DCS Command (on Button Press) Settings</a>
+<ul>
+<li><a href="#button-id">Button ID</a></li>
+<li><a href="#device-id">Device ID</a></li>
+<li><a href="#send-value-while-pressed">Send Value while Pressed</a></li>
+<li><a href="#send-value-while-released">Send Value while Released</a></li>
+<li><a href="#note-more-complex-send-values">NOTE: More Complex Send Values</a></li>
+</ul>
+</li>
+<li><a href="#dcs-function-monitor-change-button-image-settings">DCS Function Monitor (Change Button Image) Settings</a>
+<ul>
+<li><a href="#dcs-id">DCS ID</a></li>
+<li><a href="#show-2nd-state-image-when">Show 2nd State Image When</a></li>
+<li><a href="#value">Value</a></li>
+</ul>
+</li>
+<li><a href="#dcs-function-text-update-monitor">DCS Function Text Update Monitor</a>
+<ul>
+<li><a href="#dcs-id-1">DCS ID</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h1 id="description-of-settings">Description of Settings</h1>
+<p>In order to use the DCS Interface buttons on Streamdeck you must use ID values that the aircraft modules use internally via their .lua scripts.</p>
+<hr>
+<h2 id="dcs-command-on-button-press-settings">DCS Command (on Button Press) Settings</h2>
+<p>These set what will be commanded to DCS when you physically press the StreamDeck button.</p>
+<h3 id="button-id">Button ID</h3>
+<p>The Button ID can be found in the file:</p>
+<p><code>Mods\aircraft\&lt;AC_NAME&gt;\Cockpit\clickabledata.lua</code></p>
+<p>For example, within AV8BNA the A/G Master Mode button has an id of <code>280</code> as seen from the following line:</p>
+<pre><code><code><div>elements[&quot;PTN_280&quot;] = default_button(_(&quot;AG Master Mode Selector&quot;),
+    devices.MSC, msc_commands.AG_Selector, 280)
+</div></code></code></pre>
+<h3 id="device-id">Device ID</h3>
+<p>The Device ID is a number representing different categorizations of clickable items in the cockpit. The definition of the number is defined in:</p>
+<p><code>Mods\aircraft\&lt;AC_NAME&gt;\Cockpit\devices.lua</code></p>
+<p>For the example of the A/G Master Mode button for AV8B above, the device is defined as <code>&quot;MSC&quot;</code>. You will need to then reference the <code>devices.lua</code> file to see that the Device ID number is <code>12</code> from this line:</p>
+<pre><code><code><div>devices[&quot;MSC&quot;]     = counter() -- 12
+</div></code></code></pre>
+<p><em>Note: The <code>&quot;--&quot;</code> indicate comments, the true value is defined by the number of <code>counter()</code> calls.</em></p>
+<h3 id="send-value-while-pressed">Send Value while Pressed</h3>
+<p>This value is sent for the Button ID when the Streamdeck button is pressed. For the example we have of our A/G Master Mode button we can see it is defined via the <code>default_button()</code> function.</p>
+<p>If we now look inside the <code>clickable_defs.lua</code> file we can see that the function is defined with the following inputs:</p>
+<pre><code><code><div>function default_button(hint_,device_,command_,arg_,arg_val_,arg_lim_)
+
+    local   arg_val_ = arg_val_ or 1
+    local   arg_lim_ = arg_lim_ or {0,1}
+</div></code></code></pre>
+<p>The <code>arg_</code> input is what we already saw and named the Button ID, however this shows that when <code>arg_val_</code> and <code>arg_lim_</code> are not provided in the <code>default_button()</code> function they take on default values of <code>1</code> and <code>{0,1}</code>, respectively.</p>
+<p>The <code>arg_val_</code> is what we care about here as that is the value that is sent when the button is pressed.</p>
+<h3 id="send-value-while-released">Send Value while Released</h3>
+<p>This value is sent for the Button ID when the Streamdeck button is released.</p>
+<p>From the example above we can see the button also has <code>arg_lim_={0,1}</code>. This is the range of values possible. Since this is simply an on/off button the range implies that 0 should be sent when the button is released.</p>
+<h3 id="note-more-complex-send-values">NOTE: More Complex Send Values</h3>
+<p>For buttons that are not simple on/off, but perhaps 3-way toggle or rotary dials, the <code>arg_val_</code> and <code>arg_lim_</code> become more important. Let's take a 2-way momentary switch as an example with the following define in <code>clickabledata.lua</code>:</p>
+<pre><code><code><div>elements[&quot;PTN_397&quot;] = default_2_way_spring_switch(_(&quot;Fuzing Control&quot;),
+    devices.SMC, smc_commands.Switch_FUZE, 397)
+</div></code></code></pre>
+<p>This one again does not provide anything other than <code>arg_</code> (the Button ID) to the function. Looking at the definition for <code>default_2_way_spring_switch()</code> in <code>clickable_defs.lua</code> we see it returns (with <code>inversed</code> defaulted to <code>1.0</code>):</p>
+<pre><code><code><div>    arg 		= {arg_, arg_},
+    arg_value	= {1.0*inversed, -1.0*inversed},
+    arg_lim 	= {{0.0, 1.0}, {-1.0, 0.0}},
+</div></code></code></pre>
+<p>The fact that it has a set of two <code>arg_</code>'s means it actually has two buttons defined with the same Button ID of <code>397</code>. This means that if you want to send a command to press the Fuze switch up you would use the following settings:</p>
+<pre><code><code><div>Button ID=397, Device ID=29, SendPressed=1.0, SendReleased=0.0
+</div></code></code></pre>
+<p>And to send a command for Fuze switch down on a button press:</p>
+<pre><code><code><div>Button ID=397, Device ID=29, SendPressed=-1.0, SendReleased=0.0
+</div></code></code></pre>
+<hr>
+<h2 id="dcs-function-monitor-change-button-image-settings">DCS Function Monitor (Change Button Image) Settings</h2>
+<p><img src="file:///c:\code\streamdeck-dcs\Sources\com.ctytler.dcs.sdPlugin\helpDocs\change_button_image.png" alt="Change Button State" title="Change Button Image (State)"></p>
+<p>These settings will monitor the DCS game and change the image of the Streamdeck button when conditions are met.</p>
+<h3 id="dcs-id">DCS ID</h3>
+<p>This field is set to the numeric value of the DCS function you would like to monitor. As this Streamdeck plugin relies on the <strong>DCSExportScript</strong> project for communication with the game, I recommend finding these values directly from their curated export scripts - <a href="https://github.com/s-d-a/DCS-ExportScripts/tree/master/Scripts/DCS-ExportScript/ExportsModules">GitHub Link</a>.</p>
+<p>Continuing with our example of the AV8B A/G Mode Button, we can see the indicator lamp has a DCS ID of <code>281</code> from the following excerpt of <strong>DCSExportScript</strong>'s <code>AV8BNA.lua</code> file:</p>
+<pre><code><code><div>    --MIP OUTER LEFT SIDE
+    [283] = &quot;%.f&quot;, --NAV
+    [285] = &quot;%.f&quot;, --VSTOL
+    [281] = &quot;%.f&quot;, --A/G
+</div></code></code></pre>
+<h3 id="show-2nd-state-image-when">Show 2nd State Image When</h3>
+<p>This setting is a selection of how you would like to evaluate the received state of the function (<code>&lt;</code>, <code>==</code>, or <code>&gt;</code>). If the evaluation is <code>True</code>, then the state of the button will be set to the 2nd state (the illuminted button if looking at the above image).</p>
+<p>Example: <code>DCS ID = 281, Show When = &quot;&gt;&quot;, Value = 0.0</code><br>
+For these settings the second state of the button will be activated (showing the second image) if the A/G Mode lamp function returns a value of <code>1.0</code>, and will reset to the first state if it drops back to <code>0.0</code>.</p>
+<h3 id="value">Value</h3>
+<p>This is the value of the condition evaluated with either <code>&lt;</code>, <code>==</code>, or <code>&gt;</code>. This is generally a numeric value, but strings could also be evaluated.</p>
+<p><em>Text Strings</em> -- If you would like to identify if the DCS function value is &quot;not empty&quot; you could set the condition to greater than (<code>&gt;</code>) and the Value=<code>&quot;&quot;</code>. Any non-empty string value received will be evaluated as <code>True</code> if compared against an empty string.</p>
+<hr>
+<h2 id="dcs-function-text-update-monitor">DCS Function Text Update Monitor</h2>
+<p>This section is to monitor the same type of DCS functions as the &quot;DCS Function Monitor&quot; section above, but instead of changing the Streamdeck button image it will set the button Title equal to the text received. Examples of where this would be useful is for Aircraft Scratchpads and UFC Text Displays.</p>
+<h3 id="dcs-id-1">DCS ID</h3>
+<p>The only setting specified here is the function ID number which returns values you'd like to have displayed as text.</p>
+<p>For example, with the <code>AV8BNA.lua</code> export script, setting a DCS ID equal to <code>250</code> would display the text for the ODU Option1 panel.</p>
+<pre><code><code><div>    -- ODU Panel
+    [250] = &quot;%1d&quot;, --ODU Option1
+    [251] = &quot;%1d&quot;, --ODU Option2
+    [252] = &quot;%1d&quot;, --ODU Option3
+    [248] = &quot;%1d&quot;, --ODU Option4
+    [249] = &quot;%1d&quot;, --ODU Option5
+</div></code></code></pre>
+<p>The font, size, and color of the text can be set with the Streamdeck Title settings.</p>
+<p><strong>NOTE:</strong> The &quot;Title&quot; field must be left empty in the Streamdeck settings for this to work.</p>
+
+    </body>
+    </html>

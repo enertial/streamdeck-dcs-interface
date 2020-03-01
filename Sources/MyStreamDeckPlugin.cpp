@@ -65,7 +65,7 @@ private:
 MyStreamDeckPlugin::MyStreamDeckPlugin()
 {
 	mTimer = new CallBackTimer();
-	mTimer->start(1000, [this]() {
+	mTimer->start(2000, [this]() {
 		this->UpdateTimer();
 	});
 }
@@ -100,9 +100,6 @@ void MyStreamDeckPlugin::UpdateTimer()
 void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
 	// Nothing to do
-	json jsonSettings;
-	EPLJSONUtils::GetObjectByName(inPayload, "settings", jsonSettings);
-	button_title_ = EPLJSONUtils::GetStringByName(jsonSettings, "dcs_group_string_input");
 }
 
 void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
@@ -138,5 +135,28 @@ void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID)
 
 void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-	// Nothing to do
+
+	const auto event = EPLJSONUtils::GetStringByName(inPayload, "event");
+
+	if (event == "updateRegisteredExportId")
+	{
+		const auto export_id_str = EPLJSONUtils::GetStringByName(inPayload, "value");
+
+		// TODO: remove after testing - temporarily just shows the received value in Button title.
+		if (mConnectionManager != nullptr)
+		{
+			mVisibleContextsMutex.lock();
+			mConnectionManager->SetTitle(export_id_str, inContext, kESDSDKTarget_HardwareAndSoftware);
+			mVisibleContextsMutex.unlock();
+		}
+
+		if (export_id_str.empty())
+		{
+			// Unregister any existing export_id for current context from DCS monitor.
+		}
+		else
+		{
+			// Register export_id with DCS monitor.
+		}
+	}
 }
