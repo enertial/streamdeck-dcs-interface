@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover"
+    />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <title>com.ctytler.streamdeck.dcs Property Inspector</title>
+    <link rel="stylesheet" href="css/sdpi.css" />
+  </head>
+  <body>
+    <div class="sdpi-wrapper">
+      <!-- DROP HTML-STUFF BELOW -->
+
+      <!--
+            Here we just copied a couple of elements from the PISamples example, which contains
+            a huge collection pre-made HTML-elements for you to use.
+            Important here is (if you plan to communicate from the Property Inspector to the plugin without
+            further programming), that you add an 'id' to an element's control. 
+            This will get the 'key', which is sent to the plugin (or settings), along with the value of
+            the control.
+          -->
+
+      <details>
+        <summary>DCS Command (on Button Press) Settings</summary>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">Group</div>
+          <input
+            id="dcs_group_output"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="Group number of DCS Function to Command"
+          />
+        </div>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">DCS ID</div>
+          <input
+            id="dcs_id_output"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="DCS ID number of Function to Command"
+          />
+        </div>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">Send Value while Released</div>
+          <input
+            id="release_value"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="Example: 0"
+          />
+        </div>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">Send Value while Pressed</div>
+          <input
+            id="press_value"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="Example: 1"
+          />
+        </div>
+      </details>
+
+      <details>
+        <summary>DCS Function Monitor (Change Button Image) Settings</summary>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">Group</div>
+          <input
+            id="dcs_group_input"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="Group number of DCS Function to Monitor"
+          />
+        </div>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">DCS ID</div>
+          <input
+            id="dcs_id_input"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="DCS ID number of Function to Monitor"
+          />
+        </div>
+
+        <div class="sdpi-item" id="select_change_condition">
+          <div class="sdpi-item-label">Show 2nd State Image</div>
+          <select class="sdpi-item-value select" id="change_condition_input">
+            <option value="==">when ID is equal to (==) below value</option>
+            <option value="<">when ID is less than (<) below value</option>
+            <option value=">">when ID is greater than (>) below value</option>
+          </select>
+        </div>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">Value</div>
+          <input
+            id="condition_value_input"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="Specify condition value"
+          />
+        </div>
+      </details>
+
+      <details>
+        <summary>DCS Function Text Update Monitor Settings</summary>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">Group</div>
+          <input
+            id="dcs_group_string_input"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="Group number of DCS Function to Monitor"
+          />
+        </div>
+
+        <div class="sdpi-item">
+          <div class="sdpi-item-label">DCS ID</div>
+          <input
+            id="dcs_id_string_input"
+            class="sdpi-item-value"
+            type="text"
+            value=""
+            placeholder="DCS ID number of Function to Monitor"
+          />
+        </div>
+
+        <details>
+          <summary>details...</summary>
+          <p>
+            This will display the text published by DCS for the provided DCS
+            function. The font settings can be customized with the "Title"
+            section, but the text field for "Title:" in StreamDeck button
+            settings must be kept blank.<br />
+            Example use: UFC Displays
+          </p>
+        </details>
+      </details>
+
+      <!-- END OF SDPI-WRAPPER -->
+    </div>
+
+    <div class="sdpi-info-label hidden" style="top: -1000;" value=""></div>
+    <script src="js/common.js"></script>
+    <script src="js/common_pi.js"></script>
+    <script src="js/index_pi.js"></script>
+  </body>
+</html>

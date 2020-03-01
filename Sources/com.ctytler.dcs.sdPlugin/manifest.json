@@ -1,35 +1,76 @@
 {
   "Actions": [
     {
-      "Icon": "icon", 
-      "Name": "DCS", 
+      "Icon": "switch_down",
+      "Name": "DCS Two-State Switch",
       "States": [
         {
-          "Image": "defaultImage",
-          "TitleAlignment": "middle", 
+          "Image": "switch_down",
+          "TitleAlignment": "middle",
+          "FontSize": "17"
+        },
+        {
+          "Image": "switch_up",
+          "TitleAlignment": "middle",
           "FontSize": "17"
         }
-      ], 
+      ],
       "SupportedInMultiActions": false,
-      "Tooltip": "Counts for now", 
-      "UUID": "com.ctytler.dcs.switch"
-    }
-  ], 
-  "SDKVersion": 2,
-  "Author": "Charlie Tytler", 
-  "CodePathWin": "dcs_interface.exe", 
-  "Description": "Allows buttons with triggers from DCS", 
-  "Name": "DCS", 
-  "Icon": "pluginIcon", 
-  "Version": "0.1",
-  "OS": [
+      "Tooltip": "Two-State DCS Button/Switch",
+      "UUID": "com.ctytler.dcs.switch",
+      "ShowTitle": false
+    },
     {
-        "Platform": "windows", 
-        "MinimumVersion" : "10"
+      "Icon": "button_light_on",
+      "Name": "DCS Two-State Button",
+      "States": [
+        {
+          "Image": "button_light_off",
+          "TitleAlignment": "middle",
+          "FontSize": "17"
+        },
+        {
+          "Image": "button_light_on",
+          "TitleAlignment": "middle",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Two-State DCS Button",
+      "UUID": "com.ctytler.dcs.button"
+    },
+    {
+      "Icon": "display_icon",
+      "Name": "DCS Static Button/Display",
+      "States": [
+        {
+          "Image": "display_icon",
+          "TitleAlignment": "middle",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "One-State DCS Button",
+      "UUID": "com.ctytler.dcs.static"
     }
   ],
-  "Software": 
+  "SDKVersion": 2,
+  "Author": "Charlie Tytler",
+  "CodePathWin": "dcs_interface.exe",
+  "PropertyInspectorPath": "propertyinspector/index.html",
+  "Description": "Allows buttons with triggers from DCS",
+  "Name": "DCS",
+  "Icon": "ufc_key_icon",
+  "Category": "DCS Interface",
+  "CategoryIcon": "dcs_icon",
+  "Version": "0.2",
+  "OS": [
     {
-        "MinimumVersion" : "4.1"
+      "Platform": "windows",
+      "MinimumVersion": "10"
     }
+  ],
+  "Software": {
+    "MinimumVersion": "4.1"
+  }
 }
