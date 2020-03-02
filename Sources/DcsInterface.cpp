@@ -13,39 +13,53 @@ DcsInterface::DcsInterface(const int rx_port, const int tx_port)
 
 void DcsInterface::register_dcs_monitor(const int dcs_id, const std::string &context)
 {
-    if (dcs_monitor_map_.find(dcs_id) == dcs_monitor_map_.end())
+    if (registered_contexts_map_.count(dcs_id) == 0)
     {
-        dcs_monitor_map_[dcs_id] = std::vector<std::string>();
+        registered_contexts_map_[dcs_id] = std::unordered_set<std::string>();
     }
-    dcs_monitor_map_[dcs_id].push_back(context);
+    registered_contexts_map_[dcs_id].insert(context);
+    active_contexts_map_[context] = dcs_id;
 }
 
-void DcsInterface::process_next_dcs_events()
+void DcsInterface::unregister_dcs_monitor(const std::string &context)
 {
-    std::queue<std::string> tokens = {};
-    dcs_socket_.DcsReceive(":", "*", tokens);
-    while (!tokens.empty())
+    if (active_contexts_map_.count(context) > 0)
     {
-        std::string dcs_event = tokens.front();
-        tokens.pop();
+        const int registered_dcs_id = active_contexts_map_[context];
+        registered_contexts_map_[registered_dcs_id].erase(context);
+        if (registered_contexts_map_[registered_dcs_id].empty())
+        {
+            registered_contexts_map_.erase(registered_dcs_id);
+        }
+        active_contexts_map_.erase(context);
+    }
+}
 
-        // Parse dcs_event string of the form:
+std::vector<DcsIdValueUpdate> DcsInterface::get_next_dcs_update()
+{
+    const char *token_delimiter = ":";
+    const char *header_delimiter = "*";
+    std::vector<std::string> tokens = dcs_socket_.DcsReceive(token_delimiter, header_delimiter);
+    std::vector<DcsIdValueUpdate> received_updates;
+    for (std::string token : tokens)
+    {
+        // Parse token string of the form:
         //   "<dcs_id>=<reported_value>"
         const std::string delim = "=";
-        const auto delim_loc = dcs_event.find(delim);
-        const int dcs_id = std::stoi(dcs_event.substr(0, delim_loc));
-        const std::string reported_value = dcs_event.substr(delim_loc + delim.size(), dcs_event.size());
+        const auto delim_loc = token.find(delim);
+        const int dcs_id = std::stoi(token.substr(0, delim_loc));
+        const std::string reported_value = token.substr(delim_loc + delim.size(), token.size());
 
-        if (dcs_monitor_map_.find(dcs_id) != dcs_monitor_map_.end())
+        if (registered_contexts_map_.count(dcs_id) > 0)
         {
-            handle_dcs_event(dcs_id, reported_value);
+            for (std::string context : registered_contexts_map_[dcs_id])
+            {
+                DcsIdValueUpdate value_update;
+                value_update.context = context;
+                value_update.dcs_id = dcs_id;
+                value_update.dcs_id_value = reported_value;
+                received_updates.push_back(value_update);
+            }
         }
     }
-}
-
-void DcsInterface::handle_dcs_event(const int dcs_id, const std::string value)
-{
-    // Placeholder for initial testing.
-    std::cout << "DCS ID: " << dcs_id << std::endl;
-    std::cout << "Value: " << value << std::endl;
 }

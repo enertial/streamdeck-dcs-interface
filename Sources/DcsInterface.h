@@ -7,15 +7,34 @@
 #include "Common\ESDConnectionManager.h"
 
 #include <string>
-#include <queue>
+#include <vector>
 #include <unordered_map>
+#include <unordered_set>
+
+/**
+ * @brief Defines a per-context update of a DCS ID value.
+ *
+ */
+typedef struct
+{
+    std::string context;      // Identification of a context registered to the DCS ID.
+    int dcs_id;               // DCS ID which has received an updated value.
+    std::string dcs_id_value; // Updated value.
+} DcsIdValueUpdate;
 
 class DcsInterface
 {
     // Maps registered DCS IDs to a vector of Stream Deck button instances.
-    using dcs_id_to_context_map = std::unordered_map<int, std::vector<std::string>>;
+    using dcs_id_to_context_map = std::unordered_map<int, std::unordered_set<std::string>>;
+    using context_to_dcs_id_map = std::unordered_map<std::string, int>;
 
 public:
+    /**
+     * @brief Construct a new Dcs Interface object
+     *
+     * @param rx_port UDP port to receive updates from DCS.
+     * @param tx_port UDP port to send commands to DCS.
+     */
     DcsInterface(const int rx_port, const int tx_port);
 
     /**
@@ -27,37 +46,21 @@ public:
     void register_dcs_monitor(const int dcs_id, const std::string &context);
 
     /**
-     * @brief Monitors DCS events and processes them, updating registered StreamDeck button instances.
+     * @brief Removes registration of a StreamDeck button monitoring the value of a DCS ID.
      *
+     * @param context Context identification of StreamDeck button registered to DCS ID updates.
      */
-    // TODO: add ESDConnectionManager &mConnectionManager as input to update.
-    void process_next_dcs_events();
+    void unregister_dcs_monitor(const std::string &context);
 
     /**
-     * @brief Handles key press using desired action and attributes specified from StreamDeck property instpector.
-     * 
-     * @param action     StreamDeck button instance type implying desired type of action.
-     * @param in_payload User-defined attributes extracted from StreamDeck button property inspector.
+     * @brief Receives DCS value updates, returning ID values which are monitored by a Streamdeck context.
+     *
+     * @return A vector of value updates for monitored DCS ID's and their registered context.
      */
-    void handle_key_down(const std::string action, const char *in_payload);
-
-    /**
-     * @brief Handles key release using desired action and attributes specified from StreamDeck property instpector.
-     * 
-     * @param action     StreamDeck button instance type implying desired type of action.
-     * @param in_payload User-defined attributes extracted from StreamDeck button property inspector.
-     */
-    void handle_key_up(const std::string action, const char *in_payload);
+    std::vector<DcsIdValueUpdate> get_next_dcs_update();
 
 private:
-    /**
-     * @brief Handles StreamDeck button updates to apply (if any) based on received DCS event.
-     * 
-     * @param dcs_id DCS ID with a received change in value.
-     * @param value  Updated value of the DCS ID.
-     */
-    void handle_dcs_event(const int dcs_id, const std::string value);
-
-    DcsSocket dcs_socket_;
-    dcs_id_to_context_map dcs_monitor_map_ = {};
+    DcsSocket dcs_socket_;                               // UDP Socket connection for communicating with DCS lua export scripts.
+    dcs_id_to_context_map registered_contexts_map_ = {}; // Maps DCS ID keys to registered Streamdeck contexts.
+    context_to_dcs_id_map active_contexts_map_ = {};     // Maps Streamdeck contexts to actively monitored DCS ID keys.
 };

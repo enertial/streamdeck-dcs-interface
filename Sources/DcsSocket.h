@@ -35,11 +35,11 @@ public:
      *
      * @param token_delimiter Character used to separate tokens from received buffer.
      * @param header_delimiter Character used to separate header from message contents in buffer.
-     * @param tokens Vector of tokens that received content is pushed to.
+     * @return Vector of string tokens parsed from received message.
      */
-    void DcsReceive(const char *token_delimiter, const char *header_delimiter, std::queue<std::string> &tokens);
+    std::vector<std::string> DcsReceive(const char *token_delimiter, const char *header_delimiter);
 
 private:
-    SOCKET socket_id_;      ///< Socket which is binded to the rx port.
-    sockaddr_in dest_port_; ///< UDP port address which will be transmitted to.
+    SOCKET socket_id_;      // Socket which is binded to the rx port.
+    sockaddr_in dest_port_; // UDP port address which will be transmitted to.
 };
