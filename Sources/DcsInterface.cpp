@@ -4,8 +4,6 @@
 
 #include "DcsInterface.h"
 
-#include <iostream> //TODO: delete after testing
-
 DcsInterface::DcsInterface(const int rx_port, const int tx_port)
     : dcs_socket_(rx_port, tx_port)
 {
@@ -37,29 +35,37 @@ void DcsInterface::unregister_dcs_monitor(const std::string &context)
 
 std::vector<DcsIdValueUpdate> DcsInterface::get_next_dcs_update()
 {
-    const char *token_delimiter = ":";
-    const char *header_delimiter = "*";
-    std::vector<std::string> tokens = dcs_socket_.DcsReceive(token_delimiter, header_delimiter);
-    std::vector<DcsIdValueUpdate> received_updates;
-    for (std::string token : tokens)
-    {
-        // Parse token string of the form:
-        //   "<dcs_id>=<reported_value>"
-        const std::string delim = "=";
-        const auto delim_loc = token.find(delim);
-        const int dcs_id = std::stoi(token.substr(0, delim_loc));
-        const std::string reported_value = token.substr(delim_loc + delim.size(), token.size());
+    // Receive next UDP message from DCS and strip header.
+    const char header_delimiter = '*'; // Header content ends in a '*'.
+    std::stringstream recv_msg = dcs_socket_.DcsReceive();
 
-        if (registered_contexts_map_.count(dcs_id) > 0)
+    std::vector<DcsIdValueUpdate> received_updates = {};
+    std::string token;
+    if (std::getline(recv_msg, token, header_delimiter))
+    {
+        const char token_delimiter = ':';
+        while (std::getline(recv_msg, token, token_delimiter))
         {
-            for (std::string context : registered_contexts_map_[dcs_id])
+            // Parse token string of the form:
+            //   "<dcs_id>=<reported_value>"
+            const std::string delim = "=";
+            const auto delim_loc = token.find(delim);
+            const int dcs_id = std::stoi(token.substr(0, delim_loc));
+            const std::string reported_value = token.substr(delim_loc + delim.size(), token.size());
+
+            // Push value update to vector if there are any contexts registered to it.
+            if (registered_contexts_map_.count(dcs_id) > 0)
             {
-                DcsIdValueUpdate value_update;
-                value_update.context = context;
-                value_update.dcs_id = dcs_id;
-                value_update.dcs_id_value = reported_value;
-                received_updates.push_back(value_update);
+                for (std::string context : registered_contexts_map_[dcs_id])
+                {
+                    DcsIdValueUpdate value_update;
+                    value_update.context = context;
+                    value_update.dcs_id = dcs_id;
+                    value_update.dcs_id_value = reported_value;
+                    received_updates.push_back(std::move(value_update));
+                };
             }
         }
     }
+    return received_updates;
 }

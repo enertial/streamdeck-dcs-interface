@@ -2,8 +2,7 @@
 
 #pragma once
 
-#include <string>
-#include <queue>
+#include <sstream>
 #include <winsock2.h>
 
 class DcsSocket
@@ -33,11 +32,9 @@ public:
     /**
      * @brief Reads the UDP buffer from DCS and adds received data to the queue of tokens.
      *
-     * @param token_delimiter Character used to separate tokens from received buffer.
-     * @param header_delimiter Character used to separate header from message contents in buffer.
-     * @return Vector of string tokens parsed from received message.
+     * @return String stream of received message from DCS.
      */
-    std::vector<std::string> DcsReceive(const char *token_delimiter, const char *header_delimiter);
+    std::stringstream DcsReceive();
 
 private:
     SOCKET socket_id_;      // Socket which is binded to the rx port.

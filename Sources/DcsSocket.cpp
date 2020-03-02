@@ -54,7 +54,7 @@ DcsSocket::~DcsSocket()
     WSACleanup();
 }
 
-std::vector<std::string> DcsSocket::DcsReceive(const char *token_delimiter, const char *header_delimiter)
+std::stringstream DcsSocket::DcsReceive()
 {
     // Sender address - dummy variable as it is unused outside recvfrom.
     sockaddr_in sender_addr;
@@ -64,22 +64,7 @@ std::vector<std::string> DcsSocket::DcsReceive(const char *token_delimiter, cons
     char msg[MAX_UDP_MSG_SIZE] = {};
     (void)recvfrom(socket_id_, msg, MAX_UDP_MSG_SIZE, 0, (SOCKADDR *)&sender_addr, &sender_addr_size);
 
-    // First remove header (up to header_delimiter) from received msg.
-    char *extracted_token;
-    char *dummy_token_storage = NULL;
-    extracted_token = strtok_s(msg, header_delimiter, &dummy_token_storage);
-
-    std::vector<std::string> tokens = {};
-    if (extracted_token != NULL)
-    {
-        // Parse message and push to tokens.
-        extracted_token = strtok_s(NULL, token_delimiter, &dummy_token_storage);
-        while (extracted_token != NULL)
-        {
-            tokens.push_back(extracted_token);
-            extracted_token = strtok_s(NULL, token_delimiter, &dummy_token_storage);
-        }
-    }
-
-    return tokens;
+    std::stringstream ss;
+    ss << msg;
+    return ss;
 }
