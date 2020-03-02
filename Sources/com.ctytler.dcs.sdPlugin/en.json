@@ -1,0 +1,8 @@
+{
+  "Description": "Provides interface to and from Digital Combat Simulator (DCS)",
+  "Name": "DCS Interface",
+  "com.ctytler.dcs.sdPlugin": {
+    "Name": "DCS Interface",
+    "Tooltip": "Allows reading status from and sending commands to DCS"
+  }
+}
