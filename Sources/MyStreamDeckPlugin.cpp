@@ -15,6 +15,7 @@
 
 #include "Common/ESDConnectionManager.h"
 #include "Common/EPLJSONUtils.h"
+#include "DcsInterfaceParameters.h"
 
 class CallBackTimer
 {
@@ -62,11 +63,11 @@ private:
 	std::thread _thd;
 };
 
-MyStreamDeckPlugin::MyStreamDeckPlugin()
+MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcsSendPort)
 {
 	mTimer = new CallBackTimer();
-	mTimer->start(2000, [this]() {
-		this->UpdateTimer();
+	mTimer->start(1, [this]() {
+		this->CheckDcsState();
 	});
 }
 
@@ -81,17 +82,18 @@ MyStreamDeckPlugin::~MyStreamDeckPlugin()
 	}
 }
 
-void MyStreamDeckPlugin::UpdateTimer()
+void MyStreamDeckPlugin::CheckDcsState()
 {
 	//
-	// Warning: UpdateTimer() is running in the timer thread
+	// Warning: CheckDcsState() is running in the timer thread
 	//
 	if (mConnectionManager != nullptr)
 	{
+		std::vector<DcsIdValueUpdate> dcs_updates = dcs_interface_.get_next_dcs_update();
 		mVisibleContextsMutex.lock();
-		for (const std::string &context : mVisibleContexts)
+		for (const DcsIdValueUpdate &dcs_update : dcs_updates)
 		{
-			mConnectionManager->SetTitle(button_title_, context, kESDSDKTarget_HardwareAndSoftware);
+			mConnectionManager->SetTitle(dcs_update.dcs_id_value, dcs_update.context, kESDSDKTarget_HardwareAndSoftware);
 		}
 		mVisibleContextsMutex.unlock();
 	}
@@ -142,21 +144,12 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::st
 	{
 		const auto export_id_str = EPLJSONUtils::GetStringByName(inPayload, "value");
 
-		// TODO: remove after testing - temporarily just shows the received value in Button title.
-		if (mConnectionManager != nullptr)
-		{
-			mVisibleContextsMutex.lock();
-			mConnectionManager->SetTitle(export_id_str, inContext, kESDSDKTarget_HardwareAndSoftware);
-			mVisibleContextsMutex.unlock();
-		}
+		// Unregister any prior monitoring.
+		dcs_interface_.unregister_dcs_monitor(inContext);
 
-		if (export_id_str.empty())
+		if (!export_id_str.empty())
 		{
-			// Unregister any existing export_id for current context from DCS monitor.
-		}
-		else
-		{
-			// Register export_id with DCS monitor.
+			dcs_interface_.register_dcs_monitor(std::stoi(export_id_str), inContext);
 		}
 	}
 }

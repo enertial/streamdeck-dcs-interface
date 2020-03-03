@@ -11,6 +11,7 @@
 //==============================================================================
 
 #include "Common/ESDBasePlugin.h"
+#include "DcsInterface.h"
 #include <mutex>
 
 class CallBackTimer;
@@ -39,7 +40,7 @@ public:
 	void SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) override;
 
 private:
-	void UpdateTimer();
+	void CheckDcsState();
 
 	std::mutex mVisibleContextsMutex;
 	std::set<std::string> mVisibleContexts;
@@ -48,4 +49,5 @@ private:
 	std::string button_title_ = "";
 
 	CallBackTimer *mTimer;
+	DcsInterface dcs_interface_;
 };
