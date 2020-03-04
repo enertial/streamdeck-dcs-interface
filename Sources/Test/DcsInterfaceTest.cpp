@@ -6,37 +6,75 @@
 namespace test
 {
 
-TEST(DcsInterfaceTest, TestName)
+const std::string kDcsListenerPort = "1901";   // Port number to receive DCS updates from.
+const std::string kDcsSendPort = "1902";       // Port number which DCS commands will be sent to.
+const std::string kDcsIpAddress = "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
+
+TEST(DcsInterfaceTest, unregister_monitor_while_empty)
 {
-    const std::string kDcsListenerSocket = "1625";
-    const std::string kDcsSendSocket = "26027";
-    const std::string kDcsSendIpAddress = "127.0.0.1";
-    DcsInterface dcs_interface(kDcsListenerSocket, kDcsSendSocket, kDcsSendIpAddress);
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
 
-    // Test that calling unregister with an unregistred string does not cause issue.
-    dcs_interface.unregister_dcs_monitor("dummy");
+    // Test that calling unregister with an empty registry does not cause issue.
+    EXPECT_NO_THROW(dcs_interface.unregister_dcs_monitor("dummy_context"));
+}
 
-    dcs_interface.register_dcs_monitor(761, "12345");
-    dcs_interface.register_dcs_monitor(2026, "22345");
-    dcs_interface.register_dcs_monitor(2027, "32325");
-    dcs_interface.register_dcs_monitor(2028, "72325");
-    dcs_interface.register_dcs_monitor(765, "42345");
-    dcs_interface.unregister_dcs_monitor("32325");
+TEST(DcsInterfaceTest, registered_dcs_id_monitor)
+{
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
 
-    // Test that data with the monitored DCS ID comes through.
-    for (int i = 0; i < 300; ++i)
-    {
-        std::vector<DcsIdValueUpdate> output = dcs_interface.get_next_dcs_update();
+    // Open a socket that will mock Send/Receive messages from DCS.
+    DcsSocket mock_DCS(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
 
-        for (const auto &update : output)
-        {
-            std::cout << "Received update - DCS ID " << update.dcs_id
-                      << " = " << update.dcs_id_value
-                      << "  [Context " << update.context << "]" << std::endl;
-        }
-    }
+    // Register multiple (DCS ID : Context) pairs.
+    dcs_interface.register_dcs_monitor(761, "context_for_761");
+    dcs_interface.register_dcs_monitor(2026, "context_for_2026");
+    dcs_interface.register_dcs_monitor(2027, "context_for_2027");
+    dcs_interface.register_dcs_monitor(765, "context_for_765");
 
-    EXPECT_TRUE(true);
+    // Send a single message from mock DCS that contains updates for all registered DCS ID's.
+    const std::string mock_DCS_message = "header*761=1:765=2:2026=3:2027=4";
+    mock_DCS.DcsSend(mock_DCS_message);
+    std::vector<DcsIdValueUpdate> update = dcs_interface.get_next_dcs_update();
+
+    // Expect that 4 total value updates were returned.
+    EXPECT_EQ(update.size(), 4);
+
+    // Expect that DCS ID value updates are received in the order they were sent.
+    EXPECT_EQ(update[0].dcs_id, 761);
+    EXPECT_EQ(update[0].dcs_id_value, "1");
+    EXPECT_EQ(update[0].context, "context_for_761");
+
+    EXPECT_EQ(update[1].dcs_id, 765);
+    EXPECT_EQ(update[1].dcs_id_value, "2");
+    EXPECT_EQ(update[1].context, "context_for_765");
+
+    EXPECT_EQ(update[2].dcs_id, 2026);
+    EXPECT_EQ(update[2].dcs_id_value, "3");
+    EXPECT_EQ(update[2].context, "context_for_2026");
+
+    EXPECT_EQ(update[3].dcs_id, 2027);
+    EXPECT_EQ(update[3].dcs_id_value, "4");
+    EXPECT_EQ(update[3].context, "context_for_2027");
+
+    // Unregister some of the DCS ID's from being monitored.
+    dcs_interface.unregister_dcs_monitor("context_for_2027");
+    dcs_interface.unregister_dcs_monitor("context_for_761");
+
+    // Send another message update with all DCS ID's still present.
+    mock_DCS.DcsSend(mock_DCS_message);
+    update = dcs_interface.get_next_dcs_update();
+
+    // Expect that 2 total value updates were returned.
+    EXPECT_EQ(update.size(), 2);
+
+    // Expect that DCS ID value updates are received in the order they were sent.
+    EXPECT_EQ(update[0].dcs_id, 765);
+    EXPECT_EQ(update[0].dcs_id_value, "2");
+    EXPECT_EQ(update[0].context, "context_for_765");
+
+    EXPECT_EQ(update[1].dcs_id, 2026);
+    EXPECT_EQ(update[1].dcs_id_value, "3");
+    EXPECT_EQ(update[1].context, "context_for_2026");
 }
 
 } // namespace test

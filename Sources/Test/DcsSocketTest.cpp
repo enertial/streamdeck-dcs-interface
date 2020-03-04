@@ -5,22 +5,27 @@
 
 namespace test
 {
-TEST(DcsSocketTest, print_out_some_data)
+TEST(DcsSocketTest, send_and_receive)
 {
-	// This is not a true test, but allows visibility that the socket connection is working.
-	// Requires that something (DCS) is actively publishing to the specified port.
-	const std::string kDcsListenerSocket = "1625";
-	const std::string kDcsSendSocket = "26027";
-	const std::string kDcsSendIpAddress = "127.0.0.1";
-	DcsSocket dcs_socket(kDcsListenerSocket, kDcsSendSocket, kDcsSendIpAddress);
+	const std::string common_port = "1789";
+	DcsSocket sender_socket("1788", common_port, "127.0.0.1");
+	DcsSocket receiver_socket(common_port, "1790", "127.0.0.1");
 
-	// Listen to 10 messages.
-	for (int i = 0; i < 10; ++i)
-	{
-		std::cout << "Messdage: " << std::endl;
-		std::stringstream ss_out = dcs_socket.DcsReceive();
-		std::cout << ss_out.str();
-	}
-	EXPECT_TRUE(true);
+	const std::string test_message = "test send from one DcsSocket to another.";
+
+	sender_socket.DcsSend(test_message);
+	std::stringstream ss_received = receiver_socket.DcsReceive();
+	EXPECT_EQ(ss_received.str(), test_message);
+}
+
+TEST(DcsSocketTest, unavailable_port_bind)
+{
+	const std::string rx_port = "1801";
+	const std::string tx_port = "1802";
+	const std::string ip_address = "127.0.0.1";
+	DcsSocket first_socket(rx_port, tx_port, ip_address);
+
+	// Expect exception thrown if try to bind a new socket to same rx_port.
+	EXPECT_ANY_THROW(DcsSocket duplicate_socket(rx_port, tx_port, ip_address));
 }
 } // namespace test

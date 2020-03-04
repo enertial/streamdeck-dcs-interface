@@ -42,7 +42,7 @@ public:
      * 
      * @param message String to send.
      */
-    int DcsSend(const std::string &message);
+    void DcsSend(const std::string &message);
 
 private:
     SOCKET socket_id_;    // Socket which is binded to the rx port.

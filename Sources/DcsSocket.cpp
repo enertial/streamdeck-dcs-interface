@@ -71,12 +71,12 @@ std::stringstream DcsSocket::DcsReceive()
     return ss;
 }
 
-int DcsSocket::DcsSend(const std::string &message)
+void DcsSocket::DcsSend(const std::string &message)
 {
-    return sendto(socket_id_,
-                  message.c_str(),
-                  static_cast<int>(message.length()),
-                  0,
-                  dest_port_->ai_addr,
-                  static_cast<int>(dest_port_->ai_addrlen));
+    (void)sendto(socket_id_,
+                 message.c_str(),
+                 static_cast<int>(message.length()),
+                 0,
+                 dest_port_->ai_addr,
+                 static_cast<int>(dest_port_->ai_addrlen));
 }
