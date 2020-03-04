@@ -8,9 +8,7 @@
 
 #include <WS2tcpip.h>
 
-constexpr int MAX_UDP_MSG_SIZE = 1024; // Maximum UDP buffer size to read.
-
-DcsSocket::DcsSocket(const int rx_port, const int tx_port)
+DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
 {
     // Initialize Windows Sockets DLL to version 2.2.
     WSADATA wsaData;
@@ -21,16 +19,21 @@ DcsSocket::DcsSocket(const int rx_port, const int tx_port)
         throw std::runtime_error(error_msg);
     }
 
+    // Define socket address info settings for UDP protocol.
+    addrinfo hints;
+    memset(&hints, 0, sizeof(hints));
+    hints.ai_family = AF_INET;
+    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_flags = AI_PASSIVE;
+
     // Define local receive port.
-    sockaddr_in local_port;
-    memset(&local_port, 0, sizeof(local_port));
-    local_port.sin_family = AF_INET;
-    local_port.sin_addr.s_addr = INADDR_ANY;
-    local_port.sin_port = htons(rx_port);
+    addrinfo *local_port;
+    getaddrinfo(ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
 
     // Bind local socket to receive port.
-    socket_id_ = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-    const auto result = bind(socket_id_, reinterpret_cast<const sockaddr *>(&local_port), sizeof(local_port));
+    socket_id_ = socket(local_port->ai_family, local_port->ai_socktype, local_port->ai_protocol);
+    const auto result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
+    freeaddrinfo(local_port);
 
     if (result == SOCKET_ERROR)
     {
@@ -40,16 +43,14 @@ DcsSocket::DcsSocket(const int rx_port, const int tx_port)
         throw std::runtime_error(error_msg);
     }
 
-    // Define destination port for transmit.
-    memset(&dest_port_, 0, sizeof(dest_port_));
-    dest_port_.sin_family = AF_INET;
-    dest_port_.sin_addr.s_addr = INADDR_ANY;
-    dest_port_.sin_port = htons(tx_port);
+    // Define send destination port.
+    getaddrinfo(ip_address.c_str(), tx_port.c_str(), &hints, &dest_port_);
 }
 
 DcsSocket::~DcsSocket()
 {
     // Delete opened socket.
+    freeaddrinfo(dest_port_);
     closesocket(socket_id_);
     WSACleanup();
 }
@@ -61,10 +62,21 @@ std::stringstream DcsSocket::DcsReceive()
     int sender_addr_size = sizeof(sender_addr);
 
     // Receive next UDP message.
+    constexpr int MAX_UDP_MSG_SIZE = 1024; // Maximum UDP buffer size to read.
     char msg[MAX_UDP_MSG_SIZE] = {};
     (void)recvfrom(socket_id_, msg, MAX_UDP_MSG_SIZE, 0, (SOCKADDR *)&sender_addr, &sender_addr_size);
 
     std::stringstream ss;
     ss << msg;
     return ss;
+}
+
+int DcsSocket::DcsSend(const std::string &message)
+{
+    return sendto(socket_id_,
+                  message.c_str(),
+                  static_cast<int>(message.length()),
+                  0,
+                  dest_port_->ai_addr,
+                  static_cast<int>(dest_port_->ai_addrlen));
 }

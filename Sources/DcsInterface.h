@@ -32,8 +32,9 @@ public:
      *
      * @param rx_port UDP port to receive updates from DCS.
      * @param tx_port UDP port to send commands to DCS.
+     * @param ip_address UDP IP address to send commands to DCS (Default is LocalHost).
      */
-    DcsInterface(const int rx_port, const int tx_port);
+    DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address);
 
     /**
      * @brief Registers a new instance of a StreamDeck button that wishes to monitor the value of a given DCS ID.

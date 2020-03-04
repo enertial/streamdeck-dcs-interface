@@ -14,8 +14,9 @@ public:
      *
      * @param rx_port UDP receive port.
      * @param tx_port UDP transmit port.
+     * @param tx_ip_address UDP transmit IP address.
      */
-    DcsSocket(const int rx_port, const int tx_port);
+    DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address);
 
     /**
      * @brief Destroy the Dcs Socket object
@@ -36,7 +37,14 @@ public:
      */
     std::stringstream DcsReceive();
 
+    /**
+     * @brief Sends a UDP message to the destination port.
+     * 
+     * @param message String to send.
+     */
+    int DcsSend(const std::string &message);
+
 private:
-    SOCKET socket_id_;      // Socket which is binded to the rx port.
-    sockaddr_in dest_port_; // UDP port address which will be transmitted to.
+    SOCKET socket_id_;    // Socket which is binded to the rx port.
+    addrinfo *dest_port_; // UDP address info for port which will be transmitted to.
 };

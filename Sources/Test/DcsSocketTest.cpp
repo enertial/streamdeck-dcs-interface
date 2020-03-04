@@ -9,9 +9,10 @@ TEST(DcsSocketTest, print_out_some_data)
 {
 	// This is not a true test, but allows visibility that the socket connection is working.
 	// Requires that something (DCS) is actively publishing to the specified port.
-	constexpr int kDcsListenerSocket = 1625;
-	constexpr int kDcsSendSocket = 26027;
-	DcsSocket dcs_socket(kDcsListenerSocket, kDcsSendSocket);
+	const std::string kDcsListenerSocket = "1625";
+	const std::string kDcsSendSocket = "26027";
+	const std::string kDcsSendIpAddress = "127.0.0.1";
+	DcsSocket dcs_socket(kDcsListenerSocket, kDcsSendSocket, kDcsSendIpAddress);
 
 	// Listen to 10 messages.
 	for (int i = 0; i < 10; ++i)

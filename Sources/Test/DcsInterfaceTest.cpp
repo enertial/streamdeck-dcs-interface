@@ -8,9 +8,10 @@ namespace test
 
 TEST(DcsInterfaceTest, TestName)
 {
-    constexpr int kDcsListenerSocket = 1625;
-    constexpr int kDcsSendSocket = 26027;
-    DcsInterface dcs_interface(kDcsListenerSocket, kDcsSendSocket);
+    const std::string kDcsListenerSocket = "1625";
+    const std::string kDcsSendSocket = "26027";
+    const std::string kDcsSendIpAddress = "127.0.0.1";
+    DcsInterface dcs_interface(kDcsListenerSocket, kDcsSendSocket, kDcsSendIpAddress);
 
     // Test that calling unregister with an unregistred string does not cause issue.
     dcs_interface.unregister_dcs_monitor("dummy");

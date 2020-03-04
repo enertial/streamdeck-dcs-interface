@@ -63,7 +63,7 @@ private:
 	std::thread _thd;
 };
 
-MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcsSendPort)
+MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcsSendPort, kDcsSendIpAddress)
 {
 	mTimer = new CallBackTimer();
 	mTimer->start(1, [this]() {

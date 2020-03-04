@@ -4,8 +4,8 @@
 
 #include "DcsInterface.h"
 
-DcsInterface::DcsInterface(const int rx_port, const int tx_port)
-    : dcs_socket_(rx_port, tx_port)
+DcsInterface::DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
+    : dcs_socket_(rx_port, tx_port, ip_address)
 {
 }
 
