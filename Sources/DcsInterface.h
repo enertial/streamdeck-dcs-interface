@@ -65,7 +65,7 @@ public:
      * @param device_id ID number of the device.
      * @param value     Value to set the button to.
      */
-    void send_dcs_command(const int button_id, const int device_id, const std::string value);
+    void send_dcs_command(const int button_id, const std::string &device_id, const std::string &value);
 
 private:
     DcsSocket dcs_socket_;                               // UDP Socket connection for communicating with DCS lua export scripts.

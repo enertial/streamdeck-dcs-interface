@@ -149,7 +149,7 @@
      * @param {String} updated_value New value set by Streamdeck user.
      */
     function registerExportIdUpdate(updated_item, updated_value) {
-      console.log(updated_item, updated_value);
+      console.log("Register DCS ID: ", updated_item, updated_value);
       if (!isNaN(updated_value)) {
         var payload = {
           key: updated_item,

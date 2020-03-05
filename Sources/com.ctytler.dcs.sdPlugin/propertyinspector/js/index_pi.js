@@ -158,13 +158,15 @@ $SD.on('piDataChanged', (returnValue) => {
     console.log('%c%s', 'color: white; background: blue}; font-size: 15px;', 'piDataChanged');
     console.log(returnValue);
 
-    /* SAVE THE VALUE TO SETTINGS */
-    saveSettings(returnValue);
-
     /* For any export_id_* fields, register mapping */
-    if (returnValue.hasOwnProperty('key') && returnValue.key.contains("export_id")) {
+    if (returnValue.hasOwnProperty('key') && returnValue.key.includes("export_id")) {
         registerExportIdUpdate(returnValue.key, returnValue.value);
     }
+
+    //if (returnValue.hasOwnProperty('key') && returnValue.key == "save_settings_button") {
+    /* SAVE THE VALUE TO SETTINGS */
+    saveSettings(returnValue);
+    //}
 
     /* SEND THE VALUES TO PLUGIN */
     // sendValueToPlugin(returnValue, 'sdpi_collection');
@@ -192,7 +194,7 @@ function saveSettings(sdpi_collection) {
     if (typeof sdpi_collection !== 'object') return;
 
     if (sdpi_collection.hasOwnProperty('key') && sdpi_collection.key != '') {
-        if (sdpi_collection.value && sdpi_collection.value !== undefined) {
+        if (sdpi_collection.value && sdpi_collection.value !== undefined && !isNaN(sdpi_collection.value)) {
             console.log(sdpi_collection.key, " => ", sdpi_collection.value);
             settings[sdpi_collection.key] = sdpi_collection.value;
             console.log('setSettings....', settings);

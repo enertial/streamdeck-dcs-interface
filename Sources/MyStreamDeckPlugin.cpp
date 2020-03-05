@@ -101,12 +101,28 @@ void MyStreamDeckPlugin::CheckDcsState()
 
 void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-	// Nothing to do
+	json settings;
+	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+	const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
+	const std::string device_id = EPLJSONUtils::GetStringByName(settings, "device_id");
+	const std::string value = EPLJSONUtils::GetStringByName(settings, "press_value");
+	if (!button_id.empty() && !device_id.empty() && !value.empty())
+	{
+		dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
+	}
 }
 
 void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-	// Nothing to do
+	json settings;
+	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+	const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
+	const std::string device_id = EPLJSONUtils::GetStringByName(settings, "device_id");
+	const std::string value = EPLJSONUtils::GetStringByName(settings, "release_value");
+	if (!button_id.empty() && !device_id.empty() && !value.empty())
+	{
+		dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
+	}
 }
 
 void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)

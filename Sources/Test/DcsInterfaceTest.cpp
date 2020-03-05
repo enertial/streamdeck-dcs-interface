@@ -85,7 +85,7 @@ TEST(DcsInterfaceTest, send_dcs_command)
     DcsSocket mock_DCS(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
 
     const int button_id = 250;
-    const int device_id = 24;
+    const std::string device_id = "24";
     const std::string value = "1";
     // Message is sent prepended with "C" prepended and 3000 added to Button ID.
     const std::string expected_msg_buffer = "C24,3250,1";
