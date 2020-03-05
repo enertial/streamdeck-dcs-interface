@@ -46,7 +46,8 @@
         {
           "Image": "images/display_icon",
           "TitleAlignment": "middle",
-          "FontSize": "17"
+          "FontFamily": "Impact",
+          "FontSize": "18"
         }
       ],
       "SupportedInMultiActions": false,

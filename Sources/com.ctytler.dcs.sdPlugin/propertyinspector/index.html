@@ -24,6 +24,17 @@
             the control.
           -->
 
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Settings</div>
+      <!-- Note - "Save" button does not actually do anything just makes sure user deselects boxes to save all info.-->
+      <button class="sdpi-item-value" id="save_settings_button">
+        Save Settings
+      </button>
+      <button class="sdpi-item-value" id="external_help_window_button" onclick="callbackHelpButtonPress()">
+        Help
+      </button>
+    </div>
+
     <details>
       <summary>DCS Command (on Button Press) Settings</summary>
 
@@ -56,8 +67,7 @@
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
         <input id="export_id_value_monitor" class="sdpi-item-value" type="text" value=""
-          placeholder="DCS ID number of Function to Monitor"
-          onchange="registerExportIdUpdate(id, event.target.value)" />
+          placeholder="DCS ID number of Function to Monitor" />
       </div>
 
       <div class="sdpi-item" id="select_change_condition">
@@ -82,34 +92,17 @@
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
         <input id="export_id_string_monitor" class="sdpi-item-value" type="text" value=""
-          placeholder="DCS ID number of Function to Monitor"
-          onchange="registerExportIdUpdate(id, event.target.value)" />
+          placeholder="DCS ID number of Function to Monitor" />
       </div>
-
-      <details>
-        <summary>details...</summary>
-        <p>
-          This will display the text published by DCS for the provided DCS
-          function. The font settings can be customized with the "Title"
-          section, but the text field for "Title:" in StreamDeck button
-          settings must be kept blank.<br />
-          Example use: UFC Displays
-        </p>
-      </details>
     </details>
-
-    <div class="sdpi-item">
-      <div class="sdpi-item-label">Settings</div>
-      <button class="sdpi-item-value" id="external_help_window_button" onclick="callbackHelpButtonPress()">
-        Help / Documentation
-      </button>
-    </div>
 
     <!-- END OF SDPI-WRAPPER -->
   </div>
 
   <div class="sdpi-info-label hidden" style="top: -1000;" value=""></div>
   <script src="js/common.js"></script>
+  <script src="js/common_pi.js"></script>
+  <script src="js/index_pi.js"></script>
 
   <script>
     /**
