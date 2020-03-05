@@ -77,4 +77,22 @@ TEST(DcsInterfaceTest, registered_dcs_id_monitor)
     EXPECT_EQ(update[1].context, "context_for_2026");
 }
 
+TEST(DcsInterfaceTest, send_dcs_command)
+{
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
+
+    // Open a socket that will mock Send/Receive messages from DCS.
+    DcsSocket mock_DCS(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
+
+    const int button_id = 250;
+    const int device_id = 24;
+    const std::string value = "1";
+    // Message is sent prepended with "C" prepended and 3000 added to Button ID.
+    const std::string expected_msg_buffer = "C24,3250,1";
+    dcs_interface.send_dcs_command(button_id, device_id, value);
+
+    std::stringstream ss_received = mock_DCS.DcsReceive();
+    EXPECT_EQ(ss_received.str(), expected_msg_buffer);
+}
+
 } // namespace test

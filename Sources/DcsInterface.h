@@ -58,6 +58,15 @@ public:
      */
     std::vector<DcsIdValueUpdate> get_next_dcs_update();
 
+    /**
+     * @brief Sends a message to DCS to command a change in a clickable data item.
+     *
+     * @param button_id ID number of the button.
+     * @param device_id ID number of the device.
+     * @param value     Value to set the button to.
+     */
+    void send_dcs_command(const int button_id, const int device_id, const std::string value);
+
 private:
     DcsSocket dcs_socket_;                               // UDP Socket connection for communicating with DCS lua export scripts.
     dcs_id_to_context_map registered_contexts_map_ = {}; // Maps DCS ID keys to registered Streamdeck contexts.
