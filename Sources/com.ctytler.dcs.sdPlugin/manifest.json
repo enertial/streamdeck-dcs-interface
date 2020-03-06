@@ -7,11 +7,13 @@
         {
           "Image": "images/switch_down",
           "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
           "FontSize": "17"
         },
         {
           "Image": "images/switch_up",
           "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
           "FontSize": "17"
         }
       ],
@@ -27,11 +29,13 @@
         {
           "Image": "images/button_light_off",
           "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
           "FontSize": "17"
         },
         {
           "Image": "images/button_light_on",
           "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
           "FontSize": "17"
         }
       ],
@@ -44,10 +48,11 @@
       "Name": "DCS Static Button/Display",
       "States": [
         {
-          "Image": "images/display_icon",
+          "Image": "images/display_wide",
           "TitleAlignment": "middle",
-          "FontFamily": "Impact",
-          "FontSize": "18"
+          "FontFamily": "Tahoma",
+          "FontSize": "18",
+          "TitleColor": "#14e68f"
         }
       ],
       "SupportedInMultiActions": false,

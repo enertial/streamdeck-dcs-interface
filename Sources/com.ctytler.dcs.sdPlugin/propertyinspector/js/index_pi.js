@@ -194,7 +194,7 @@ function saveSettings(sdpi_collection) {
     if (typeof sdpi_collection !== 'object') return;
 
     if (sdpi_collection.hasOwnProperty('key') && sdpi_collection.key != '') {
-        if (sdpi_collection.value && sdpi_collection.value !== undefined && !isNaN(sdpi_collection.value)) {
+        if (sdpi_collection.value && sdpi_collection.value !== undefined) {
             console.log(sdpi_collection.key, " => ", sdpi_collection.value);
             settings[sdpi_collection.key] = sdpi_collection.value;
             console.log('setSettings....', settings);

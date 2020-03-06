@@ -45,9 +45,6 @@ private:
 	std::mutex mVisibleContextsMutex;
 	std::set<std::string> mVisibleContexts;
 
-	int internal_counter = 0;
-	std::string button_title_ = "";
-
 	CallBackTimer *mTimer;
 	DcsInterface dcs_interface_;
 };
