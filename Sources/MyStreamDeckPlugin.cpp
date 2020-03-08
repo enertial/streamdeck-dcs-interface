@@ -89,7 +89,6 @@ void MyStreamDeckPlugin::CheckDcsState()
 	//
 	if (mConnectionManager != nullptr)
 	{
-		std::vector<DcsIdValueUpdate> dcs_updates = dcs_interface_.get_next_dcs_update();
 		mVisibleContextsMutex.lock();
 		//for (const DcsIdValueUpdate &dcs_update : dcs_updates)
 		//{
