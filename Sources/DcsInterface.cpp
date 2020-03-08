@@ -9,36 +9,13 @@ DcsInterface::DcsInterface(const std::string &rx_port, const std::string &tx_por
 {
 }
 
-void DcsInterface::register_dcs_monitor(const int dcs_id, const std::string &context)
-{
-    if (registered_contexts_map_.count(dcs_id) == 0)
-    {
-        registered_contexts_map_[dcs_id] = std::unordered_set<std::string>();
-    }
-    registered_contexts_map_[dcs_id].insert(context);
-    active_contexts_map_[context] = dcs_id;
-}
-
-void DcsInterface::unregister_dcs_monitor(const std::string &context)
-{
-    if (active_contexts_map_.count(context) > 0)
-    {
-        const int registered_dcs_id = active_contexts_map_[context];
-        registered_contexts_map_[registered_dcs_id].erase(context);
-        if (registered_contexts_map_[registered_dcs_id].empty())
-        {
-            registered_contexts_map_.erase(registered_dcs_id);
-        }
-        active_contexts_map_.erase(context);
-    }
-}
-
 std::vector<DcsIdValueUpdate> DcsInterface::get_next_dcs_update()
 {
     // Receive next UDP message from DCS and strip header.
     const char header_delimiter = '*'; // Header content ends in a '*'.
     std::stringstream recv_msg = dcs_socket_.DcsReceive();
 
+    // Iterate through tokens received from single message.
     std::vector<DcsIdValueUpdate> received_updates = {};
     std::string token;
     if (std::getline(recv_msg, token, header_delimiter))
@@ -53,18 +30,10 @@ std::vector<DcsIdValueUpdate> DcsInterface::get_next_dcs_update()
             const int dcs_id = std::stoi(token.substr(0, delim_loc));
             const std::string reported_value = token.substr(delim_loc + delim.size(), token.size());
 
-            // Push value update to vector if there are any contexts registered to it.
-            if (registered_contexts_map_.count(dcs_id) > 0)
-            {
-                for (std::string context : registered_contexts_map_[dcs_id])
-                {
-                    DcsIdValueUpdate value_update;
-                    value_update.context = context;
-                    value_update.dcs_id = dcs_id;
-                    value_update.dcs_id_value = reported_value;
-                    received_updates.push_back(std::move(value_update));
-                };
-            }
+            DcsIdValueUpdate value_update;
+            value_update.dcs_id = dcs_id;
+            value_update.dcs_id_value = reported_value;
+            received_updates.push_back(std::move(value_update));
         }
     }
     return received_updates;
@@ -74,4 +43,9 @@ void DcsInterface::send_dcs_command(const int button_id, const std::string &devi
 {
     const std::string message_assembly = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + value;
     dcs_socket_.DcsSend(message_assembly);
+}
+
+void DcsInterface::clear_game_state()
+{
+    current_game_state_.clear();
 }

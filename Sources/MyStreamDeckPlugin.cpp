@@ -91,10 +91,10 @@ void MyStreamDeckPlugin::CheckDcsState()
 	{
 		std::vector<DcsIdValueUpdate> dcs_updates = dcs_interface_.get_next_dcs_update();
 		mVisibleContextsMutex.lock();
-		for (const DcsIdValueUpdate &dcs_update : dcs_updates)
-		{
-			mConnectionManager->SetTitle(dcs_update.dcs_id_value, dcs_update.context, kESDSDKTarget_HardwareAndSoftware);
-		}
+		//for (const DcsIdValueUpdate &dcs_update : dcs_updates)
+		//{
+		//	mConnectionManager->SetTitle(dcs_update.dcs_id_value, dcs_update.context, kESDSDKTarget_HardwareAndSoftware);
+		//}
 		mVisibleContextsMutex.unlock();
 	}
 }
@@ -159,13 +159,5 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::st
 	if (event == "updateRegisteredExportId")
 	{
 		const auto export_id_str = EPLJSONUtils::GetStringByName(inPayload, "value");
-
-		// Unregister any prior monitoring.
-		dcs_interface_.unregister_dcs_monitor(inContext);
-
-		if (!export_id_str.empty())
-		{
-			dcs_interface_.register_dcs_monitor(std::stoi(export_id_str), inContext);
-		}
 	}
 }
