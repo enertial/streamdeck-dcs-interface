@@ -7,18 +7,28 @@
 #include "Common/EPLJSONUtils.h"
 #include "Utilities.h"
 
-StreamdeckContext::StreamdeckContext(ContextId context, json &settings)
+StreamdeckContext::StreamdeckContext(std::string context)
+{
+    context_ = context;
+}
+
+StreamdeckContext::StreamdeckContext(std::string context, json &settings)
 {
     context_ = context;
     updateContextSettings(settings);
 }
 
-bool StreamdeckContext::operator==(const ContextId &rhs) const
+bool StreamdeckContext::operator==(const StreamdeckContext &rhs) const
 {
-    return (context_ == rhs);
+    return (context_ == rhs.context_);
 }
 
-void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager &mConnectionManager)
+bool StreamdeckContext::operator<(const StreamdeckContext &rhs) const
+{
+    return (context_ < rhs.context_);
+}
+
+void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
     if (compare_monitor_is_set_)
     {
@@ -39,17 +49,17 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
 
         if (set_context_state_to_second)
         {
-            mConnectionManager.SetState(1, context_);
+            mConnectionManager->SetState(1, context_);
         }
         else
         {
-            mConnectionManager.SetState(0, context_);
+            mConnectionManager->SetState(0, context_);
         }
     }
 
     if (string_monitor_is_set_)
     {
-        mConnectionManager.SetTitle(dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_), context_, kESDSDKTarget_HardwareAndSoftware);
+        mConnectionManager->SetTitle(dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_), context_, kESDSDKTarget_HardwareAndSoftware);
     }
 }
 

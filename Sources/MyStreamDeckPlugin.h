@@ -12,6 +12,7 @@
 
 #include "Common/ESDBasePlugin.h"
 #include "DcsInterface.h"
+#include "StreamdeckContext.h"
 #include <mutex>
 
 class CallBackTimer;
@@ -40,10 +41,10 @@ public:
 	void SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) override;
 
 private:
-	void CheckDcsState();
+	void UpdateFromGameState();
 
 	std::mutex mVisibleContextsMutex;
-	std::set<std::string> mVisibleContexts;
+	std::set<StreamdeckContext> mVisibleContexts;
 
 	CallBackTimer *mTimer;
 	DcsInterface dcs_interface_;

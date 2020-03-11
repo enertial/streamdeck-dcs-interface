@@ -67,7 +67,7 @@ MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcs
 {
 	mTimer = new CallBackTimer();
 	mTimer->start(1, [this]() {
-		this->CheckDcsState();
+		this->UpdateFromGameState();
 	});
 }
 
@@ -82,18 +82,20 @@ MyStreamDeckPlugin::~MyStreamDeckPlugin()
 	}
 }
 
-void MyStreamDeckPlugin::CheckDcsState()
+void MyStreamDeckPlugin::UpdateFromGameState()
 {
 	//
-	// Warning: CheckDcsState() is running in the timer thread
+	// Warning: UpdateFromGameState() is running in the timer thread
 	//
+	dcs_interface_.update_dcs_state();
+
 	if (mConnectionManager != nullptr)
 	{
 		mVisibleContextsMutex.lock();
-		//for (const DcsIdValueUpdate &dcs_update : dcs_updates)
-		//{
-		//	mConnectionManager->SetTitle(dcs_update.dcs_id_value, dcs_update.context, kESDSDKTarget_HardwareAndSoftware);
-		//}
+		for (StreamdeckContext elem : mVisibleContexts)
+		{
+			elem.updateContextState(dcs_interface_, mConnectionManager);
+		}
 		mVisibleContextsMutex.unlock();
 	}
 }
@@ -128,7 +130,9 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction, const 
 {
 	// Remember the context
 	mVisibleContextsMutex.lock();
-	mVisibleContexts.insert(inContext);
+	json settings;
+	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+	mVisibleContexts.insert(StreamdeckContext(inContext, settings));
 	mVisibleContextsMutex.unlock();
 }
 
@@ -136,7 +140,7 @@ void MyStreamDeckPlugin::WillDisappearForAction(const std::string &inAction, con
 {
 	// Remove the context
 	mVisibleContextsMutex.lock();
-	mVisibleContexts.erase(inContext);
+	mVisibleContexts.erase(StreamdeckContext(inContext));
 	mVisibleContextsMutex.unlock();
 }
 
@@ -153,10 +157,14 @@ void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID)
 void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
 
-	const auto event = EPLJSONUtils::GetStringByName(inPayload, "event");
-
-	if (event == "updateRegisteredExportId")
+	mVisibleContextsMutex.lock();
+	json settings;
+	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+	auto streamdeck_context = mVisibleContexts.find(StreamdeckContext(inContext));
+	if (streamdeck_context != mVisibleContexts.end())
 	{
-		const auto export_id_str = EPLJSONUtils::GetStringByName(inPayload, "value");
+		StreamdeckContext ctx = *streamdeck_context;
+		ctx.updateContextSettings(settings);
 	}
+	mVisibleContextsMutex.unlock();
 }
