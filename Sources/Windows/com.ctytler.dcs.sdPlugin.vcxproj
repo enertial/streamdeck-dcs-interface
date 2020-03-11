@@ -189,6 +189,8 @@
     <ClInclude Include="..\DcsInterface.h" />
     <ClInclude Include="..\DcsSocket.h" />
     <ClInclude Include="..\DcsInterfaceParameters.h" />
+    <ClInclude Include="..\Utilities.h" />
+    <ClInclude Include="..\StreamdeckContext.h" />
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -225,6 +227,7 @@
     </ClCompile>
     <ClCompile Include="..\DcsInterface.cpp" />
     <ClCompile Include="..\DcsSocket.cpp" />
+    <ClCompile Include="..\StreamdeckContext.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

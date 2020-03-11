@@ -3,6 +3,7 @@
 #include "pch.h"
 
 #include "DcsInterface.h"
+#include "Utilities.h"
 
 DcsInterface::DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
     : dcs_socket_(rx_port, tx_port, ip_address)
@@ -70,13 +71,6 @@ std::vector<std::string> DcsInterface::debug_get_current_game_state()
         game_state_printout.push_back(formatted_key_and_value);
     }
     return std::move(game_state_printout);
-}
-
-// Helper function to identify if a string is an integer.
-inline bool is_integer(const std::string &str)
-{
-    // Simple check - only check if first character is a digit (0-9).
-    return isdigit(str.c_str()[0]) ? true : false;
 }
 
 void DcsInterface::handle_received_token(const std::string &key, const std::string &value)
