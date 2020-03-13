@@ -7,12 +7,12 @@
 #include "Common/EPLJSONUtils.h"
 #include "Utilities.h"
 
-StreamdeckContext::StreamdeckContext(std::string context)
+StreamdeckContext::StreamdeckContext(const std::string &context)
 {
     context_ = context;
 }
 
-StreamdeckContext::StreamdeckContext(std::string context, json &settings)
+StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings)
 {
     context_ = context;
     updateContextSettings(settings);
@@ -32,38 +32,46 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
 {
     if (compare_monitor_is_set_)
     {
-        float current_game_value = std::stof(dcs_interface.get_value_of_dcs_id(dcs_id_compare_monitor_));
-        bool set_context_state_to_second = false;
-        switch (dcs_id_compare_condition_)
+        const std::string current_game_value_raw = dcs_interface.get_value_of_dcs_id(dcs_id_compare_monitor_);
+        if (!current_game_value_raw.empty() && is_number(current_game_value_raw))
         {
-        case EQUAL_TO:
-            set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
-            break;
-        case LESS_THAN:
-            set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
-            break;
-        case GREATER_THAN:
-            set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
-            break;
-        }
+            float current_game_value = std::stof(current_game_value_raw);
+            bool set_context_state_to_second = false;
+            switch (dcs_id_compare_condition_)
+            {
+            case EQUAL_TO:
+                set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
+                break;
+            case LESS_THAN:
+                set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
+                break;
+            case GREATER_THAN:
+                set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
+                break;
+            }
 
-        if (set_context_state_to_second)
-        {
-            mConnectionManager->SetState(1, context_);
-        }
-        else
-        {
-            mConnectionManager->SetState(0, context_);
+            if (set_context_state_to_second)
+            {
+                mConnectionManager->SetState(1, context_);
+            }
+            else
+            {
+                mConnectionManager->SetState(0, context_);
+            }
         }
     }
 
     if (string_monitor_is_set_)
     {
-        mConnectionManager->SetTitle(dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_), context_, kESDSDKTarget_HardwareAndSoftware);
+        const std::string current_game_string_value = dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
+        if (!current_game_string_value.empty())
+        {
+            mConnectionManager->SetTitle(current_game_string_value, context_, kESDSDKTarget_HardwareAndSoftware);
+        }
     }
 }
 
-void StreamdeckContext::updateContextSettings(json &settings)
+void StreamdeckContext::updateContextSettings(const json &settings)
 {
     const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
     const std::string dcs_id_compare_condition_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
@@ -78,7 +86,7 @@ void StreamdeckContext::updateContextSettings(json &settings)
     if (compare_monitor_is_set_)
     {
         dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
-        dcs_id_comparison_value_ = std::stof(dcs_id_compare_monitor_raw);
+        dcs_id_comparison_value_ = std::stof(dcs_id_comparison_value_raw);
         if (dcs_id_compare_condition_raw == "EQUAL_TO")
         {
             dcs_id_compare_condition_ = EQUAL_TO;
@@ -95,6 +103,6 @@ void StreamdeckContext::updateContextSettings(json &settings)
 
     if (string_monitor_is_set_)
     {
-        dcs_id_string_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
+        dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
     }
 }

@@ -4,15 +4,17 @@
 
 #include "DcsInterface.h"
 
+#ifndef UNIT_TEST
 #include "Common/ESDConnectionManager.h"
+#endif
 
 #include <string>
 
 class StreamdeckContext
 {
 public:
-    explicit StreamdeckContext(std::string context);
-    explicit StreamdeckContext(std::string context, json &settings);
+    explicit StreamdeckContext(const std::string &context);
+    explicit StreamdeckContext(const std::string &context, const json &settings);
     bool operator==(const StreamdeckContext &rhs) const;
     bool operator<(const StreamdeckContext &rhs) const;
 
@@ -29,7 +31,7 @@ public:
      * 
      * @param settings Json payload of settings values populated in Streamdeck Property Inspector.
      */
-    void updateContextSettings(json &settings);
+    void updateContextSettings(const json &settings);
 
 private:
     using CompareConditionType = enum {
