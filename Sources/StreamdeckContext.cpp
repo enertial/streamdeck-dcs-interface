@@ -95,7 +95,7 @@ void StreamdeckContext::updateContextSettings(const json &settings)
         {
             dcs_id_compare_condition_ = LESS_THAN;
         }
-        else if (dcs_id_compare_condition_raw == "GREATER_THAN")
+        else // Default in Property Inspector html is GREATER_THAN.
         {
             dcs_id_compare_condition_ = GREATER_THAN;
         }

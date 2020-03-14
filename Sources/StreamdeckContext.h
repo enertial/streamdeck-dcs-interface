@@ -49,7 +49,7 @@ private:
     std::string current_title_ = "";
 
     int dcs_id_compare_monitor_ = 0;
-    CompareConditionType dcs_id_compare_condition_ = EQUAL_TO;
+    CompareConditionType dcs_id_compare_condition_ = GREATER_THAN;
     float dcs_id_comparison_value_ = 0.0F;
     int dcs_id_string_monitor_ = 0;
 };

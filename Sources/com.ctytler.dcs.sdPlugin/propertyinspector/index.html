@@ -48,12 +48,12 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Send Value while Released</div>
-        <input id="release_value" class="sdpi-item-value" type="text" value="" placeholder="Example: 0" />
+        <input id="release_value" class="sdpi-item-value" type="text" value="0" placeholder="Example: 0" />
       </div>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Send Value while Pressed</div>
-        <input id="press_value" class="sdpi-item-value" type="text" value="" placeholder="Example: 1" />
+        <input id="press_value" class="sdpi-item-value" type="text" value="1" placeholder="Example: 1" />
       </div>
     </details>
 
@@ -69,15 +69,15 @@
       <div class="sdpi-item" id="select_change_condition">
         <div class="sdpi-item-label">Show 2nd State Image When</div>
         <select class="sdpi-item-value select" id="dcs_id_compare_condition">
+          <option value="GREATER_THAN">is greater than (>) below value</option>
           <option value="EQUAL_TO">is equal to (==) below value</option>
           <option value="LESS_THAN">is less than (<) below value</option>
-          <option value="GREATER_THAN">is greater than (>) below value</option>
         </select>
       </div>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Value</div>
-        <input id="dcs_id_comparison_value" class="sdpi-item-value" type="text" value=""
+        <input id="dcs_id_comparison_value" class="sdpi-item-value" type="text" value="0"
           placeholder="Specify condition value" />
       </div>
     </details>

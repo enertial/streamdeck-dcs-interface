@@ -21,6 +21,14 @@ public:
         title_ = title;
     }
 
+    // Only in mock class:
+    void clear_buffer()
+    {
+        context_ = "";
+        state_ = 0;
+        title_ = "";
+    }
+
     std::string context_ = "";
     int state_ = 0;
     std::string title_ = "";
@@ -51,10 +59,8 @@ TEST(StreamdeckContextTest, update_context_state)
 
     // Test 1 -- With an unpopulated game state in dcs_interface, try to update context state.
     streamdeck_context_a.updateContextState(dcs_interface, &esd_connection_manager);
-    // Expect default state and title values as no updates have been received.
-    EXPECT_EQ(esd_connection_manager.context_, context_a);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
-    EXPECT_EQ(esd_connection_manager.title_, "");
+    // Expect no state or title change as default context state and title values have not changed.
+    EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test 2 -- With a populated game state in dcs_interface, try to update context state.
     // Send a single message from mock DCS that contains updates for multiple IDs.
@@ -82,11 +88,9 @@ TEST(StreamdeckContextTest, update_context_settings)
     const std::string context_a = "abc123";
     StreamdeckContext streamdeck_context_a(context_a);
 
-    // Test 1 -- With no settings defined, streamdeck context should set default state and title.
+    // Test 1 -- With no settings defined, streamdeck context should not send update.
     streamdeck_context_a.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, context_a);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
-    EXPECT_EQ(esd_connection_manager.title_, "");
+    EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test 2 -- With populated settings, streamdeck context should try to update context state.
     json settings = {{"dcs_id_compare_monitor", "765"},
@@ -136,57 +140,62 @@ TEST(StreamdeckContextTest, update_context_state_float_comparisons)
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
 
+    esd_connection_manager.clear_buffer();
     context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+    esd_connection_manager.clear_buffer();
     context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
     EXPECT_EQ(esd_connection_manager.state_, 1);
+    esd_connection_manager.clear_buffer();
     context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_greater_than");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test 2 -- Compare value less than comparison_value.
     mock_dcs_message = "header*123=" + std::to_string(comparison_value_as_flt / 2.0F);
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
 
+    esd_connection_manager.clear_buffer();
     context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+    esd_connection_manager.clear_buffer();
     context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
-    EXPECT_EQ(esd_connection_manager.state_, 1);
+    EXPECT_EQ(esd_connection_manager.context_, ""); //< Does not send because no change (coniditon still satisfied).
+    esd_connection_manager.clear_buffer();
     context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_greater_than");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test 3 -- Compare value equal to comparison_value.
     mock_dcs_message = "header*123=" + std::to_string(comparison_value_as_flt);
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
 
+    esd_connection_manager.clear_buffer();
     context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
     EXPECT_EQ(esd_connection_manager.state_, 1);
+    esd_connection_manager.clear_buffer();
     context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
+    EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than"); //< Sends because of state change.
     EXPECT_EQ(esd_connection_manager.state_, 0);
+    esd_connection_manager.clear_buffer();
     context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_greater_than");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test 4 -- Compare value greater than comparison_value.
     mock_dcs_message = "header*123=" + std::to_string(comparison_value_as_flt * 2.0F);
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
 
+    esd_connection_manager.clear_buffer();
     context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
+    EXPECT_EQ(esd_connection_manager.context_, "ctx_equals"); //< Sends because of state change.
     EXPECT_EQ(esd_connection_manager.state_, 0);
+    esd_connection_manager.clear_buffer();
     context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+    esd_connection_manager.clear_buffer();
     context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_greater_than");
     EXPECT_EQ(esd_connection_manager.state_, 1);
