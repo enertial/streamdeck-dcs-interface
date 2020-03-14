@@ -26,6 +26,14 @@ public:
     void updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager);
 
     /**
+     * @brief Forces an update to the Streamdeck of the context's current state be sent.
+     *        (Normally an update is sent to the Streamdeck only on change of current state).
+     *
+     * @param mConnectionManager Interface to StreamDeck.
+     */
+    void forceSendState(ESDConnectionManager *mConnectionManager);
+
+    /**
      * @brief Updates settings from received json payload.
      * 
      * @param settings Json payload of settings values populated in Streamdeck Property Inspector.

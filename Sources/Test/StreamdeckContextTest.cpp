@@ -301,7 +301,7 @@ TEST(StreamdeckContextTest, class_instances_within_container)
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
     ESDConnectionManager esd_connection_manager;
-    std::string mock_dcs_message = "header*1=a:2=b:3=c:4=d";
+    std::string mock_dcs_message = "header*1=a:2=b:3=c";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
 
@@ -309,15 +309,33 @@ TEST(StreamdeckContextTest, class_instances_within_container)
     ctx_map["ctx_a"] = StreamdeckContext("ctx_a", {{"dcs_id_string_monitor", "1"}});
     ctx_map["ctx_b"] = StreamdeckContext("ctx_b", {{"dcs_id_string_monitor", "2"}});
     ctx_map["ctx_c"] = StreamdeckContext("ctx_c", {{"dcs_id_string_monitor", "3"}});
-    ctx_map["ctx_d"] = StreamdeckContext("ctx_d", {{"dcs_id_string_monitor", "4"}});
 
+    // Update state through map key.
     ctx_map["ctx_b"].updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_b");
     EXPECT_EQ(esd_connection_manager.title_, "b");
 
+    // Update settings through map key.
     ctx_map["ctx_b"].updateContextSettings({{"dcs_id_string_monitor", "1"}});
 
+    // Test that new settings are reflected in state send.
     ctx_map["ctx_b"].updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_b");
     EXPECT_EQ(esd_connection_manager.title_, "a");
+}
+
+TEST(StreamdeckContextTest, force_send_state_update)
+{
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
+    ESDConnectionManager esd_connection_manager;
+    StreamdeckContext streamdeck_context("abc123");
+
+    // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
+    streamdeck_context.updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+
+    // Test -- force send will send current state regardless of state change.
+    streamdeck_context.forceSendState(&esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "abc123");
+    EXPECT_EQ(esd_connection_manager.state_, 0);
 }

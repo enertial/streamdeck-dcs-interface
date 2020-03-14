@@ -60,13 +60,18 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
     if (state != current_state_)
     {
         current_state_ = state;
-        mConnectionManager->SetState(state, context_);
+        mConnectionManager->SetState(current_state_, context_);
     }
     if (title != current_title_)
     {
         current_title_ = title;
-        mConnectionManager->SetTitle(title, context_, kESDSDKTarget_HardwareAndSoftware);
+        mConnectionManager->SetTitle(current_title_, context_, kESDSDKTarget_HardwareAndSoftware);
     }
+}
+
+void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager)
+{
+    mConnectionManager->SetState(current_state_, context_);
 }
 
 void StreamdeckContext::updateContextSettings(const json &settings)
