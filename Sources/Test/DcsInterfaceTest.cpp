@@ -54,6 +54,23 @@ TEST(DcsInterfaceTest, update_dcs_state) {
     EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
 }
 
+TEST(DcsInterfaceTest, update_dcs_state_handle_newline_chars) {
+    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
+    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
+
+    // Send a single message from mock DCS that contains newline characters at the end of tokens.
+    std::string mock_dcs_message = "header*761=1\n:765=2.00\n:2026=TEXT_STR\n:2027=4\n";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+
+    // Query for ID updates.
+    EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761));
+    EXPECT_EQ("2.00", dcs_interface.get_value_of_dcs_id(765));
+    EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026));
+    EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
+}
+
 TEST(DcsInterfaceTest, update_dcs_state_end_of_mission) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);

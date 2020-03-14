@@ -23,7 +23,11 @@ void DcsInterface::update_dcs_state() {
             const std::string delim = "=";
             const auto delim_loc = token.find(delim);
             const std::string key = token.substr(0, delim_loc);
-            const std::string reported_value = token.substr(delim_loc + delim.size(), token.size());
+
+            // Reported value is found after delimiter until a newline character or end of string.
+            const auto token_start = delim_loc + delim.size();
+            const auto token_end = token.find('\n');
+            const std::string reported_value = token.substr(token_start, token_end - token_start);
             handle_received_token(key, reported_value);
         }
     }
