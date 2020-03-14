@@ -1,30 +1,26 @@
 // Copyright 2020 Charles Tytler
 
-#include "gtest/gtest.h"
 #include "../Windows/pch.h"
+#include "gtest/gtest.h"
 #include <unordered_map>
 
 // Create mock version of ESDConnectionManager for testing.
 #define UNIT_TEST
 const int kESDSDKTarget_HardwareAndSoftware = 0;
 
-class ESDConnectionManager
-{
-public:
-    void SetState(int state, std::string context)
-    {
+class ESDConnectionManager {
+  public:
+    void SetState(int state, std::string context) {
         context_ = context;
         state_ = state;
     }
-    void SetTitle(std::string title, std::string context, int flag)
-    {
+    void SetTitle(std::string title, std::string context, int flag) {
         context_ = context;
         title_ = title;
     }
 
     // Only in mock class:
-    void clear_buffer()
-    {
+    void clear_buffer() {
         context_ = "";
         state_ = 0;
         title_ = "";
@@ -35,16 +31,15 @@ public:
     std::string title_ = "";
 };
 
-#include "../StreamdeckContext.h"
 #include "../StreamdeckContext.cpp"
+#include "../StreamdeckContext.h"
 
 // Constants to be used for providing a valid DcsInterface.
 const std::string kDcsListenerPort = "1908";   // Port number to receive DCS updates from.
 const std::string kDcsSendPort = "1909";       // Port number which DCS commands will be sent to.
 const std::string kDcsIpAddress = "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
 
-TEST(StreamdeckContextTest, update_context_state)
-{
+TEST(StreamdeckContextTest, update_context_state) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -74,8 +69,7 @@ TEST(StreamdeckContextTest, update_context_state)
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
 }
 
-TEST(StreamdeckContextTest, update_context_settings)
-{
+TEST(StreamdeckContextTest, update_context_settings) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -116,8 +110,7 @@ TEST(StreamdeckContextTest, update_context_settings)
     EXPECT_EQ(esd_connection_manager.title_, "");
 }
 
-TEST(StreamdeckContextTest, update_context_state_float_comparisons)
-{
+TEST(StreamdeckContextTest, update_context_state_float_comparisons) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -202,8 +195,7 @@ TEST(StreamdeckContextTest, update_context_state_float_comparisons)
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 
-TEST(StreamdeckContextTest, update_context_state_invalid_value_types)
-{
+TEST(StreamdeckContextTest, update_context_state_invalid_value_types) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -293,8 +285,7 @@ TEST(StreamdeckContextTest, update_context_state_invalid_value_types)
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 
-TEST(StreamdeckContextTest, class_instances_within_container)
-{
+TEST(StreamdeckContextTest, class_instances_within_container) {
     // This is more of a test of the MyStreamDeckPlugin.cpp use of this class than of the class itself.
 
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
@@ -324,8 +315,7 @@ TEST(StreamdeckContextTest, class_instances_within_container)
     EXPECT_EQ(esd_connection_manager.title_, "a");
 }
 
-TEST(StreamdeckContextTest, force_send_state_update)
-{
+TEST(StreamdeckContextTest, force_send_state_update) {
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     ESDConnectionManager esd_connection_manager;
     StreamdeckContext streamdeck_context("abc123");

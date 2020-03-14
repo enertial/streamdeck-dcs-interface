@@ -8,10 +8,9 @@
 #include <string>
 #include <vector>
 
-class DcsInterface
-{
+class DcsInterface {
 
-public:
+  public:
     /**
      * @brief Construct a new Dcs Interface object
      *
@@ -29,7 +28,7 @@ public:
 
     /**
      * @brief Get the name of the current DCS aircraft module.
-     * 
+     *
      * @return Aircraft module name.
      */
     std::string get_current_dcs_module();
@@ -63,16 +62,17 @@ public:
      */
     std::vector<std::string> debug_get_current_game_state();
 
-private:
+  private:
     /**
-    * @brief Processes received tokens of DCS game updates.
-    * 
-    * @param key Key for updated value
-    * @param value Updated value.
-    */
+     * @brief Processes received tokens of DCS game updates.
+     *
+     * @param key Key for updated value
+     * @param value Updated value.
+     */
     void handle_received_token(const std::string &key, const std::string &value);
 
-    DcsSocket dcs_socket_;                          // UDP Socket connection for communicating with DCS lua export scripts.
-    std::string current_game_module_;               // Stores the current aircraft module name being used in game.
-    std::map<int, std::string> current_game_state_; // Maps DCS ID keys of received values to their most recently published values.
+    DcsSocket dcs_socket_;            // UDP Socket connection for communicating with DCS lua export scripts.
+    std::string current_game_module_; // Stores the current aircraft module name being used in game.
+    std::map<int, std::string>
+        current_game_state_; // Maps DCS ID keys of received values to their most recently published values.
 };

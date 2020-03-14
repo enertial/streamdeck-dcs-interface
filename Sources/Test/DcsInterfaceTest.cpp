@@ -2,18 +2,16 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsInterface.h"
 #include "../DcsInterface.cpp" // Included because I can't figure out Windows Linker
+#include "../DcsInterface.h"
 
-namespace test
-{
+namespace test {
 
 const std::string kDcsListenerPort = "1908";   // Port number to receive DCS updates from.
 const std::string kDcsSendPort = "1909";       // Port number which DCS commands will be sent to.
 const std::string kDcsIpAddress = "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
 
-TEST(DcsInterfaceTest, empty_game_state_on_initialization)
-{
+TEST(DcsInterfaceTest, empty_game_state_on_initialization) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -25,8 +23,7 @@ TEST(DcsInterfaceTest, empty_game_state_on_initialization)
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST(DcsInterfaceTest, update_dcs_state)
-{
+TEST(DcsInterfaceTest, update_dcs_state) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -57,8 +54,7 @@ TEST(DcsInterfaceTest, update_dcs_state)
     EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
 }
 
-TEST(DcsInterfaceTest, update_dcs_state_end_of_mission)
-{
+TEST(DcsInterfaceTest, update_dcs_state_end_of_mission) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -79,8 +75,7 @@ TEST(DcsInterfaceTest, update_dcs_state_end_of_mission)
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST(DcsInterfaceTest, send_dcs_command)
-{
+TEST(DcsInterfaceTest, send_dcs_command) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -96,8 +91,7 @@ TEST(DcsInterfaceTest, send_dcs_command)
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
-TEST(DcsInterfaceTest, get_current_dcs_module)
-{
+TEST(DcsInterfaceTest, get_current_dcs_module) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -118,8 +112,7 @@ TEST(DcsInterfaceTest, get_current_dcs_module)
     EXPECT_EQ("", dcs_interface.get_current_dcs_module());
 }
 
-TEST(DcsInterfaceTest, get_value_of_dcs_id_if_nonexistant)
-{
+TEST(DcsInterfaceTest, get_value_of_dcs_id_if_nonexistant) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -128,8 +121,7 @@ TEST(DcsInterfaceTest, get_value_of_dcs_id_if_nonexistant)
     EXPECT_EQ("", dcs_interface.get_value_of_dcs_id(999));
 }
 
-TEST(DcsInterfaceTest, clear_game_state)
-{
+TEST(DcsInterfaceTest, clear_game_state) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
@@ -148,8 +140,7 @@ TEST(DcsInterfaceTest, clear_game_state)
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST(DcsInterfaceTest, debug_print_format)
-{
+TEST(DcsInterfaceTest, debug_print_format) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);

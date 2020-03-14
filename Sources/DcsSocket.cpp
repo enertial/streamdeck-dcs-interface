@@ -8,14 +8,13 @@
 
 #include <WS2tcpip.h>
 
-DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
-{
+DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address) {
     // Initialize Windows Sockets DLL to version 2.2.
     WSADATA wsaData;
     const auto err = WSAStartup(MAKEWORD(2, 2), &wsaData);
-    if (err != 0)
-    {
-        const std::string error_msg = "Could not startup Windows socket library -- WSA Error: " + std::to_string(WSAGetLastError());
+    if (err != 0) {
+        const std::string error_msg =
+            "Could not startup Windows socket library -- WSA Error: " + std::to_string(WSAGetLastError());
         throw std::runtime_error(error_msg);
     }
 
@@ -35,9 +34,9 @@ DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, con
     const auto result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
     freeaddrinfo(local_port);
 
-    if (result == SOCKET_ERROR)
-    {
-        const std::string error_msg = "Could not bind UDP address to socket -- WSA Error: " + std::to_string(WSAGetLastError());
+    if (result == SOCKET_ERROR) {
+        const std::string error_msg =
+            "Could not bind UDP address to socket -- WSA Error: " + std::to_string(WSAGetLastError());
         closesocket(socket_id_);
         WSACleanup();
         throw std::runtime_error(error_msg);
@@ -47,16 +46,14 @@ DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, con
     getaddrinfo(ip_address.c_str(), tx_port.c_str(), &hints, &dest_port_);
 }
 
-DcsSocket::~DcsSocket()
-{
+DcsSocket::~DcsSocket() {
     // Delete opened socket.
     freeaddrinfo(dest_port_);
     closesocket(socket_id_);
     WSACleanup();
 }
 
-std::stringstream DcsSocket::DcsReceive()
-{
+std::stringstream DcsSocket::DcsReceive() {
     // Sender address - dummy variable as it is unused outside recvfrom.
     sockaddr_in sender_addr;
     int sender_addr_size = sizeof(sender_addr);
@@ -71,8 +68,7 @@ std::stringstream DcsSocket::DcsReceive()
     return ss;
 }
 
-void DcsSocket::DcsSend(const std::string &message)
-{
+void DcsSocket::DcsSend(const std::string &message) {
     (void)sendto(socket_id_,
                  message.c_str(),
                  static_cast<int>(message.length()),

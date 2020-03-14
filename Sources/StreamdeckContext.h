@@ -10,16 +10,15 @@
 
 #include <string>
 
-class StreamdeckContext
-{
-public:
+class StreamdeckContext {
+  public:
     StreamdeckContext() = default;
     StreamdeckContext(const std::string &context);
     StreamdeckContext(const std::string &context, const json &settings);
 
     /**
      * @brief Queries the dcs_interface for updates to the Context's monitored DCS IDs.
-     * 
+     *
      * @param dcs_interface Interface to DCS containing current game state.
      * @param mConnectionManager Interface to StreamDeck.
      */
@@ -35,17 +34,13 @@ public:
 
     /**
      * @brief Updates settings from received json payload.
-     * 
+     *
      * @param settings Json payload of settings values populated in Streamdeck Property Inspector.
      */
     void updateContextSettings(const json &settings);
 
-private:
-    using CompareConditionType = enum {
-        EQUAL_TO = 0,
-        LESS_THAN,
-        GREATER_THAN
-    };
+  private:
+    using CompareConditionType = enum { EQUAL_TO = 0, LESS_THAN, GREATER_THAN };
 
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 

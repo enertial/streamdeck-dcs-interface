@@ -5,12 +5,12 @@
 #include <sstream>
 #include <winsock2.h>
 
-class DcsSocket
-{
-public:
+class DcsSocket {
+  public:
     // Binds a UDP socket to the rx port and also intializes the destination address using the tx port.
     /**
-     * @brief Construct a new Dcs Socket object bound to the rx port and initializes the destination address using the tx port.
+     * @brief Construct a new Dcs Socket object bound to the rx port and initializes the destination address using the
+     * tx port.
      *
      * @param rx_port UDP receive port.
      * @param tx_port UDP transmit port.
@@ -39,12 +39,12 @@ public:
 
     /**
      * @brief Sends a UDP message to the destination port.
-     * 
+     *
      * @param message String to send.
      */
     void DcsSend(const std::string &message);
 
-private:
+  private:
     SOCKET socket_id_;    // Socket which is binded to the rx port.
     addrinfo *dest_port_; // UDP address info for port which will be transmitted to.
 };
