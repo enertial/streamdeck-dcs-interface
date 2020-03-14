@@ -160,7 +160,13 @@ void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID)
 
 void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-	// Unused.
+	// Update settings for the specified context -- triggered by Property Inspector detecting a change.
+	mVisibleContextsMutex.lock();
+	if (mVisibleContexts.count(inContext) > 0)
+	{
+		mVisibleContexts[inContext].updateContextSettings(inPayload);
+	}
+	mVisibleContextsMutex.unlock();
 }
 
 void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload)
@@ -175,9 +181,9 @@ void MyStreamDeckPlugin::DidReceiveSettings(const std::string &inAction, const s
 	mVisibleContextsMutex.lock();
 	if (mVisibleContexts.count(inContext) > 0)
 	{
-		json settings;
-		EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-		mVisibleContexts[inContext].updateContextSettings(settings);
+		//json settings;
+		//EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+		mVisibleContexts[inContext].updateContextSettings(inPayload);
 	}
 	mVisibleContextsMutex.unlock();
 }

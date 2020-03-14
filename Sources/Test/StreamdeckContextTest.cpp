@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 #include "../Windows/pch.h"
+#include <unordered_map>
 
 // Create mock version of ESDConnectionManager for testing.
 #define UNIT_TEST
@@ -220,6 +221,7 @@ TEST(StreamdeckContextTest, update_context_state_invalid_value_types)
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
     streamdeck_context_a.updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, context_a);
     EXPECT_EQ(esd_connection_manager.state_, 1);
 
     // Send game state value as an integer -- should still resolve to float comparison.
@@ -282,11 +284,40 @@ TEST(StreamdeckContextTest, update_context_state_invalid_value_types)
     // A trailing space is currently not handled.
     // TODO: Consider stripping trailing spaces.
     settings["dcs_id_compare_monitor"] = "123";
-    settings["dcs_id_comparison_value"] = "1.0";
+    settings["dcs_id_comparison_value"] = "1.0 "; //< Trailing space
     streamdeck_context_a.updateContextSettings(settings);
-    mock_dcs_message = "header*123=2.0 "; //< Trailing space
+    mock_dcs_message = "header*123=2.0";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
     streamdeck_context_a.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 0);
+}
+
+TEST(StreamdeckContextTest, class_instances_within_container)
+{
+    // This is more of a test of the MyStreamDeckPlugin.cpp use of this class than of the class itself.
+
+    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
+    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
+    ESDConnectionManager esd_connection_manager;
+    std::string mock_dcs_message = "header*1=a:2=b:3=c:4=d";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+
+    std::unordered_map<std::string, StreamdeckContext> ctx_map;
+    ctx_map["ctx_a"] = StreamdeckContext("ctx_a", {{"dcs_id_string_monitor", "1"}});
+    ctx_map["ctx_b"] = StreamdeckContext("ctx_b", {{"dcs_id_string_monitor", "2"}});
+    ctx_map["ctx_c"] = StreamdeckContext("ctx_c", {{"dcs_id_string_monitor", "3"}});
+    ctx_map["ctx_d"] = StreamdeckContext("ctx_d", {{"dcs_id_string_monitor", "4"}});
+
+    ctx_map["ctx_b"].updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "ctx_b");
+    EXPECT_EQ(esd_connection_manager.title_, "b");
+
+    ctx_map["ctx_b"].updateContextSettings({{"dcs_id_string_monitor", "1"}});
+
+    ctx_map["ctx_b"].updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "ctx_b");
+    EXPECT_EQ(esd_connection_manager.title_, "a");
 }

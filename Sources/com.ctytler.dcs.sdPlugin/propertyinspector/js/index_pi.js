@@ -164,6 +164,9 @@ $SD.on('piDataChanged', (returnValue) => {
 
     /* SEND THE VALUES TO PLUGIN */
     //sendValueToPlugin(returnValue, 'sdpi_collection');
+
+    /* SEND ALL SETTINGS TO PLUGIN */
+    sendSettingsToPlugin();
 });
 
 /**
@@ -220,6 +223,25 @@ function sendValueToPlugin(value, prop) {
                 [prop]: value,
                 targetContext: $SD.actionInfo['context']
             }
+        };
+
+        $SD.connection.send(JSON.stringify(json));
+    }
+}
+
+/**
+ * 'sendSettingsToPlugin' is a wrapper to send current settings to the plugin
+ *
+ */
+
+function sendSettingsToPlugin() {
+    console.log("sendSettingsToPlugin", settings);
+    if ($SD.connection && $SD.connection.readyState === 1) {
+        const json = {
+            action: $SD.actionInfo['action'],
+            event: 'sendToPlugin',
+            context: $SD.uuid,
+            payload: settings
         };
 
         $SD.connection.send(JSON.stringify(json));
