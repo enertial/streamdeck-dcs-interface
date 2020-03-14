@@ -33,9 +33,6 @@ public:
 
 	virtual void SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) = 0;
 
-	virtual void DidReceiveGlobalSettings(const json &inPayload) = 0;
-	virtual void DidReceiveSettings(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) = 0;
-
 protected:
 	ESDConnectionManager *mConnectionManager = nullptr;
 };

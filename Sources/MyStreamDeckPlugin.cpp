@@ -2,11 +2,10 @@
 /**
 @file       MyStreamDeckPlugin.cpp
 
-@brief      CPU plugin
+@brief      Based off of Elgato's CPU plugin example
 
 @copyright  (c) 2018, Corsair Memory, Inc.
-                        This source code is licensed under the MIT-style license found in the
-LICENSE file.
+                        This source code is licensed under the MIT-style license found in the LICENSE file.
 
 **/
 //==============================================================================
@@ -99,8 +98,8 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
         dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
     }
 
-    // The Streamdeck will by default change a context's state after a button action, so a force
-    // send of the current context's state will keep the button state in sync with the plugin.
+    // The Streamdeck will by default change a context's state after a button action, so a force send of the current
+    // context's state will keep the button state in sync with the plugin.
     mVisibleContexts[inContext].forceSendState(mConnectionManager);
 }
 
@@ -118,8 +117,8 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
         dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
     }
 
-    // The Streamdeck will by default change a context's state after a button action, so a force
-    // send of the current context's state will keep the button state in sync with the plugin.
+    // The Streamdeck will by default change a context's state after a button action, so a force send of the current
+    // context's state will keep the button state in sync with the plugin.
     mVisibleContexts[inContext].forceSendState(mConnectionManager);
 }
 
@@ -162,26 +161,6 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
     // change.
     mVisibleContextsMutex.lock();
     if (mVisibleContexts.count(inContext) > 0) {
-        mVisibleContexts[inContext].updateContextSettings(inPayload);
-    }
-    mVisibleContextsMutex.unlock();
-}
-
-void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload) {
-    // Unused.
-    // TODO: Look into handling setting alternate IP Addr/Port.
-}
-
-void MyStreamDeckPlugin::DidReceiveSettings(const std::string &inAction,
-                                            const std::string &inContext,
-                                            const json &inPayload,
-                                            const std::string &inDeviceID) {
-    // Update settings for the specified context -- triggered by Property Inspector detecting a
-    // change.
-    mVisibleContextsMutex.lock();
-    if (mVisibleContexts.count(inContext) > 0) {
-        // json settings;
-        // EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
         mVisibleContexts[inContext].updateContextSettings(inPayload);
     }
     mVisibleContextsMutex.unlock();

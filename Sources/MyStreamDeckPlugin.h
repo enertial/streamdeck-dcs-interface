@@ -2,7 +2,7 @@
 /**
 @file       MyStreamDeckPlugin.h
 
-@brief      CPU plugin
+@brief      Based off of Elgato's CPU plugin example
 
 @copyright  (c) 2018, Corsair Memory, Inc.
                         This source code is licensed under the MIT-style license found in the LICENSE file.
@@ -33,10 +33,10 @@ class MyStreamDeckPlugin : public ESDBasePlugin {
                         const std::string &inDeviceID) override;
 
     /**
-     * The 'willAppear' event is the first event a key will receive, right before it gets
-     * showed on your Stream Deck and/or in Stream Deck software.
-     * This event is a good place to setup your plugin and look at current settings (if any),
-     * which are embedded in the events payload.
+     * The 'willAppear' event is the first event a key will receive, right before it gets showed on your Stream Deck
+     * and/or in Stream Deck software.
+     * This event is a good place to setup your plugin and look at current settings (if any), which are embedded in the
+     * events payload.
      */
     void WillAppearForAction(const std::string &inAction,
                              const std::string &inContext,
@@ -54,13 +54,6 @@ class MyStreamDeckPlugin : public ESDBasePlugin {
                       const std::string &inContext,
                       const json &inPayload,
                       const std::string &inDeviceID) override;
-
-    // Had to add the below functions manually (not in CPU example), but listed in Streamdeck SDK.
-    void DidReceiveGlobalSettings(const json &inPayload) override;
-    void DidReceiveSettings(const std::string &inAction,
-                            const std::string &inContext,
-                            const json &inPayload,
-                            const std::string &inDeviceID) override;
 
   private:
     void UpdateFromGameState();
