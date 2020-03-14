@@ -24,20 +24,14 @@
             the control.
           -->
 
-    <div class="sdpi-item">
-      <div class="sdpi-item-label">Settings</div>
-      <button class="sdpi-item-value" id="external_help_window_button" onclick="callbackHelpButtonPress()">
-        Help / Documentation
-      </button>
-    </div>
-
     <details>
       <summary>DCS Command (on Button Press) Settings</summary>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Button ID</div>
-        <input id="button_id" class="sdpi-item-value" type="text" value=""
-          placeholder="Button ID number of clickable data" />
+        <input id="button_id" class="sdpi-item-value" type="text" value="" placeholder="Button ID number" />
+        <button class="sdpi-item-value" id="clear_dcs_command_button" onclick="callbackClearDcsCommand()"> Clear
+        </button>
       </div>
 
       <div class="sdpi-item">
@@ -48,12 +42,12 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Send Value while Released</div>
-        <input id="release_value" class="sdpi-item-value" type="text" value="0" placeholder="Example: 0" />
+        <input id="release_value" class="sdpi-item-value" type="text" placeholder="Example: 0" />
       </div>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Send Value while Pressed</div>
-        <input id="press_value" class="sdpi-item-value" type="text" value="1" placeholder="Example: 1" />
+        <input id="press_value" class="sdpi-item-value" type="text" placeholder="Example: 1" />
       </div>
     </details>
 
@@ -62,8 +56,9 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
-        <input id="dcs_id_compare_monitor" class="sdpi-item-value" type="text" value=""
-          placeholder="DCS ID number of Function to Monitor" />
+        <input id="dcs_id_compare_monitor" class="sdpi-item-value" type="text" value="" placeholder="DCS ID number" />
+        <button class="sdpi-item-value" id="clear_compare_monitor_button" onclick="callbackClearCompareMonitor()"> Clear
+        </button>
       </div>
 
       <div class="sdpi-item" id="select_change_condition">
@@ -77,8 +72,7 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Value</div>
-        <input id="dcs_id_comparison_value" class="sdpi-item-value" type="text" value="0"
-          placeholder="Specify condition value" />
+        <input id="dcs_id_comparison_value" class="sdpi-item-value" type="text" placeholder="Specify condition value" />
       </div>
     </details>
 
@@ -87,10 +81,19 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
-        <input id="dcs_id_string_monitor" class="sdpi-item-value" type="text" value=""
-          placeholder="DCS ID number of Function to Monitor" />
+        <input id="dcs_id_string_monitor" class="sdpi-item-value" type="text" value="" placeholder="DCS ID number" />
+        <button class="sdpi-item-value" id="clear_string_monitor_button" onclick="callbackClearStringMonitor()"> Clear
+        </button>
       </div>
     </details>
+
+    <div class="sdpi-item">
+      <div class="sdpi-item-label">Settings</div>
+      <button class="sdpi-item-value" id="external_help_window_button" onclick="callbackHelpButtonPress()">
+        Help / Documentation
+      </button>
+    </div>
+
 
     <!-- END OF SDPI-WRAPPER -->
   </div>

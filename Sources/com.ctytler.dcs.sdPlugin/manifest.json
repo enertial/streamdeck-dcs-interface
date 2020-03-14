@@ -64,12 +64,13 @@
   "Author": "Charlie Tytler",
   "CodePathWin": "dcs_interface.exe",
   "PropertyInspectorPath": "propertyinspector/index.html",
+  "DefaultWindowSize": [750, 650],
   "Description": "Allows buttons with triggers from DCS",
   "Name": "DCS",
   "Icon": "images/ufc_key_icon",
   "Category": "DCS Interface",
   "CategoryIcon": "images/dcs_icon",
-  "Version": "0.2",
+  "Version": "0.9",
   "OS": [
     {
       "Platform": "windows",
