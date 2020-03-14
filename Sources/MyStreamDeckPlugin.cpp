@@ -157,11 +157,14 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
                                       const std::string &inContext,
                                       const json &inPayload,
                                       const std::string &inDeviceID) {
-    // Update settings for the specified context -- triggered by Property Inspector detecting a
-    // change.
-    mVisibleContextsMutex.lock();
-    if (mVisibleContexts.count(inContext) > 0) {
-        mVisibleContexts[inContext].updateContextSettings(inPayload);
+    const std::string event = EPLJSONUtils::GetStringByName(inPayload, "event");
+
+    if (event == "SettingsUpdate") {
+        // Update settings for the specified context -- triggered by Property Inspector detecting a change.
+        mVisibleContextsMutex.lock();
+        if (mVisibleContexts.count(inContext) > 0) {
+            mVisibleContexts[inContext].updateContextSettings(inPayload["settings"]);
+        }
+        mVisibleContextsMutex.unlock();
     }
-    mVisibleContextsMutex.unlock();
 }

@@ -241,7 +241,10 @@ function sendSettingsToPlugin() {
             action: $SD.actionInfo['action'],
             event: 'sendToPlugin',
             context: $SD.uuid,
-            payload: settings
+            payload: {
+                event: 'SettingsUpdate',
+                settings: settings
+            }
         };
 
         $SD.connection.send(JSON.stringify(json));
