@@ -160,6 +160,17 @@ void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID)
 
 void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
+	// Unused.
+}
+
+void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload)
+{
+	// Unused.
+	// TODO: Look into handling setting alternate IP Addr/Port.
+}
+
+void MyStreamDeckPlugin::DidReceiveSettings(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
+{
 	// Update settings for the specified context -- triggered by Property Inspector detecting a change.
 	mVisibleContextsMutex.lock();
 	if (mVisibleContexts.count(inContext) > 0)

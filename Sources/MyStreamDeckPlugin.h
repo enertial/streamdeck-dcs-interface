@@ -41,6 +41,10 @@ public:
 
 	void SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) override;
 
+	// Had to add the below functions manually (not in CPU example), but listed in Streamdeck SDK.
+	void DidReceiveGlobalSettings(const json &inPayload) override;
+	void DidReceiveSettings(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) override;
+
 private:
 	void UpdateFromGameState();
 
