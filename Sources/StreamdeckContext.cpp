@@ -18,16 +18,6 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
     updateContextSettings(settings);
 }
 
-bool StreamdeckContext::operator==(const StreamdeckContext &rhs) const
-{
-    return (context_ == rhs.context_);
-}
-
-bool StreamdeckContext::operator<(const StreamdeckContext &rhs) const
-{
-    return (context_ < rhs.context_);
-}
-
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
     // Default button states:

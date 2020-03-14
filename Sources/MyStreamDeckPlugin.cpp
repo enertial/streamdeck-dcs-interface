@@ -87,14 +87,16 @@ void MyStreamDeckPlugin::UpdateFromGameState()
 	//
 	// Warning: UpdateFromGameState() is running in the timer thread
 	//
+
+	// Update the DCS game state in memory, then update each Streamdeck button context.
 	dcs_interface_.update_dcs_state();
 
 	if (mConnectionManager != nullptr)
 	{
 		mVisibleContextsMutex.lock();
-		for (StreamdeckContext elem : mVisibleContexts)
+		for (auto &elem : mVisibleContexts)
 		{
-			elem.updateContextState(dcs_interface_, mConnectionManager);
+			elem.second.updateContextState(dcs_interface_, mConnectionManager);
 		}
 		mVisibleContextsMutex.unlock();
 	}
@@ -102,6 +104,7 @@ void MyStreamDeckPlugin::UpdateFromGameState()
 
 void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
+	// Send a command to DCS using the settings included with the KeyDownForAction callback.
 	json settings;
 	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
 	const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
@@ -115,6 +118,7 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction, const std
 
 void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
+	// Send a command to DCS using the settings included with the KeyUpForAction callback.
 	json settings;
 	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
 	const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
@@ -128,43 +132,41 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction, const std::
 
 void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-	// Remember the context
+	// Remember the context.
 	mVisibleContextsMutex.lock();
 	json settings;
 	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-	mVisibleContexts.insert(StreamdeckContext(inContext, settings));
+	mVisibleContexts[inContext] = StreamdeckContext(inContext, settings);
 	mVisibleContextsMutex.unlock();
 }
 
 void MyStreamDeckPlugin::WillDisappearForAction(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-	// Remove the context
+	// Remove the context.
 	mVisibleContextsMutex.lock();
-	mVisibleContexts.erase(StreamdeckContext(inContext));
+	mVisibleContexts.erase(inContext);
 	mVisibleContextsMutex.unlock();
 }
 
 void MyStreamDeckPlugin::DeviceDidConnect(const std::string &inDeviceID, const json &inDeviceInfo)
 {
-	// Nothing to do
+	// Nothing to do.
 }
 
 void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID)
 {
-	// Nothing to do
+	// Nothing to do.
 }
 
 void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID)
 {
-
+	// Update settings for the specified context -- triggered by Property Inspector detecting a change.
 	mVisibleContextsMutex.lock();
-	json settings;
-	EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-	auto streamdeck_context = mVisibleContexts.find(StreamdeckContext(inContext));
-	if (streamdeck_context != mVisibleContexts.end())
+	if (mVisibleContexts.count(inContext) > 0)
 	{
-		StreamdeckContext ctx = *streamdeck_context;
-		ctx.updateContextSettings(settings);
+		json settings;
+		EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+		mVisibleContexts[inContext].updateContextSettings(settings);
 	}
 	mVisibleContextsMutex.unlock();
 }

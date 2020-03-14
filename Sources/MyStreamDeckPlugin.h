@@ -14,6 +14,7 @@
 #include "DcsInterface.h"
 #include "StreamdeckContext.h"
 #include <mutex>
+#include <unordered_map>
 
 class CallBackTimer;
 
@@ -44,7 +45,7 @@ private:
 	void UpdateFromGameState();
 
 	std::mutex mVisibleContextsMutex;
-	std::set<StreamdeckContext> mVisibleContexts;
+	std::unordered_map<std::string, StreamdeckContext> mVisibleContexts = {};
 
 	CallBackTimer *mTimer;
 	DcsInterface dcs_interface_;

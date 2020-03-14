@@ -13,10 +13,9 @@
 class StreamdeckContext
 {
 public:
-    explicit StreamdeckContext(const std::string &context);
-    explicit StreamdeckContext(const std::string &context, const json &settings);
-    bool operator==(const StreamdeckContext &rhs) const;
-    bool operator<(const StreamdeckContext &rhs) const;
+    StreamdeckContext() = default;
+    StreamdeckContext(const std::string &context);
+    StreamdeckContext(const std::string &context, const json &settings);
 
     /**
      * @brief Queries the dcs_interface for updates to the Context's monitored DCS IDs.
