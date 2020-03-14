@@ -30,6 +30,10 @@ bool StreamdeckContext::operator<(const StreamdeckContext &rhs) const
 
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
+    // Default button states:
+    int state = 0;
+    std::string title = "";
+
     if (compare_monitor_is_set_)
     {
         const std::string current_game_value_raw = dcs_interface.get_value_of_dcs_id(dcs_id_compare_monitor_);
@@ -50,14 +54,7 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
                 break;
             }
 
-            if (set_context_state_to_second)
-            {
-                mConnectionManager->SetState(1, context_);
-            }
-            else
-            {
-                mConnectionManager->SetState(0, context_);
-            }
+            state = set_context_state_to_second ? 1 : 0;
         }
     }
 
@@ -66,13 +63,18 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
         const std::string current_game_string_value = dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
         if (!current_game_string_value.empty())
         {
-            mConnectionManager->SetTitle(current_game_string_value, context_, kESDSDKTarget_HardwareAndSoftware);
+            title = current_game_string_value;
         }
     }
+
+    mConnectionManager->SetState(state, context_);
+    mConnectionManager->SetTitle(title, context_, kESDSDKTarget_HardwareAndSoftware);
 }
 
 void StreamdeckContext::updateContextSettings(const json &settings)
 {
+    //TODO: Allow comparsion of strings in addition to numeric values.
+
     const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
     const std::string dcs_id_compare_condition_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
     const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
