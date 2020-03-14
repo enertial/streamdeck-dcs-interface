@@ -35,6 +35,7 @@
   <ItemGroup>
     <ClCompile Include="DcsInterfaceTest.cpp" />
     <ClCompile Include="DcsSocketTest.cpp" />
+    <ClCompile Include="StreamdeckContextTest.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Windows\com.ctytler.dcs.sdPlugin.vcxproj">
@@ -77,6 +78,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -108,6 +110,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

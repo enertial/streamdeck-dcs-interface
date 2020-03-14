@@ -48,12 +48,12 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Send Value while Released</div>
-        <input id="release_value" class="sdpi-item-value" type="text" value="" placeholder="Example: 0" />
+        <input id="release_value" class="sdpi-item-value" type="text" value="0" placeholder="Example: 0" />
       </div>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Send Value while Pressed</div>
-        <input id="press_value" class="sdpi-item-value" type="text" value="" placeholder="Example: 1" />
+        <input id="press_value" class="sdpi-item-value" type="text" value="1" placeholder="Example: 1" />
       </div>
     </details>
 
@@ -62,22 +62,22 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
-        <input id="export_id_value_monitor" class="sdpi-item-value" type="text" value=""
+        <input id="dcs_id_compare_monitor" class="sdpi-item-value" type="text" value=""
           placeholder="DCS ID number of Function to Monitor" />
       </div>
 
       <div class="sdpi-item" id="select_change_condition">
         <div class="sdpi-item-label">Show 2nd State Image When</div>
-        <select class="sdpi-item-value select" id="change_condition_input">
+        <select class="sdpi-item-value select" id="dcs_id_compare_condition">
+          <option value="GREATER_THAN">is greater than (>) below value</option>
           <option value="EQUAL_TO">is equal to (==) below value</option>
           <option value="LESS_THAN">is less than (<) below value</option>
-          <option value="GREATER_THAN">is greater than (>) below value</option>
         </select>
       </div>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Value</div>
-        <input id="condition_value_input" class="sdpi-item-value" type="text" value=""
+        <input id="dcs_id_comparison_value" class="sdpi-item-value" type="text" value="0"
           placeholder="Specify condition value" />
       </div>
     </details>
@@ -87,7 +87,7 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
-        <input id="export_id_string_monitor" class="sdpi-item-value" type="text" value=""
+        <input id="dcs_id_string_monitor" class="sdpi-item-value" type="text" value=""
           placeholder="DCS ID number of Function to Monitor" />
       </div>
     </details>
@@ -108,50 +108,6 @@
     function callbackHelpButtonPress() {
       if (!window.xtWindow || window.xtWindow.closed) {
         window.xtWindow = window.open('../helpDocs/helpWindow.html', 'External Window');
-      }
-    }
-
-
-    /**
-     * @function sendEventToPlugin
-     * Sends a JSON payload with a specified event string to the plugin.
-     * 
-     * These messages are handled within the plugin via MyStreamDeckPlugin::SendToPlugin()
-     * where the event field can be used to identify appropriate action to take.
-     * 
-     * @param {String} event String used to identify the reason for sending message.
-     * @param {Json} inPayload Payload containing data to be transferred to plugin.
-     */
-    function sendEventToPlugin(event, inPayload) {
-      if ($SD.connection && $SD.connection.readyState === 1) {
-        inPayload.event = event;
-        const json = {
-          action: $SD.actionInfo['action'],
-          event: 'sendToPlugin',
-          context: $SD.uuid,
-          payload: inPayload
-        }
-        $SD.connection.send(JSON.stringify(json));
-      }
-    }
-
-    /**
-     * @function registerExportIdUpdate
-     * Callback function that will send updated "export_id_*" value from the Property Inspector
-     * to the plugin whenever a user changes the field in order to register/unregister that
-     * export_id for DCS monitoring.
-     * 
-     * @param {String} updated_item ID for the spdi item in the Property Inspector which was updated.
-     * @param {String} updated_value New value set by Streamdeck user.
-     */
-    function registerExportIdUpdate(updated_item, updated_value) {
-      console.log("Register DCS ID: ", updated_item, updated_value);
-      if (!isNaN(updated_value)) {
-        var payload = {
-          key: updated_item,
-          value: updated_value,
-        }
-        sendEventToPlugin('updateRegisteredExportId', payload)
       }
     }
   </script>

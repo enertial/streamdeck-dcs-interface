@@ -12,7 +12,9 @@
 
 #include "Common/ESDBasePlugin.h"
 #include "DcsInterface.h"
+#include "StreamdeckContext.h"
 #include <mutex>
+#include <unordered_map>
 
 class CallBackTimer;
 
@@ -39,11 +41,15 @@ public:
 
 	void SendToPlugin(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) override;
 
+	// Had to add the below functions manually (not in CPU example), but listed in Streamdeck SDK.
+	void DidReceiveGlobalSettings(const json &inPayload) override;
+	void DidReceiveSettings(const std::string &inAction, const std::string &inContext, const json &inPayload, const std::string &inDeviceID) override;
+
 private:
-	void CheckDcsState();
+	void UpdateFromGameState();
 
 	std::mutex mVisibleContextsMutex;
-	std::set<std::string> mVisibleContexts;
+	std::unordered_map<std::string, StreamdeckContext> mVisibleContexts = {};
 
 	CallBackTimer *mTimer;
 	DcsInterface dcs_interface_;

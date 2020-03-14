@@ -4,27 +4,12 @@
 
 #include "DcsSocket.h"
 
+#include <map>
 #include <string>
 #include <vector>
-#include <unordered_map>
-#include <unordered_set>
-
-/**
- * @brief Defines a per-context update of a DCS ID value.
- *
- */
-typedef struct
-{
-    std::string context;      // Identification of a context registered to the DCS ID.
-    int dcs_id;               // DCS ID which has received an updated value.
-    std::string dcs_id_value; // Updated value.
-} DcsIdValueUpdate;
 
 class DcsInterface
 {
-    // Maps registered DCS IDs to a vector of Stream Deck button instances.
-    using dcs_id_to_context_map = std::unordered_map<int, std::unordered_set<std::string>>;
-    using context_to_dcs_id_map = std::unordered_map<std::string, int>;
 
 public:
     /**
@@ -37,26 +22,24 @@ public:
     DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address);
 
     /**
-     * @brief Registers a new instance of a StreamDeck button that wishes to monitor the value of a given DCS ID.
+     * @brief Receives DCS value updates, updating DcsInterface's internal current game state.
      *
-     * @param dcs_id  DCS ID to monitor.
-     * @param context Context identification of StreamDeck button registered to DCS ID updates.
      */
-    void register_dcs_monitor(const int dcs_id, const std::string &context);
+    void update_dcs_state();
 
     /**
-     * @brief Removes registration of a StreamDeck button monitoring the value of a DCS ID.
-     *
-     * @param context Context identification of StreamDeck button registered to DCS ID updates.
+     * @brief Get the name of the current DCS aircraft module.
+     * 
+     * @return Aircraft module name.
      */
-    void unregister_dcs_monitor(const std::string &context);
+    std::string get_current_dcs_module();
 
     /**
-     * @brief Receives DCS value updates, returning ID values which are monitored by a Streamdeck context.
+     * @brief Get the value of dcs id object from current game state.
      *
-     * @return A vector of value updates for monitored DCS ID's and their registered context.
+     * @return Value of DCS ID, defaults to "" if DCS ID has not been logged.
      */
-    std::vector<DcsIdValueUpdate> get_next_dcs_update();
+    std::string get_value_of_dcs_id(const int dcs_id);
 
     /**
      * @brief Sends a message to DCS to command a change in a clickable data item.
@@ -67,8 +50,29 @@ public:
      */
     void send_dcs_command(const int button_id, const std::string &device_id, const std::string &value);
 
+    /**
+     * @brief Clears history of logged DCS current game state values.
+     *
+     */
+    void clear_game_state();
+
+    /**
+     * @brief For debugging purposes, outputs all logged DCS ID key value pairs stored in current game state.
+     *
+     * @return Vector of strings ready for printing containing all current values.
+     */
+    std::vector<std::string> debug_get_current_game_state();
+
 private:
-    DcsSocket dcs_socket_;                               // UDP Socket connection for communicating with DCS lua export scripts.
-    dcs_id_to_context_map registered_contexts_map_ = {}; // Maps DCS ID keys to registered Streamdeck contexts.
-    context_to_dcs_id_map active_contexts_map_ = {};     // Maps Streamdeck contexts to actively monitored DCS ID keys.
+    /**
+    * @brief Processes received tokens of DCS game updates.
+    * 
+    * @param key Key for updated value
+    * @param value Updated value.
+    */
+    void handle_received_token(const std::string &key, const std::string &value);
+
+    DcsSocket dcs_socket_;                          // UDP Socket connection for communicating with DCS lua export scripts.
+    std::string current_game_module_;               // Stores the current aircraft module name being used in game.
+    std::map<int, std::string> current_game_state_; // Maps DCS ID keys of received values to their most recently published values.
 };
