@@ -45,6 +45,9 @@ private:
     bool compare_monitor_is_set_ = false; // True if all DCS ID comparison monitor settings have been set.
     bool string_monitor_is_set_ = false;  // True if all DCS ID string monitor settings have been set.
 
+    int current_state_ = 0;
+    std::string current_title_ = "";
+
     int dcs_id_compare_monitor_ = 0;
     CompareConditionType dcs_id_compare_condition_ = EQUAL_TO;
     float dcs_id_comparison_value_ = 0.0F;

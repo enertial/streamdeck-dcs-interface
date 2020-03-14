@@ -66,7 +66,7 @@ private:
 MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcsSendPort, kDcsIpAddress)
 {
 	mTimer = new CallBackTimer();
-	mTimer->start(1, [this]() {
+	mTimer->start(10, [this]() {
 		this->UpdateFromGameState();
 	});
 }
