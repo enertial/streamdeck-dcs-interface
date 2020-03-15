@@ -65,11 +65,11 @@
   "CodePathWin": "dcs_interface.exe",
   "PropertyInspectorPath": "propertyinspector/index.html",
   "DefaultWindowSize": [750, 650],
-  "Description": "Allows buttons with triggers from DCS",
-  "Name": "DCS",
-  "Icon": "images/ufc_key_icon",
+  "Description": "Allows buttons which communicate with Digital Combat Simulator (DCS)",
+  "Name": "DCS Interface",
+  "Icon": "images/plugin_icon",
   "Category": "DCS Interface",
-  "CategoryIcon": "images/dcs_icon",
+  "CategoryIcon": "images/category_icon",
   "Version": "0.9",
   "OS": [
     {

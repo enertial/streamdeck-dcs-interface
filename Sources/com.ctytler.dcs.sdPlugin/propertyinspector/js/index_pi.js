@@ -72,13 +72,13 @@ $SD.on('connected', (jsn) => {
 
     /* DEFAULT SETTINGS SPECIFIED HERE */
     if (!settings.hasOwnProperty("press_value")) {
-        settings["press_value"] = 1;
+        settings["press_value"] = "1";
     }
     if (!settings.hasOwnProperty("release_value")) {
-        settings["release_value"] = 0;
+        settings["release_value"] = "0";
     }
     if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
-        settings["dcs_id_comparison_value"] = 0;
+        settings["dcs_id_comparison_value"] = "0";
     }
 
     if (settings) {
