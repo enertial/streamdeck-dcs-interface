@@ -69,13 +69,30 @@ $SD.on('connected', (jsn) => {
      */
 
     settings = Utils.getProp(jsn, 'actionInfo.payload.settings', false);
+    var action = Utils.getProp(jsn, 'actionInfo.action');
+
+    /* PROPERTY INSPECTOR ACTION-SPECIFIC SETTINGS SPECIFIED HERE */
+    if (action.includes("switch")) {
+        document.querySelector('#send_while_released .sdpi-item-label').innerText = 'Send Value for 1st->2nd State';
+        document.querySelector('#send_while_pressed .sdpi-item-label').innerText = 'Send Value for 2nd->1st State';
+    }
 
     /* DEFAULT SETTINGS SPECIFIED HERE */
-    if (!settings.hasOwnProperty("press_value")) {
-        settings["press_value"] = "1";
+    if (action.includes("switch")) {
+        if (!settings.hasOwnProperty("press_value")) {
+            settings["press_value"] = "1";
+        }
+        if (!settings.hasOwnProperty("release_value")) {
+            settings["release_value"] = "-1";
+        }
     }
-    if (!settings.hasOwnProperty("release_value")) {
-        settings["release_value"] = "0";
+    else {
+        if (!settings.hasOwnProperty("press_value")) {
+            settings["press_value"] = "1";
+        }
+        if (!settings.hasOwnProperty("release_value")) {
+            settings["release_value"] = "0";
+        }
     }
     if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
         settings["dcs_id_comparison_value"] = "0";

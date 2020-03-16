@@ -93,28 +93,49 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
     const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
     const std::string device_id = EPLJSONUtils::GetStringByName(settings, "device_id");
-    const std::string value = EPLJSONUtils::GetStringByName(settings, "press_value");
+
+    // For switches the state of the context must be used:
+    //      release_value used in state 1, press_value used in state 2.
+    std::string value = "";
+    const bool is_switch_action = (inAction.find("switch") != std::string::npos);
+    if (is_switch_action) {
+        const int state = EPLJSONUtils::GetIntByName(inPayload, "state");
+        if (state == 0) {
+            value = EPLJSONUtils::GetStringByName(settings, "release_value");
+        } else {
+            value = EPLJSONUtils::GetStringByName(settings, "press_value");
+        }
+    } else {
+        value = EPLJSONUtils::GetStringByName(settings, "press_value");
+
+        // The Streamdeck will by default change a context's state after a button action, so a force send of the current
+        // context's state will keep the button state in sync with the plugin.
+        // (Not performed for switches as generally the change in state is desired there).
+        mVisibleContexts[inContext].forceSendState(mConnectionManager);
+    }
+
     if (!button_id.empty() && !device_id.empty() && !value.empty()) {
         dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
     }
-
-    // The Streamdeck will by default change a context's state after a button action, so a force send of the current
-    // context's state will keep the button state in sync with the plugin.
-    mVisibleContexts[inContext].forceSendState(mConnectionManager);
 }
 
 void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
                                         const std::string &inContext,
                                         const json &inPayload,
                                         const std::string &inDeviceID) {
-    // Send a command to DCS using the settings included with the KeyUpForAction callback.
-    json settings;
-    EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-    const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
-    const std::string device_id = EPLJSONUtils::GetStringByName(settings, "device_id");
-    const std::string value = EPLJSONUtils::GetStringByName(settings, "release_value");
-    if (!button_id.empty() && !device_id.empty() && !value.empty()) {
-        dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
+
+    // For switches no change of value is needed on key up.
+    const bool is_switch_action = (inAction.find("switch") != std::string::npos);
+    if (!is_switch_action) {
+        // Send a command to DCS using the settings included with the KeyUpForAction callback.
+        json settings;
+        EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+        const std::string button_id = EPLJSONUtils::GetStringByName(settings, "button_id");
+        const std::string device_id = EPLJSONUtils::GetStringByName(settings, "device_id");
+        const std::string value = EPLJSONUtils::GetStringByName(settings, "release_value");
+        if (!button_id.empty() && !device_id.empty() && !value.empty()) {
+            dcs_interface_.send_dcs_command(std::stoi(button_id), device_id, value);
+        }
     }
 
     // The Streamdeck will by default change a context's state after a button action, so a force send of the current
