@@ -2,7 +2,7 @@
   "Actions": [
     {
       "Icon": "images/switch_down",
-      "Name": "DCS Two-State Switch",
+      "Name": "Switch",
       "States": [
         {
           "Image": "images/switch_down",
@@ -18,13 +18,13 @@
         }
       ],
       "SupportedInMultiActions": false,
-      "Tooltip": "Two-State DCS Button/Switch",
-      "UUID": "com.ctytler.dcs.switch",
+      "Tooltip": "Button press depends on displayed state",
+      "UUID": "com.ctytler.dcs.up-down.switch.two-state",
       "ShowTitle": false
     },
     {
       "Icon": "images/button_light_on",
-      "Name": "DCS Two-State Button",
+      "Name": "Momentary Button with Lamp",
       "States": [
         {
           "Image": "images/button_light_off",
@@ -40,12 +40,28 @@
         }
       ],
       "SupportedInMultiActions": false,
-      "Tooltip": "Two-State DCS Button",
-      "UUID": "com.ctytler.dcs.button"
+      "Tooltip": "Momentary button press independent of display",
+      "UUID": "com.ctytler.dcs.lamp.button.two-state"
+    },
+    {
+      "Icon": "images/Button_UFC_Blank",
+      "Name": "Static Button/Display (UFC)",
+      "States": [
+        {
+          "Image": "images/display_wide",
+          "MultiActionImage": "images/Button_AV8B_ODU",
+          "TitleAlignment": "middle",
+          "FontFamily": "Arial",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": true,
+      "Tooltip": "Single display state can be used for button and/or text display",
+      "UUID": "com.ctytler.dcs.static.button.one-state"
     },
     {
       "Icon": "images/display_icon",
-      "Name": "DCS Static Button/Display",
+      "Name": "Static Button/Display (Text)",
       "States": [
         {
           "Image": "images/display_wide",
@@ -56,8 +72,8 @@
         }
       ],
       "SupportedInMultiActions": false,
-      "Tooltip": "One-State DCS Button",
-      "UUID": "com.ctytler.dcs.static"
+      "Tooltip": "Single display state can be used for button and/or text display",
+      "UUID": "com.ctytler.dcs.static.text.one-state"
     }
   ],
   "SDKVersion": 2,
