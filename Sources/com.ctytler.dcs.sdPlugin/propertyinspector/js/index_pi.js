@@ -71,22 +71,30 @@ $SD.on('connected', (jsn) => {
     settings = Utils.getProp(jsn, 'actionInfo.payload.settings', false);
     var action = Utils.getProp(jsn, 'actionInfo.action');
 
-    /* PROPERTY INSPECTOR ACTION-SPECIFIC SETTINGS SPECIFIED HERE */
-    if (action.includes("switch")) {
-        document.querySelector('#send_while_released .sdpi-item-label').innerText = 'Send Value for 1st->2nd State';
-        document.querySelector('#send_while_pressed .sdpi-item-label').innerText = 'Send Value for 2nd->1st State';
-    }
-
     /* DEFAULT SETTINGS SPECIFIED HERE */
     if (action.includes("switch")) {
-        if (!settings.hasOwnProperty("press_value")) {
-            settings["press_value"] = "1";
+        document.getElementById("switch_button_settings").hidden = false;
+        if (!settings.hasOwnProperty("send_when_first_state")) {
+            settings["send_when_first_state_value"] = "1";
         }
-        if (!settings.hasOwnProperty("release_value")) {
-            settings["release_value"] = "-1";
+        if (!settings.hasOwnProperty("send_when_second_state")) {
+            settings["send_when_second_state_value"] = "-1";
+        }
+    }
+    else if (action.includes("increment")) {
+        document.getElementById("increment_button_settings").hidden = false;
+        if (!settings.hasOwnProperty("send_increment_value")) {
+            settings["increment_value"] = "0.1";
+        }
+        if (!settings.hasOwnProperty("send_increment_min")) {
+            settings["increment_min"] = "0";
+        }
+        if (!settings.hasOwnProperty("send_increment_max")) {
+            settings["increment_max"] = "1";
         }
     }
     else {
+        document.getElementById("momentary_button_settings").hidden = false;
         if (!settings.hasOwnProperty("press_value")) {
             settings["press_value"] = "1";
         }
@@ -94,6 +102,7 @@ $SD.on('connected', (jsn) => {
             settings["release_value"] = "0";
         }
     }
+
     if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
         settings["dcs_id_comparison_value"] = "0";
     }

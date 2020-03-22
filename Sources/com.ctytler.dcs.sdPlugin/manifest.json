@@ -48,7 +48,7 @@
       "Name": "Static Button/Display (UFC)",
       "States": [
         {
-          "Image": "images/display_wide",
+          "Image": "images/Button_UFC_Blank",
           "MultiActionImage": "images/Button_AV8B_ODU",
           "TitleAlignment": "middle",
           "FontFamily": "Arial",
