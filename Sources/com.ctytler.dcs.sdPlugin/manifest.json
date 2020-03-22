@@ -74,6 +74,48 @@
       "SupportedInMultiActions": false,
       "Tooltip": "Single display state can be used for button and/or text display",
       "UUID": "com.ctytler.dcs.static.text.one-state"
+    },
+    {
+      "Icon": "images/Rotary_Dial_0",
+      "Name": "Incremental Input Button",
+      "States": [
+        {
+          "Image": "images/Rotary_Dial_0",
+          "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
+          "FontSize": "17"
+        },
+        {
+          "Image": "images/Rotary_Dial_1",
+          "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Incremental input button can be used for dials/switches/multi-position",
+      "UUID": "com.ctytler.dcs.increment.dial.two-state"
+    },
+    {
+      "Icon": "images/Rotary_Dial_Half_0",
+      "Name": "Incremental Input (Text Above)",
+      "States": [
+        {
+          "Image": "images/Rotary_Dial_Half_0",
+          "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
+          "FontSize": "17"
+        },
+        {
+          "Image": "images/Rotary_Dial_Half_1",
+          "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Incremental input button with space for text above",
+      "UUID": "com.ctytler.dcs.increment.textdial.two-state"
     }
   ],
   "SDKVersion": 2,

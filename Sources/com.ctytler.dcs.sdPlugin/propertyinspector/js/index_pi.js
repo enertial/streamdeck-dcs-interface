@@ -95,20 +95,31 @@ $SD.on('connected', (jsn) => {
     }
     else {
         document.getElementById("momentary_button_settings").hidden = false;
-        if (!settings.hasOwnProperty("press_value")) {
-            settings["press_value"] = "1";
+        if (!settings.hasOwnProperty("increment_value")) {
+            settings["increment_value"] = "0.1";
         }
-        if (!settings.hasOwnProperty("release_value")) {
-            settings["release_value"] = "0";
+        if (!settings.hasOwnProperty("increment_min")) {
+            settings["increment_min"] = "0";
+        }
+        if (!settings.hasOwnProperty("increment_max")) {
+            settings["increment_max"] = "1";
+        }
+        if (!settings.hasOwnProperty("increment_cycle_allowed_check")) {
+            settings["increment_cycle_allowed_check"] = false;
         }
     }
 
     if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
         settings["dcs_id_comparison_value"] = "0";
     }
+    if (!settings.hasOwnProperty("string_monitor_passthrough_check")) {
+        settings["string_monitor_passthrough_check"] = true;
+    }
+
 
     if (settings) {
         updateUI(settings);
+        callbackStringMonitorPassthroughCheck(settings["string_monitor_passthrough_check"]);
         console.log("Loaded settings: ", settings);
     }
 });
@@ -146,13 +157,18 @@ const updateUI = (pl) => {
         if (e && e != '') {
             const foundElement = document.querySelector(`#${e}`);
             console.log(`searching for: #${e}`, 'found:', foundElement);
-            if (foundElement && foundElement.type !== 'file') {
-                foundElement.value = pl[e];
-                const maxl = foundElement.getAttribute('maxlength') || 50;
-                const labels = document.querySelectorAll(`[for='${foundElement.id}']`);
-                if (labels.length) {
-                    for (let x of labels) {
-                        x.textContent = maxl ? `${foundElement.value.length}/${maxl}` : `${foundElement.value.length}`;
+            if (foundElement) {
+                if (foundElement.type == 'checkbox') {
+                    foundElement.checked = pl[e];
+                }
+                else if (foundElement.type !== 'file') {
+                    foundElement.value = pl[e];
+                    const maxl = foundElement.getAttribute('maxlength') || 50;
+                    const labels = document.querySelectorAll(`[for='${foundElement.id}']`);
+                    if (labels.length) {
+                        for (let x of labels) {
+                            x.textContent = maxl ? `${foundElement.value.length}/${maxl}` : `${foundElement.value.length}`;
+                        }
                     }
                 }
             }
@@ -229,10 +245,19 @@ function saveSettings(sdpi_collection) {
 
     if (typeof sdpi_collection !== 'object') return;
 
+
     if (sdpi_collection.hasOwnProperty('key') && sdpi_collection.key != '') {
         if (sdpi_collection.value && sdpi_collection.value !== undefined) {
-            console.log(sdpi_collection.key, " => ", sdpi_collection.value);
-            settings[sdpi_collection.key] = sdpi_collection.value;
+            // Handle check boxes separately.
+            if (sdpi_collection.value == 'check') {
+                console.log(sdpi_collection.key, " => ", sdpi_collection.checked);
+                settings[sdpi_collection.key] = sdpi_collection.checked;
+            }
+            // Handle all other spdi types.
+            else {
+                console.log(sdpi_collection.key, " => ", sdpi_collection.value);
+                settings[sdpi_collection.key] = sdpi_collection.value;
+            }
             console.log('setSettings....', settings);
             $SD.api.setSettings($SD.uuid, settings);
         }
@@ -290,6 +315,29 @@ function sendSettingsToPlugin() {
     }
 }
 
+/**
+ * @function callbackHelpButtonPress
+ * Opens an external window when button is clicked.
+ */
+function callbackHelpButtonPress() {
+    if (!window.xtWindow || window.xtWindow.closed) {
+        window.xtWindow = window.open('../helpDocs/helpWindow.html', 'External Window');
+    }
+}
+
+/**
+ * @function callbackStringMonitorPassthroughCheck
+ * Shows/hides textbox for entering string display mapping.
+ */
+function callbackStringMonitorPassthroughCheck(isChecked) {
+    if (isChecked) {
+        document.getElementById("string_monitor_mapping_div").hidden = true;
+    }
+    else {
+        document.getElementById("string_monitor_mapping_div").hidden = false;
+    }
+    console.log("String Monitor Passtrhough Callback isChecked: ", isChecked);
+}
 
 /**
  *  Clears setting for DCS Command Button ID, disabling the feature.

@@ -29,15 +29,14 @@
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Button ID</div>
-        <input id="button_id" class="sdpi-item-value" type="text" value="" placeholder="Button ID number" />
+        <input id="button_id" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
         <button class="sdpi-item-value" id="clear_dcs_command_button" onclick="callbackClearDcsCommand()"> Clear
         </button>
       </div>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">Device ID</div>
-        <input id="device_id" class="sdpi-item-value" type="text" value=""
-          placeholder="Device ID number of clickable data" />
+        <input id="device_id" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
       </div>
 
       <div id="momentary_button_settings" hidden>
@@ -70,14 +69,16 @@
           <input id="increment_value" class="sdpi-item-value" type="text" placeholder="Example: 0.1" />
         </div>
 
-        <div class="sdpi-item" id="send_increment_min">
-          <div class="sdpi-item-label">Increment range min</div>
+        <div class="sdpi-item" id="send_increment_range">
+          <div class="sdpi-item-label">Increment range min/max</div>
           <input id="increment_min" class="sdpi-item-value" type="text" placeholder="Example: 0" />
+          <input id="increment_max" class="sdpi-item-value" type="text" placeholder="Example: 1" />
         </div>
 
-        <div class="sdpi-item" id="send_increment_max">
-          <div class="sdpi-item-label">Increment range max</div>
-          <input id="increment_max" class="sdpi-item-value" type="text" placeholder="Example: 1" />
+        <div type="checkbox" class="sdpi-item">
+          <div class="sdpi-item-label">Cycle Settings</div>
+          <input class="sdpi-item-value" id="increment_cycle_allowed_check" type="checkbox" value="check" />
+          <label for="increment_cycle_allowed_check"><span></span>Allow cycling to beginning</label>
         </div>
       </div>
 
@@ -85,11 +86,11 @@
     </details>
 
     <details>
-      <summary>DCS Function Monitor (Change Button Image) Settings</summary>
+      <summary>Image State Change on DCS Update Settings</summary>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
-        <input id="dcs_id_compare_monitor" class="sdpi-item-value" type="text" value="" placeholder="DCS ID number" />
+        <input id="dcs_id_compare_monitor" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
         <button class="sdpi-item-value" id="clear_compare_monitor_button" onclick="callbackClearCompareMonitor()"> Clear
         </button>
       </div>
@@ -110,13 +111,30 @@
     </details>
 
     <details>
-      <summary>DCS Function Text Update Monitor Settings</summary>
+      <summary>Title Text Change on DCS Update Settings</summary>
 
       <div class="sdpi-item">
         <div class="sdpi-item-label">DCS ID</div>
-        <input id="dcs_id_string_monitor" class="sdpi-item-value" type="text" value="" placeholder="DCS ID number" />
+        <input id="dcs_id_string_monitor" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
         <button class="sdpi-item-value" id="clear_string_monitor_button" onclick="callbackClearStringMonitor()"> Clear
         </button>
+      </div>
+
+      <div type="checkbox" class="sdpi-item">
+        <div class="sdpi-item-label">Display String</div>
+        <input class="sdpi-item-value" id="string_monitor_passthrough_check" type="checkbox" value="check" checked
+          onclick="callbackStringMonitorPassthroughCheck(checked)">
+        <label for="string_monitor_passthrough_check"><span></span>Display string unaltered</label>
+      </div>
+
+      <div id="string_monitor_mapping_div" hidden>
+        <div type="textarea" class="sdpi-item" id="string_monitor_mapping_textarea">
+          <div class="sdpi-item-label">Map Value to Display Text</div>
+          <span class="sdpi-item-value textarea">
+            <textarea type="textarea" id="string_monitor_mapping" placeholder="Enter as 'key:text,key:text' Example:
+            0.1:ValA,0.2:ValB,0.3:ValC"></textarea>
+          </span>
+        </div>
       </div>
     </details>
 
@@ -135,18 +153,6 @@
   <script src="js/common.js"></script>
   <script src="js/common_pi.js"></script>
   <script src="js/index_pi.js"></script>
-
-  <script>
-    /**
-     * @function callbackHelpButtonPress
-     * Opens an external window when button is clicked.
-     */
-    function callbackHelpButtonPress() {
-      if (!window.xtWindow || window.xtWindow.closed) {
-        window.xtWindow = window.open('../helpDocs/helpWindow.html', 'External Window');
-      }
-    }
-  </script>
 
 </body>
 
