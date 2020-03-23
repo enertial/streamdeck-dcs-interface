@@ -80,8 +80,10 @@ class StreamdeckContext {
     bool compare_monitor_is_set_ = false; // True if all DCS ID comparison monitor settings have been set.
     bool string_monitor_is_set_ = false;  // True if all DCS ID string monitor settings have been set.
 
-    int current_state_ = 0;
-    std::string current_title_ = "";
+    int current_state_ = 0;                    // Stored state of the context.
+    std::string current_title_ = "";           // Stored title of the context.
+    float current_increment_value_ = 0.0F;     // Stored value for increment button types.
+    bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
 
     int dcs_id_compare_monitor_ = 0;
     CompareConditionType dcs_id_compare_condition_ = GREATER_THAN;
