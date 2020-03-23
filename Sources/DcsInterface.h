@@ -50,6 +50,12 @@ class DcsInterface {
     void send_dcs_command(const int button_id, const std::string &device_id, const std::string &value);
 
     /**
+     * @brief Sends a reset command ("R" char) to DCS to signify a request for a resend of data.
+     *
+     */
+    void send_dcs_reset_command();
+
+    /**
      * @brief Clears history of logged DCS current game state values.
      *
      */

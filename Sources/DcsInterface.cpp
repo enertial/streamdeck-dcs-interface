@@ -48,6 +48,8 @@ void DcsInterface::send_dcs_command(const int button_id, const std::string &devi
     dcs_socket_.DcsSend(message_assembly);
 }
 
+void DcsInterface::send_dcs_reset_command() { dcs_socket_.DcsSend("R"); }
+
 void DcsInterface::clear_game_state() { current_game_state_.clear(); }
 
 std::map<int, std::string> DcsInterface::debug_get_current_game_state() { return current_game_state_; }

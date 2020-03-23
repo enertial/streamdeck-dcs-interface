@@ -56,6 +56,8 @@ class CallBackTimer {
 MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcsSendPort, kDcsIpAddress) {
     mTimer = new CallBackTimer();
     mTimer->start(10, [this]() { this->UpdateFromGameState(); });
+    // Send a reset to command in case DCS mission is already running.
+    dcs_interface_.send_dcs_reset_command();
 }
 
 MyStreamDeckPlugin::~MyStreamDeckPlugin() {

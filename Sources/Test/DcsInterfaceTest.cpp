@@ -108,6 +108,16 @@ TEST(DcsInterfaceTest, send_dcs_command) {
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
+TEST(DcsInterfaceTest, send_dcs_reset_command) {
+    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
+    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
+
+    dcs_interface.send_dcs_reset_command();
+    std::stringstream ss_received = mock_dcs.DcsReceive();
+    EXPECT_EQ(ss_received.str(), "R");
+}
+
 TEST(DcsInterfaceTest, get_current_dcs_module) {
     // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
