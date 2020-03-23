@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+	<title>com.elgato.template.externalWindow</title>
+	<meta charset="utf-8" />
+	<link rel="stylesheet" href="css/sdpi.css">
+	<style>
+		body {
+			background-color: transparent;
+		}
+
+		.sdpi-item {
+			max-width: none !important;
+		}
+
+		.sdpi-heading {
+			margin: 16px 0;
+		}
+
+		ul {
+			max-height: none;
+		}
+
+		li * {
+			min-height: 18px;
+			padding: 4px;
+			display: flex;
+			align-items: center;
+		}
+
+		.wrap {
+			margin: 0 auto;
+			max-width: 600px;
+		}
+
+		.title {
+			font-weight: bold;
+			padding-bottom: 2px;
+			margin-bottom: 6px;
+			border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+			text-transform: uppercase;
+		}
+
+		.wrap {
+			text-align: center;
+		}
+	</style>
+</head>
+
+<body onload="loaded()">
+
+	<div class="sdpi-wrapper">
+		<div id="connection_settings_div" hidden>
+			<div class="sdpi-heading">DCS Export Connection Global Settings</div>
+			<div class="wrap">
+				<p>The IP Address and Ports for communication with the DCS Export script can be set here for all
+					Streamdeck
+					buttons</p>
+
+			</div>
+
+			<div class="wrap" style="max-width: 250px;">
+				<div class="sdpi-item">
+					<div class="sdpi-item-label">IP Address</div>
+					<input class="sdpi-item-value" id="ip_address" value="127.0.0.1" placeholder="e.g. 127.0.0.1"
+						required pattern="\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}">
+				</div>
+
+				<div class="sdpi-item">
+					<div class="sdpi-item-label">Listener Port</div>
+					<input id="listener_port" class="sdpi-item-value" type="text" value="1725" />
+				</div>
+
+				<div class="sdpi-item">
+					<div class="sdpi-item-label">Send Port</div>
+					<input id="send_port" class="sdpi-item-value" type="text" value="26027" />
+				</div>
+
+
+				<button id="update_connection_settings_button" type="button" value="Update Connection Settings"
+					onclick="callbackUpdateConnectionSettings()">Update Connection Settings</button>
+			</div>
+		</div>
+
+		<div class="sdpi-heading">Debug - Print Current DCS Game Values</div>
+		<div class="wrap">
+			<button id="refresh_dcs_state" type="button" value="Refresh"
+				onclick="callbackRefreshDcsGameState()">Refresh</button>
+
+			<div class="sdpi-item" id="game_state_table">
+				<table class="sdpi-item-value no-select" width="70%">
+					<thead>
+						<tr>
+							<td><b>DCS ID</b></td>
+							<td><b>Last Received Value</b></td>
+						</tr>
+					</thead>
+					<tbody></tbody>
+				</table>
+			</div>
+		</div>
+
+	</div>
+
+	<script>
+		function callbackUpdateConnectionSettings() {
+			const settings = {
+				"ip_address": document.getElementById("ip_address").value,
+				"listener_port": document.getElementById("listener_port").value,
+				"send_port": document.getElementById("send_port").value
+			};
+			sendmessage("updateConnectionSettings", settings);
+		}
+
+		function gotGlobalSettingsFromPI(settings) {
+			document.getElementById("ip_address").value = settings.ip_address;
+			document.getElementById("listener_port").value = settings.listener_port;
+			document.getElementById("send_port").value = settings.send_port;
+			// Fields and button remain hidden until we've received settings from PI
+			// to avoid showing the wrong information.
+			document.getElementById("connection_settings_div").hidden = false;
+			console.log("Got settings: ", settings);
+		}
+
+		function callbackRefreshDcsGameState() {
+			sendmessage("refreshDcsState");
+		}
+
+		function gotDcsGameState(current_game_state) {
+			// Create rows in a new table body so it is easy to replace any old content.
+			var new_table_body = document.createElement('tbody');
+			for (const id of Object.keys(current_game_state)) {
+				var new_row = new_table_body.insertRow();
+				var dcs_id_cell = new_row.insertCell(0);
+				var value_cell = new_row.insertCell(1);
+				dcs_id_cell.appendChild(document.createTextNode(id));
+				value_cell.appendChild(document.createTextNode(current_game_state[id]));
+			}
+			var document_table_body = document.getElementById("game_state_table").getElementsByTagName('tbody')[0];
+			document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
+		}
+
+		/** Functions for communication with original window **/
+
+		function loaded() {
+			setTimeout(() => {
+				// this is just a quick message to Property Inspector (you should see it in the console)
+				window.opener.gotCallbackFromWindow("Message from window: " + new Date().toLocaleTimeString());
+			}, 1000);
+			sendmessage("requestGlobalSettings")
+
+		};
+
+		function sendmessage(event, payload) {
+			// Calls function from original (Property Inspector) window.
+			var msg = { "event": event }
+			if (payload) {
+				msg["payload"] = payload;
+			}
+			window.opener.gotCallbackFromCommsWindow(msg);
+		}
+
+	</script>
+
+</body>
+
+</html>

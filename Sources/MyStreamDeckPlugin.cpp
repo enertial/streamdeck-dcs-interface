@@ -98,19 +98,24 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
     //      release_value used in state 1, press_value used in state 2.
     std::string value = "";
     const bool is_switch_action = (inAction.find("switch") != std::string::npos);
+    const bool is_increment_action = (inAction.find("increment") != std::string::npos);
     if (is_switch_action) {
         const int state = EPLJSONUtils::GetIntByName(inPayload, "state");
         if (state == 0) {
-            value = EPLJSONUtils::GetStringByName(settings, "release_value");
+            value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
         } else {
-            value = EPLJSONUtils::GetStringByName(settings, "press_value");
+            value = EPLJSONUtils::GetStringByName(settings, "send_when_second_state_value");
         }
+    } else if (is_increment_action) {
+        value = EPLJSONUtils::GetStringByName(settings, "increment_value");
+        // TODO: handle incrementing value.
+
     } else {
         value = EPLJSONUtils::GetStringByName(settings, "press_value");
 
-        // The Streamdeck will by default change a context's state after a button action, so a force send of the current
-        // context's state will keep the button state in sync with the plugin.
-        // (Not performed for switches as generally the change in state is desired there).
+        // The Streamdeck will by default change a context's state after a button action, so a force send of the
+        // current context's state will keep the button state in sync with the plugin. (Not performed for switches
+        // as generally the change in state is desired there).
         mVisibleContexts[inContext].forceSendState(mConnectionManager);
     }
 
@@ -126,7 +131,8 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
 
     // For switches no change of value is needed on key up.
     const bool is_switch_action = (inAction.find("switch") != std::string::npos);
-    if (!is_switch_action) {
+    const bool is_increment_action = (inAction.find("increment") != std::string::npos);
+    if (!is_switch_action && !is_increment_action) {
         // Send a command to DCS using the settings included with the KeyUpForAction callback.
         json settings;
         EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
@@ -187,5 +193,15 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
             mVisibleContexts[inContext].updateContextSettings(inPayload["settings"]);
         }
         mVisibleContextsMutex.unlock();
+    }
+
+    if (event == "RequestDcsStateUpdate") {
+        const std::map<int, std::string> dcs_id_values = dcs_interface_.debug_get_current_game_state();
+        json current_game_state;
+        for (const auto &[key, value] : dcs_id_values) {
+            current_game_state[std::to_string(key)] = value;
+        }
+        mConnectionManager->SendToPropertyInspector(
+            inAction, inContext, json({{"event", "DebugDcsGameState"}, {"current_game_state", current_game_state}}));
     }
 }

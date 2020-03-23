@@ -77,7 +77,7 @@
     },
     {
       "Icon": "images/Rotary_Dial_0",
-      "Name": "Incremental Input Button",
+      "Name": "Incremental Input (Rotary)",
       "States": [
         {
           "Image": "images/Rotary_Dial_0",

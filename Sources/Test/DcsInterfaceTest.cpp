@@ -16,7 +16,7 @@ TEST(DcsInterfaceTest, empty_game_state_on_initialization) {
     DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
     DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
 
-    std::vector<std::string> current_game_state = {};
+    std::map<int, std::string> current_game_state = {};
 
     // Test that current game state initializes as empty.
     current_game_state = dcs_interface.debug_get_current_game_state();
@@ -81,7 +81,7 @@ TEST(DcsInterfaceTest, update_dcs_state_end_of_mission) {
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    std::vector<std::string> current_game_state = dcs_interface.debug_get_current_game_state();
+    std::map<int, std::string> current_game_state = dcs_interface.debug_get_current_game_state();
     EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is cleared when a "STOP" message is received, signifying end of mission.
@@ -148,7 +148,7 @@ TEST(DcsInterfaceTest, clear_game_state) {
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    std::vector<std::string> current_game_state = dcs_interface.debug_get_current_game_state();
+    std::map<int, std::string> current_game_state = dcs_interface.debug_get_current_game_state();
     EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is able to be cleared.
@@ -167,11 +167,11 @@ TEST(DcsInterfaceTest, debug_print_format) {
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    std::vector<std::string> current_game_state = dcs_interface.debug_get_current_game_state();
+    std::map<int, std::string> current_game_state = dcs_interface.debug_get_current_game_state();
 
-    EXPECT_EQ("761: 1\n", current_game_state[0]);
-    EXPECT_EQ("765: 2.00\n", current_game_state[1]);
-    EXPECT_EQ("2026: TEXT_STR\n", current_game_state[2]);
-    EXPECT_EQ("2027: 4\n", current_game_state[3]);
+    EXPECT_EQ(current_game_state[761], "1");
+    EXPECT_EQ(current_game_state[765], "2.00");
+    EXPECT_EQ(current_game_state[2026], "TEXT_STR");
+    EXPECT_EQ(current_game_state[2027], "4");
 }
 } // namespace test

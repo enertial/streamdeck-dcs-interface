@@ -50,14 +50,7 @@ void DcsInterface::send_dcs_command(const int button_id, const std::string &devi
 
 void DcsInterface::clear_game_state() { current_game_state_.clear(); }
 
-std::vector<std::string> DcsInterface::debug_get_current_game_state() {
-    std::vector<std::string> game_state_printout;
-    for (const auto &[key, value] : current_game_state_) {
-        std::string formatted_key_and_value = std::to_string(key) + ": " + value + "\n";
-        game_state_printout.push_back(formatted_key_and_value);
-    }
-    return std::move(game_state_printout);
-}
+std::map<int, std::string> DcsInterface::debug_get_current_game_state() { return current_game_state_; }
 
 void DcsInterface::handle_received_token(const std::string &key, const std::string &value) {
     if (is_integer(key)) {

@@ -67,55 +67,13 @@ $SD.on('connected', (jsn) => {
      *
      * const foundObject = Utils.getProp(JSON-OBJECT, 'path.to.target', defaultValueIfNotFound)
      */
+    console.log(jsn);
 
     settings = Utils.getProp(jsn, 'actionInfo.payload.settings', false);
     var action = Utils.getProp(jsn, 'actionInfo.action');
 
-    /* DEFAULT SETTINGS SPECIFIED HERE */
-    if (action.includes("switch")) {
-        document.getElementById("switch_button_settings").hidden = false;
-        if (!settings.hasOwnProperty("send_when_first_state")) {
-            settings["send_when_first_state_value"] = "1";
-        }
-        if (!settings.hasOwnProperty("send_when_second_state")) {
-            settings["send_when_second_state_value"] = "-1";
-        }
-    }
-    else if (action.includes("increment")) {
-        document.getElementById("increment_button_settings").hidden = false;
-        if (!settings.hasOwnProperty("send_increment_value")) {
-            settings["increment_value"] = "0.1";
-        }
-        if (!settings.hasOwnProperty("send_increment_min")) {
-            settings["increment_min"] = "0";
-        }
-        if (!settings.hasOwnProperty("send_increment_max")) {
-            settings["increment_max"] = "1";
-        }
-    }
-    else {
-        document.getElementById("momentary_button_settings").hidden = false;
-        if (!settings.hasOwnProperty("increment_value")) {
-            settings["increment_value"] = "0.1";
-        }
-        if (!settings.hasOwnProperty("increment_min")) {
-            settings["increment_min"] = "0";
-        }
-        if (!settings.hasOwnProperty("increment_max")) {
-            settings["increment_max"] = "1";
-        }
-        if (!settings.hasOwnProperty("increment_cycle_allowed_check")) {
-            settings["increment_cycle_allowed_check"] = false;
-        }
-    }
-
-    if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
-        settings["dcs_id_comparison_value"] = "0";
-    }
-    if (!settings.hasOwnProperty("string_monitor_passthrough_check")) {
-        settings["string_monitor_passthrough_check"] = true;
-    }
-
+    $SD.api.getGlobalSettings($SD.uuid);
+    settings = addDefaultSettings(action, settings);
 
     if (settings) {
         updateUI(settings);
@@ -125,31 +83,22 @@ $SD.on('connected', (jsn) => {
 });
 
 /**
+ * The 'didReceiveGlobalSettings' event is used for persistent settings across all instances.
+ */
+
+$SD.on('didReceiveGlobalSettings', jsn => {
+    console.log("Received global settings: ", jsn);
+    callbackReceivedGlobalSettings(jsn.payload.settings);
+});
+
+/**
  * The 'sendToPropertyInspector' event can be used to send messages directly from your plugin
  * to the Property Inspector without saving these messages to the settings.
  */
 
 $SD.on('sendToPropertyInspector', jsn => {
-    const pl = jsn.payload;
-    /**
-     *  This is an example, how you could show an error to the user
-     */
-    if (pl.hasOwnProperty('error')) {
-        sdpiWrapper.innerHTML = `<div class="sdpi-item">
-            <details class="message caution">
-            <summary class="${pl.hasOwnProperty('info') ? 'pointer' : ''}">${pl.error}</summary>
-                ${pl.hasOwnProperty('info') ? pl.info : ''}
-            </details>
-        </div>`;
-    } else {
-
-        /**
-         *
-         * Do something with the data sent from the plugin
-         * e.g. update some elements in the Property Inspector's UI.
-         *
-         */
-    }
+    console.log("send to property inspector payload received:", jsn);
+    callbackReceivedPayloadFromPlugin(jsn.payload);
 });
 
 const updateUI = (pl) => {
@@ -217,10 +166,9 @@ $SD.on('piDataChanged', (returnValue) => {
     saveSettings(returnValue);
     //}
 
-    /* SEND THE VALUES TO PLUGIN */
-    //sendValueToPlugin(returnValue, 'sdpi_collection');
-
     /* SEND ALL SETTINGS TO PLUGIN */
+    // This sends all settings to plugin everytime, rather than using the Streamdeck example
+    // setup which called sendValueToPlugin().
     sendSettingsToPlugin();
 });
 
@@ -291,85 +239,6 @@ function sendValueToPlugin(value, prop) {
 
         $SD.connection.send(JSON.stringify(json));
     }
-}
-
-/**
- * 'sendSettingsToPlugin' is a wrapper to send current settings to the plugin
- *
- */
-
-function sendSettingsToPlugin() {
-    console.log("sendSettingsToPlugin", settings);
-    if ($SD.connection && $SD.connection.readyState === 1) {
-        const json = {
-            action: $SD.actionInfo['action'],
-            event: 'sendToPlugin',
-            context: $SD.uuid,
-            payload: {
-                event: 'SettingsUpdate',
-                settings: settings
-            }
-        };
-
-        $SD.connection.send(JSON.stringify(json));
-    }
-}
-
-/**
- * @function callbackHelpButtonPress
- * Opens an external window when button is clicked.
- */
-function callbackHelpButtonPress() {
-    if (!window.xtWindow || window.xtWindow.closed) {
-        window.xtWindow = window.open('../helpDocs/helpWindow.html', 'External Window');
-    }
-}
-
-/**
- * @function callbackStringMonitorPassthroughCheck
- * Shows/hides textbox for entering string display mapping.
- */
-function callbackStringMonitorPassthroughCheck(isChecked) {
-    if (isChecked) {
-        document.getElementById("string_monitor_mapping_div").hidden = true;
-    }
-    else {
-        document.getElementById("string_monitor_mapping_div").hidden = false;
-    }
-    console.log("String Monitor Passtrhough Callback isChecked: ", isChecked);
-}
-
-/**
- *  Clears setting for DCS Command Button ID, disabling the feature.
- */
-function callbackClearDcsCommand() {
-    delete settings["button_id"];
-    $SD.api.setSettings($SD.uuid, settings);
-    button_id.value = "";
-    // Don't need to send to plugin as it always reads in latest settings on button push.
-    console.log("Clear DCS Command", settings);
-}
-
-/**
- *  Clears setting for DCS ID Compare Monitor, disabling the feature.
- */
-function callbackClearCompareMonitor() {
-    delete settings["dcs_id_compare_monitor"];
-    $SD.api.setSettings($SD.uuid, settings);
-    dcs_id_compare_monitor.value = "";
-    sendSettingsToPlugin();
-    console.log("Clear DCS ID Compare Monitor", settings);
-}
-
-/**
- *  Clears setting for DCS ID String Monitor, disabling the feature.
- */
-function callbackClearStringMonitor() {
-    delete settings["dcs_id_string_monitor"];
-    $SD.api.setSettings($SD.uuid, settings);
-    dcs_id_string_monitor.value = "";
-    sendSettingsToPlugin();
-    console.log("Clear DCS ID String Monitor", settings);
 }
 
 /** CREATE INTERACTIVE HTML-DOM
@@ -637,5 +506,5 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 function gotCallbackFromWindow(parameter) {
-    console.log(parameter);
+    console.log("Callback from window:", parameter);
 }

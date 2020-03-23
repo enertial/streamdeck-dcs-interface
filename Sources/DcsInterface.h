@@ -58,9 +58,9 @@ class DcsInterface {
     /**
      * @brief For debugging purposes, outputs all logged DCS ID key value pairs stored in current game state.
      *
-     * @return Vector of strings ready for printing containing all current values.
+     * @return Map of IDs and their values in current game state.
      */
-    std::vector<std::string> debug_get_current_game_state();
+    std::map<int, std::string> debug_get_current_game_state();
 
   private:
     /**
