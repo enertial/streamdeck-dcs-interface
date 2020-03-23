@@ -10,6 +10,8 @@
 
 #include <string>
 
+using KeyEvent = enum { KEY_DOWN, KEY_UP };
+
 class StreamdeckContext {
   public:
     StreamdeckContext() = default;
@@ -39,8 +41,38 @@ class StreamdeckContext {
      */
     void updateContextSettings(const json &settings);
 
+    /**
+     * @brief Sends DCS commands according to button type and settings received during Key Down/Up event.
+     *
+     * @param dcs_interface Interface to DCS containing current game state.
+     * @param event Type of button event - KeyDown or KeyUp
+     * @param action Type of button action - used to determine momentary, swtich, or increment button type.
+     * @param settings Current settings associated with context.
+     */
+    void handleButtonEvent(DcsInterface &dcs_interface,
+                           const KeyEvent event,
+                           const std::string &action,
+                           const json &inPayload);
+
   private:
-    using CompareConditionType = enum { EQUAL_TO = 0, LESS_THAN, GREATER_THAN };
+    using CompareConditionType = enum { GREATER_THAN, EQUAL_TO, LESS_THAN };
+    using ContextState = enum { FIRST, SECOND };
+
+    /**
+     * @brief Determines the send value for the type of button for KeyDown and KeyUp events.
+     *
+     * @param event Either a KeyDown or KeyUp event.
+     * @param state Current state of the context.
+     * @param settings Settings for context.
+     * @param value Value to be sent to Button ID.
+     * @return True if value should be sent to DCS.
+     */
+    bool determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value);
+    bool determineSendValueForSwitch(const KeyEvent event,
+                                     const ContextState state,
+                                     const json &settings,
+                                     std::string &value);
+    bool determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value);
 
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 

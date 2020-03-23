@@ -10,10 +10,14 @@
  *
  */
 inline bool is_integer(const std::string &str) {
-    // Check if all characters are base 10 digits (0-9).
-    char *ptr_to_first_non_numeric_char;
-    strtol(str.c_str(), &ptr_to_first_non_numeric_char, 10);
-    return (*ptr_to_first_non_numeric_char == '\0');
+    if (str.empty()) {
+        return false;
+    } else {
+        // Check if all characters are base 10 digits (0-9).
+        char *ptr_to_first_non_numeric_char;
+        strtol(str.c_str(), &ptr_to_first_non_numeric_char, 10);
+        return (*ptr_to_first_non_numeric_char == '\0');
+    }
 }
 
 /**
@@ -21,8 +25,12 @@ inline bool is_integer(const std::string &str) {
  *
  */
 inline bool is_number(const std::string &str) {
-    // Check if all characters can be converted to a floating point number.
-    char *ptr_to_first_non_numeric_char;
-    strtof(str.c_str(), &ptr_to_first_non_numeric_char);
-    return (*ptr_to_first_non_numeric_char == '\0');
+    if (str.empty()) {
+        return false;
+    } else {
+        // Check if all characters can be converted to a floating point number.
+        char *ptr_to_first_non_numeric_char;
+        strtof(str.c_str(), &ptr_to_first_non_numeric_char);
+        return (*ptr_to_first_non_numeric_char == '\0');
+    }
 }
