@@ -8,6 +8,9 @@
 
 #include <WS2tcpip.h>
 
+// Set default timeout for socket.
+DWORD socket_timeout_ms = 100;
+
 DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address) {
     // Initialize Windows Sockets DLL to version 2.2.
     WSADATA wsaData;
@@ -31,6 +34,7 @@ DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, con
 
     // Bind local socket to receive port.
     socket_id_ = socket(local_port->ai_family, local_port->ai_socktype, local_port->ai_protocol);
+    setsockopt(socket_id_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&socket_timeout_ms, sizeof(socket_timeout_ms));
     const auto result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
     freeaddrinfo(local_port);
 
