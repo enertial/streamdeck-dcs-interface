@@ -2,8 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsSocket.cpp" // Included because I can't figure out Windows Linker
-#include "../DcsSocket.h"
+#include "../DcsSocket.cpp"
 
 namespace test {
 TEST(DcsSocketTest, send_and_receive) {

@@ -2,32 +2,33 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsInterface.cpp" // Included because I can't figure out Windows Linker
-#include "../DcsInterface.h"
+#include "../DcsInterface.cpp"
 
 namespace test {
 
-const std::string kDcsListenerPort = "1908";   // Port number to receive DCS updates from.
-const std::string kDcsSendPort = "1909";       // Port number which DCS commands will be sent to.
-const std::string kDcsIpAddress = "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
+class DcsInterfaceTestFixture : public ::testing::Test {
+  public:
+    DcsInterfaceTestFixture()
+        : dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress),
+          mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress) {}
 
-TEST(DcsInterfaceTest, empty_game_state_on_initialization) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
+    DcsInterface dcs_interface; // DCS Interface to test.
+    DcsSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
 
-    std::map<int, std::string> current_game_state = {};
+    // Constants to be used for providing a valid DcsInterface.
+    static inline std::string kDcsListenerPort = "1908"; // Port number to receive DCS updates from.
+    static inline std::string kDcsSendPort = "1909";     // Port number which DCS commands will be sent to.
+    static inline std::string kDcsIpAddress =
+        "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
+};
 
+TEST_F(DcsInterfaceTestFixture, empty_game_state_on_initialization) {
     // Test that current game state initializes as empty.
-    current_game_state = dcs_interface.debug_get_current_game_state();
+    std::map<int, std::string> current_game_state = dcs_interface.debug_get_current_game_state();
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST(DcsInterfaceTest, update_dcs_state) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, update_dcs_state) {
     // TEST 1 - Received values are stored and retrievable.
     // Send a single message from mock DCS that contains updates for multiple IDs.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
@@ -54,11 +55,7 @@ TEST(DcsInterfaceTest, update_dcs_state) {
     EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
 }
 
-TEST(DcsInterfaceTest, update_dcs_state_handle_newline_chars) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, update_dcs_state_handle_newline_chars) {
     // Send a single message from mock DCS that contains newline characters at the end of tokens.
     std::string mock_dcs_message = "header*761=1\n:765=2.00\n:2026=TEXT_STR\n:2027=4\n";
     mock_dcs.DcsSend(mock_dcs_message);
@@ -71,11 +68,7 @@ TEST(DcsInterfaceTest, update_dcs_state_handle_newline_chars) {
     EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
 }
 
-TEST(DcsInterfaceTest, update_dcs_state_end_of_mission) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, update_dcs_state_end_of_mission) {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     // Expect that the number of stored values in game state is non-zero.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
@@ -92,11 +85,7 @@ TEST(DcsInterfaceTest, update_dcs_state_end_of_mission) {
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST(DcsInterfaceTest, send_dcs_command) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, send_dcs_command) {
     const int button_id = 250;
     const std::string device_id = "24";
     const std::string value = "1";
@@ -108,24 +97,18 @@ TEST(DcsInterfaceTest, send_dcs_command) {
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
-TEST(DcsInterfaceTest, send_dcs_reset_command) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, send_dcs_reset_command) {
     dcs_interface.send_dcs_reset_command();
     std::stringstream ss_received = mock_dcs.DcsReceive();
     EXPECT_EQ(ss_received.str(), "R");
 }
 
-TEST(DcsInterfaceTest, get_current_dcs_module) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, get_current_dcs_module_init) {
     // Test that the default value of an empty string is returned after initialization.
     EXPECT_EQ("", dcs_interface.get_current_dcs_module());
+}
 
+TEST_F(DcsInterfaceTestFixture, get_current_dcs_module) {
     // Test that game module is updated when the "File" message with module name is received.
     std::string mock_dcs_message = "header*File=AV8BNA";
     mock_dcs.DcsSend(mock_dcs_message);
@@ -139,20 +122,12 @@ TEST(DcsInterfaceTest, get_current_dcs_module) {
     EXPECT_EQ("", dcs_interface.get_current_dcs_module());
 }
 
-TEST(DcsInterfaceTest, get_value_of_dcs_id_if_nonexistant) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, get_value_of_dcs_id_if_nonexistant) {
     // Test that the default value of an empty string is returned for a DCS ID with no stored value.
     EXPECT_EQ("", dcs_interface.get_value_of_dcs_id(999));
 }
 
-TEST(DcsInterfaceTest, clear_game_state) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, clear_game_state) {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     // Expect that the number of stored values in game state is non-zero.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
@@ -167,11 +142,7 @@ TEST(DcsInterfaceTest, clear_game_state) {
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST(DcsInterfaceTest, debug_print_format) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-
+TEST_F(DcsInterfaceTestFixture, debug_print_format) {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     // Expect that the number of stored values in game state is non-zero.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";

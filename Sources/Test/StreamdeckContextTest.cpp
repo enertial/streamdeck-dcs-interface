@@ -32,19 +32,25 @@ class ESDConnectionManager {
 };
 
 #include "../StreamdeckContext.cpp"
-#include "../StreamdeckContext.h"
 
-// Constants to be used for providing a valid DcsInterface.
-const std::string kDcsListenerPort = "1908";   // Port number to receive DCS updates from.
-const std::string kDcsSendPort = "1909";       // Port number which DCS commands will be sent to.
-const std::string kDcsIpAddress = "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
+class StreamdeckContextTestFixture : public ::testing::Test {
+  public:
+    StreamdeckContextTestFixture()
+        : dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress),
+          mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress) {}
 
-TEST(StreamdeckContextTest, update_context_state) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-    ESDConnectionManager esd_connection_manager;
+    DcsInterface dcs_interface;                  // DCS Interface to test.
+    DcsSocket mock_dcs;                          // A socket that will mock Send/Receive messages from DCS.
+    ESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
 
+    // Constants to be used for providing a valid DcsInterface.
+    static inline std::string kDcsListenerPort = "1908"; // Port number to receive DCS updates from.
+    static inline std::string kDcsSendPort = "1909";     // Port number which DCS commands will be sent to.
+    static inline std::string kDcsIpAddress =
+        "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
+};
+
+TEST_F(StreamdeckContextTestFixture, update_context_state) {
     // Create StreamdeckContext to test.
     const std::string context_a = "abc123";
     const json settings = {{"dcs_id_compare_monitor", "765"},
@@ -69,11 +75,7 @@ TEST(StreamdeckContextTest, update_context_state) {
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
 }
 
-TEST(StreamdeckContextTest, update_context_settings) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-    ESDConnectionManager esd_connection_manager;
+TEST_F(StreamdeckContextTestFixture, update_context_settings) {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.DcsSend(mock_dcs_message);
@@ -110,12 +112,7 @@ TEST(StreamdeckContextTest, update_context_settings) {
     EXPECT_EQ(esd_connection_manager.title_, "");
 }
 
-TEST(StreamdeckContextTest, update_context_state_float_comparisons) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-    ESDConnectionManager esd_connection_manager;
-
+TEST_F(StreamdeckContextTestFixture, update_context_state_float_comparisons) {
     const std::string comparison_value_as_str = "1.56";
     const float comparison_value_as_flt = 1.56F;
     json settings = {{"dcs_id_compare_monitor", "123"},
@@ -195,12 +192,7 @@ TEST(StreamdeckContextTest, update_context_state_float_comparisons) {
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 
-TEST(StreamdeckContextTest, update_context_state_invalid_value_types) {
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-    ESDConnectionManager esd_connection_manager;
-
+TEST_F(StreamdeckContextTestFixture, update_context_state_invalid_value_types) {
     // Create StreamdeckContext to test.
     const std::string context_a = "abc123";
     json settings = {{"dcs_id_compare_monitor", "123"},
@@ -285,13 +277,9 @@ TEST(StreamdeckContextTest, update_context_state_invalid_value_types) {
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 
-TEST(StreamdeckContextTest, class_instances_within_container) {
+TEST_F(StreamdeckContextTestFixture, class_instances_within_container) {
     // This is more of a test of the MyStreamDeckPlugin.cpp use of this class than of the class itself.
 
-    // Open the interface to test and a socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    DcsSocket mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress);
-    ESDConnectionManager esd_connection_manager;
     std::string mock_dcs_message = "header*1=a:2=b:3=c";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
@@ -315,9 +303,7 @@ TEST(StreamdeckContextTest, class_instances_within_container) {
     EXPECT_EQ(esd_connection_manager.title_, "a");
 }
 
-TEST(StreamdeckContextTest, force_send_state_update) {
-    DcsInterface dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress);
-    ESDConnectionManager esd_connection_manager;
+TEST_F(StreamdeckContextTestFixture, force_send_state_update) {
     StreamdeckContext streamdeck_context("abc123");
 
     // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
