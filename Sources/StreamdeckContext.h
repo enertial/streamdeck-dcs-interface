@@ -47,7 +47,7 @@ class StreamdeckContext {
      * @param dcs_interface Interface to DCS containing current game state.
      * @param event Type of button event - KeyDown or KeyUp
      * @param action Type of button action - used to determine momentary, swtich, or increment button type.
-     * @param settings Current settings associated with context.
+     * @param payload Json payload received with KeyDown/KeyUp callback.
      */
     void handleButtonEvent(DcsInterface &dcs_interface,
                            const KeyEvent event,
