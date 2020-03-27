@@ -85,8 +85,9 @@ class StreamdeckContext {
     float current_increment_value_ = 0.0F;     // Stored value for increment button types.
     bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
 
-    int dcs_id_compare_monitor_ = 0;
-    CompareConditionType dcs_id_compare_condition_ = GREATER_THAN;
-    float dcs_id_comparison_value_ = 0.0F;
-    int dcs_id_string_monitor_ = 0;
+    int dcs_id_compare_monitor_ = 0; // DCS ID to monitor for context state setting according to value comparison.
+    CompareConditionType dcs_id_compare_condition_ = GREATER_THAN; // Comparison to use for DCS ID compare monitor.
+    float dcs_id_comparison_value_ = 0.0F;                         // Value to compare DCS ID compare monitor value to.
+    int dcs_id_string_monitor_ = 0;                                // DCS ID to monitor for context title.
+    bool string_monitor_passthrough_ = true; // Flag set by user to passthrough string to title unaltered.
 };

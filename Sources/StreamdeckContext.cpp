@@ -91,6 +91,9 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
     if (string_monitor_is_set_) {
         dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
     }
+
+    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
+    string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
 }
 
 void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
@@ -99,6 +102,10 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
                                           const json &inPayload) {
     const std::string button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
+
+    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
+    cycle_increments_is_allowed_ =
+        EPLJSONUtils::GetBoolByName(inPayload["settings"], "increment_cycle_allowed_check", false);
 
     if (is_integer(button_id) && is_integer(device_id)) {
         bool send_command = false;
@@ -112,7 +119,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
             send_command = determineSendValueForMomentary(event, inPayload["settings"], value);
         }
 
-        if (send_command && !value.empty()) {
+        if (send_command) {
             dcs_interface.send_dcs_command(std::stoi(button_id), device_id, value);
         }
     }
