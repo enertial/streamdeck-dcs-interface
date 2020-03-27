@@ -15,7 +15,7 @@
 
 #include "Common/EPLJSONUtils.h"
 #include "Common/ESDConnectionManager.h"
-#include "DcsInterfaceParameters.h"
+#include "DcsInterface/DcsInterfaceParameters.h"
 
 class CallBackTimer {
   public:

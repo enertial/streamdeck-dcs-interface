@@ -35,10 +35,9 @@ WIP: Will add DCS export instructions.
 # Source code
 
 The Sources folder contains the source code of the plugin. The primary components are as follows:  
- - `Sources/MyStreamDeckPlugin.{cpp,h}` - StreamDeck C++ API (based on the Elgato streamdeck-cpu example)
- - `Sources/StreamdeckContext.{cpp,h}` - Class which stores each visible Streamdeck button's settings
- - `Sources/DcsInterface.{cpp,h}` - Interface between plugin and DCS
- - `Sources/DcsInterfaceParams.h` - Defines the UDP ports to communicate with DCS
+ - `Sources/DcsInterface/MyStreamDeckPlugin.{cpp,h}` - StreamDeck C++ API (based on the Elgato streamdeck-cpu example)
+ - `Sources/DcsInterface/StreamdeckContext.{cpp,h}` - Class which stores each visible Streamdeck button's settings
+ - `Sources/DcsInterface/DcsInterface.{cpp,h}` - Interface between plugin and DCS
  - `Sources/Test/*.cpp` - Contains unit tests for above classes and helps demonstrate their function
  - `Sources/com.ctytler.dcs.sdPlugin/proprtyinspector` - Contains html and javascript for handling user settings
  - `Sources/com.ctytler.dcs.sdPlugin/manifest.json` - Configuration for the Stream Deck plugin

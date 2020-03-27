@@ -5,7 +5,7 @@
 #include "DcsInterface.h"
 
 #ifndef UNIT_TEST
-#include "Common/ESDConnectionManager.h"
+#include "../Common/ESDConnectionManager.h"
 #endif
 
 #include <string>

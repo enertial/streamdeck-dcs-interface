@@ -11,8 +11,8 @@
 //==============================================================================
 
 #include "Common/ESDBasePlugin.h"
-#include "DcsInterface.h"
-#include "StreamdeckContext.h"
+#include "DcsInterface/DcsInterface.h"
+#include "DcsInterface/StreamdeckContext.h"
 #include <mutex>
 #include <unordered_map>
 

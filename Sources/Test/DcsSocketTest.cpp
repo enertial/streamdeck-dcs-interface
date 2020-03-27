@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsSocket.cpp"
+#include "../DcsInterface/DcsSocket.cpp"
 
 namespace test {
 

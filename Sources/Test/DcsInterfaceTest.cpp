@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsInterface.cpp"
+#include "../DcsInterface/DcsInterface.cpp"
 
 namespace test {
 

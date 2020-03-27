@@ -31,7 +31,7 @@ class ESDConnectionManager {
     std::string title_ = "";
 };
 
-#include "../StreamdeckContext.cpp"
+#include "../DcsInterface/StreamdeckContext.cpp"
 
 class StreamdeckContextTestFixture : public ::testing::Test {
   public:

@@ -186,11 +186,11 @@
     <ClInclude Include="..\Common\ESDLocalizer.h" />
     <ClInclude Include="..\Common\ESDSDKDefines.h" />
     <ClInclude Include="..\Common\ESDUtilities.h" />
-    <ClInclude Include="..\DcsInterface.h" />
-    <ClInclude Include="..\DcsSocket.h" />
-    <ClInclude Include="..\DcsInterfaceParameters.h" />
-    <ClInclude Include="..\Utilities.h" />
-    <ClInclude Include="..\StreamdeckContext.h" />
+    <ClInclude Include="..\DcsInterface\DcsInterface.h" />
+    <ClInclude Include="..\DcsInterface\DcsInterfaceParameters.h" />
+    <ClInclude Include="..\DcsInterface\DcsSocket.h" />
+    <ClInclude Include="..\DcsInterface\StreamdeckContext.h" />
+    <ClInclude Include="..\DcsInterface\Utilities.h" />
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -219,15 +219,15 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <ClCompile Include="..\DcsInterface\DcsInterface.cpp" />
+    <ClCompile Include="..\DcsInterface\DcsSocket.cpp" />
+    <ClCompile Include="..\DcsInterface\StreamdeckContext.cpp" />
     <ClCompile Include="..\MyStreamDeckPlugin.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\DcsInterface.cpp" />
-    <ClCompile Include="..\DcsSocket.cpp" />
-    <ClCompile Include="..\StreamdeckContext.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
