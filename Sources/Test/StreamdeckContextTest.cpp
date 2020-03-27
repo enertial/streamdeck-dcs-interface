@@ -281,8 +281,6 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_wit
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_with_trailing_space) {
-    // A trailing space is currently not handled.
-    // TODO: Consider stripping trailing spaces.
     json settings;
     settings["dcs_id_compare_monitor"] = "123";
     settings["dcs_id_comparison_value"] = "1.0 "; //< Trailing space
@@ -291,7 +289,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_wit
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
     context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, force_send_state_update) {

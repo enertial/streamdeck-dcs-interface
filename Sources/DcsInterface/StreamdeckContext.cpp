@@ -5,7 +5,7 @@
 #include "StreamdeckContext.h"
 
 #include "../Common/EPLJSONUtils.h"
-#include "Utilities.h"
+#include "NumericStringUtilities.h"
 
 StreamdeckContext::StreamdeckContext(const std::string &context) { context_ = context; }
 

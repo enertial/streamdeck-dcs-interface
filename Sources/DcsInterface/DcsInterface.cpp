@@ -3,7 +3,7 @@
 #include "pch.h"
 
 #include "DcsInterface.h"
-#include "Utilities.h"
+#include "NumericStringUtilities.h"
 
 DcsInterface::DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
     : dcs_socket_(rx_port, tx_port, ip_address) {}

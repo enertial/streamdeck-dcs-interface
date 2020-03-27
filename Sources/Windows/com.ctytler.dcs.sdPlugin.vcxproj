@@ -190,7 +190,7 @@
     <ClInclude Include="..\DcsInterface\DcsInterfaceParameters.h" />
     <ClInclude Include="..\DcsInterface\DcsSocket.h" />
     <ClInclude Include="..\DcsInterface\StreamdeckContext.h" />
-    <ClInclude Include="..\DcsInterface\Utilities.h" />
+    <ClInclude Include="..\DcsInterface\NumericStringUtilities.h" />
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -221,6 +221,7 @@
     </ClCompile>
     <ClCompile Include="..\DcsInterface\DcsInterface.cpp" />
     <ClCompile Include="..\DcsInterface\DcsSocket.cpp" />
+    <ClCompile Include="..\DcsInterface\NumericStringUtilities.cpp" />
     <ClCompile Include="..\DcsInterface\StreamdeckContext.cpp" />
     <ClCompile Include="..\MyStreamDeckPlugin.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
