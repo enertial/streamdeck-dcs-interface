@@ -39,28 +39,34 @@ void Decimal::string_to_decimal(std::string number) {
     }
 }
 
+int Decimal::get_as_higher_exponent(const int higher_exponent) const {
+    int significant_digits_at_higher_exponent = significant_digits_;
+    for (int i = exponent_; i < higher_exponent; ++i) {
+        significant_digits_at_higher_exponent *= 10;
+    }
+    return significant_digits_at_higher_exponent;
+}
+
+/**
+ *  Operator Overloads
+ */
+
 Decimal operator+(const Decimal &lhs, const Decimal &rhs) {
     int precision = (std::max)(lhs.exponent_, rhs.exponent_);
-    int lhs_significant_digits = lhs.significant_digits_;
-    int rhs_significant_digits = rhs.significant_digits_;
-    for (int i = lhs.exponent_; i < precision; ++i) {
-        lhs_significant_digits *= 10;
-    }
-    for (int i = rhs.exponent_; i < precision; ++i) {
-        rhs_significant_digits *= 10;
-    }
-    return Decimal(lhs_significant_digits + rhs_significant_digits, precision);
+    return Decimal(lhs.get_as_higher_exponent(precision) + rhs.get_as_higher_exponent(precision), precision);
 }
 
 Decimal operator-(const Decimal &lhs, const Decimal &rhs) {
     int precision = (std::max)(lhs.exponent_, rhs.exponent_);
-    int lhs_significant_digits = lhs.significant_digits_;
-    int rhs_significant_digits = rhs.significant_digits_;
-    for (int i = lhs.exponent_; i < precision; ++i) {
-        lhs_significant_digits *= 10;
-    }
-    for (int i = rhs.exponent_; i < precision; ++i) {
-        rhs_significant_digits *= 10;
-    }
-    return Decimal(lhs_significant_digits - rhs_significant_digits, precision);
+    return Decimal(lhs.get_as_higher_exponent(precision) - rhs.get_as_higher_exponent(precision), precision);
+}
+
+bool operator<(const Decimal &lhs, const Decimal &rhs) {
+    int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
+    return lhs.get_as_higher_exponent(common_precision) < rhs.get_as_higher_exponent(common_precision);
+}
+
+bool operator==(const Decimal &lhs, const Decimal &rhs) {
+    int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
+    return lhs.get_as_higher_exponent(common_precision) == rhs.get_as_higher_exponent(common_precision);
 }

@@ -147,4 +147,29 @@ TEST(NumericStringUtilitiesTest, Decimal_subtraction_rhs_greater_precision) {
     EXPECT_EQ("0.0095", result.str());
 }
 
+TEST(NumericStringUtilitiesTest, Decimal_plus_equals) {
+    Decimal decimal("4.5");
+    decimal += Decimal("0.2");
+    EXPECT_EQ("4.7", decimal.str());
+}
+
+TEST(NumericStringUtilitiesTest, Decimal_minus_equals) {
+    Decimal decimal("4.5");
+    decimal -= Decimal("0.5");
+    EXPECT_EQ("4.0", decimal.str());
+}
+
+TEST(NumericStringUtilitiesTest, Decimal_less_than) {
+    EXPECT_TRUE(Decimal("3.556") < Decimal("5"));
+    EXPECT_TRUE(Decimal("0.05") < Decimal("0.1"));
+    EXPECT_FALSE(Decimal("12.1") < Decimal("0.9995"));
+}
+
+TEST(NumericStringUtilitiesTest, Decimal_equal_to) {
+    EXPECT_TRUE(Decimal("3.556") == Decimal("03.55600"));
+    EXPECT_TRUE(Decimal("0.05") == Decimal(".05"));
+    EXPECT_TRUE(Decimal("123.42") == Decimal(12342, 2));
+    EXPECT_FALSE(Decimal("55.0") == Decimal("550"));
+}
+
 } // namespace test
