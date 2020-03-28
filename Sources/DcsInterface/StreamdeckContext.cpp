@@ -14,50 +14,35 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
 }
 
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager) {
-    // Default button states:
-    int state = 0;
-    std::string title = "";
+    // Initialize to default values.
+    ContextState updated_state = FIRST;
+    std::string updated_title = "";
 
     if (compare_monitor_is_set_) {
         const std::string current_game_value_raw = dcs_interface.get_value_of_dcs_id(dcs_id_compare_monitor_);
         if (is_number(current_game_value_raw)) {
-            float current_game_value = std::stof(current_game_value_raw);
-            bool set_context_state_to_second = false;
-            switch (dcs_id_compare_condition_) {
-            case EQUAL_TO:
-                set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
-                break;
-            case LESS_THAN:
-                set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
-                break;
-            case GREATER_THAN:
-                set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
-                break;
-            }
-
-            state = set_context_state_to_second ? 1 : 0;
+            updated_state = determineStateForCompareMonitor(Decimal(current_game_value_raw));
         }
     }
-
     if (string_monitor_is_set_) {
         const std::string current_game_string_value = dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
         if (!current_game_string_value.empty()) {
-            title = current_game_string_value;
+            updated_title = determineTitleForStringMonitor(current_game_string_value);
         }
     }
 
-    if (state != current_state_) {
-        current_state_ = state;
-        mConnectionManager->SetState(current_state_, context_);
+    if (updated_state != current_state_) {
+        current_state_ = updated_state;
+        mConnectionManager->SetState(static_cast<int>(current_state_), context_);
     }
-    if (title != current_title_) {
-        current_title_ = title;
+    if (updated_title != current_title_) {
+        current_title_ = updated_title;
         mConnectionManager->SetTitle(current_title_, context_, kESDSDKTarget_HardwareAndSoftware);
     }
 }
 
 void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager) {
-    mConnectionManager->SetState(current_state_, context_);
+    mConnectionManager->SetState(static_cast<int>(current_state_), context_);
 }
 
 void StreamdeckContext::updateContextSettings(const json &settings) {
@@ -81,7 +66,7 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
     // Update internal settings of class instance.
     if (compare_monitor_is_set_) {
         dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
-        dcs_id_comparison_value_ = std::stof(dcs_id_comparison_value_raw);
+        dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);
         if (dcs_id_compare_condition_raw == "EQUAL_TO") {
             dcs_id_compare_condition_ = EQUAL_TO;
         } else if (dcs_id_compare_condition_raw == "LESS_THAN") {
@@ -130,6 +115,32 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
         if (send_command) {
             dcs_interface.send_dcs_command(std::stoi(button_id), device_id, value);
         }
+    }
+}
+
+StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonitor(const Decimal &current_game_value) {
+    bool set_context_state_to_second = false;
+    switch (dcs_id_compare_condition_) {
+    case EQUAL_TO:
+        set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
+        break;
+    case LESS_THAN:
+        set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
+        break;
+    case GREATER_THAN:
+        set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
+        break;
+    }
+
+    return set_context_state_to_second ? SECOND : FIRST;
+}
+
+std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value) {
+    if (string_monitor_passthrough_) {
+        return current_game_string_value;
+    } else {
+        std::string title_value = string_monitor_mapping_[current_game_string_value];
+        return std::move(title_value);
     }
 }
 

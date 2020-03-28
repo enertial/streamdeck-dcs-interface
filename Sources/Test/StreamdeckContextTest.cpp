@@ -61,29 +61,86 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_when_no_dcs) {
     EXPECT_EQ(esd_connection_manager.context_, "");
 }
 
-TEST_F(StreamdeckContextTestFixture, update_context_state) {
+TEST_F(StreamdeckContextTestFixture, update_context_state_dcs_id_compare) {
     // Create StreamdeckContext initialized with settings to test.
     const std::string context_id = "def456";
     const json settings = {{"dcs_id_compare_monitor", "765"},
                            {"dcs_id_compare_condition", "EQUAL_TO"},
-                           {"dcs_id_comparison_value", "2.0"},
-                           {"dcs_id_string_monitor", "2026"}};
+                           {"dcs_id_comparison_value", "2.0"}};
+    StreamdeckContext test_context(context_id, settings);
+
+    // Test -- With a populated game state in dcs_interface, try to update context state.
+    // Send a single message from mock DCS that contains update for monitored ID.
+    std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, context_id);
+    EXPECT_EQ(esd_connection_manager.state_, 1);
+}
+
+TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_passthrough) {
+    // Create StreamdeckContext initialized with settings to test.
+    const std::string context_id = "def456";
+    const json settings = {{"dcs_id_string_monitor", "2026"}, {"string_monitor_passthrough_check", true}};
+    StreamdeckContext test_context(context_id, settings);
+
+    // Test -- With a populated game state in dcs_interface, try to update context state.
+    // Send a single message from mock DCS that contains update for monitored ID.
+    std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, context_id);
+    EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
+}
+
+TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping) {
+    // Create StreamdeckContext initialized with settings to test.
+    const std::string context_id = "def456";
+    const json settings = {{"dcs_id_string_monitor", "2027"},
+                           {"string_monitor_passthrough_check", false},
+                           {"string_monitor_mapping", "0.0:A,0.1:B,0.2:C"}};
     StreamdeckContext fixture_context(context_id, settings);
 
     // Test -- With a populated game state in dcs_interface, try to update context state.
-    // Send a single message from mock DCS that contains updates for multiple IDs.
-    std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
+    // Send a single message from mock DCS that contains update for monitored ID.
+    std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
-    EXPECT_EQ(esd_connection_manager.state_, 1);
-    EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
+    EXPECT_EQ(esd_connection_manager.title_, "B");
+}
+
+TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping_unknown_key) {
+    // Create StreamdeckContext initialized with settings to test.
+    const std::string context_id = "def456";
+    const json settings = {{"dcs_id_string_monitor", "2027"},
+                           {"string_monitor_passthrough_check", false},
+                           {"string_monitor_mapping", "0.0:A,0.1:B,0.2:C"}};
+    StreamdeckContext fixture_context(context_id, settings);
+
+    // Test -- Check that a correct mapping is sent when a known key (0.0) is received from game.
+    std::string mock_dcs_message = "header*2027=0.0";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, context_id);
+    EXPECT_EQ(esd_connection_manager.title_, "A");
+
+    // Test -- Check that an empty title string is sent when an unmapped key is received from game.
+    mock_dcs_message = "header*2027=0.6";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, context_id);
+    EXPECT_EQ(esd_connection_manager.title_, "");
 }
 
 TEST_F(StreamdeckContextTestFixture, update_context_settings) {
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
+    std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
 
@@ -95,7 +152,8 @@ TEST_F(StreamdeckContextTestFixture, update_context_settings) {
     json settings = {{"dcs_id_compare_monitor", "765"},
                      {"dcs_id_compare_condition", "EQUAL_TO"},
                      {"dcs_id_comparison_value", "2.0"},
-                     {"dcs_id_string_monitor", "2026"}};
+                     {"dcs_id_string_monitor", "2026"},
+                     {"string_monitor_passthrough_check", true}};
     fixture_context.updateContextSettings(settings);
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, fixture_context_id);
