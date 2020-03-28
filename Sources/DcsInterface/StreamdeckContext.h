@@ -3,6 +3,7 @@
 #pragma once
 
 #include "DcsInterface.h"
+#include "NumericStringUtilities.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"
@@ -82,7 +83,7 @@ class StreamdeckContext {
 
     int current_state_ = 0;                    // Stored state of the context.
     std::string current_title_ = "";           // Stored title of the context.
-    float current_increment_value_ = 0.0F;     // Stored value for increment button types.
+    Decimal current_increment_value_;          // Stored value for increment button types.
     bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
 
     int dcs_id_compare_monitor_ = 0; // DCS ID to monitor for context state setting according to value comparison.

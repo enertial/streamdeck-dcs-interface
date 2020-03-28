@@ -436,7 +436,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple) 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_to_max) {
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 12; ++i) {
+    for (int i = 0; i < 15; ++i) {
         fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
@@ -475,7 +475,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_t
     payload["settings"]["increment_value"] = "-0.1";
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 12; ++i) {
+    for (int i = 0; i < 15; ++i) {
         fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
@@ -489,7 +489,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
     payload["settings"]["increment_cycle_allowed_check"] = true;
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 11; ++i) {
+    for (int i = 0; i < 1; ++i) {
         fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }

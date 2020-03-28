@@ -5,7 +5,6 @@
 #include "StreamdeckContext.h"
 
 #include "../Common/EPLJSONUtils.h"
-#include "NumericStringUtilities.h"
 
 StreamdeckContext::StreamdeckContext(const std::string &context) { context_ = context; }
 
@@ -161,17 +160,17 @@ bool StreamdeckContext::determineSendValueForIncrement(const KeyEvent event, con
         const std::string increment_max_str = EPLJSONUtils::GetStringByName(settings, "increment_max");
         const bool cycling_is_allowed = EPLJSONUtils::GetBoolByName(settings, "increment_cycle_allowed_check");
         if (is_number(increment_value_str) && is_number(increment_min_str) && is_number(increment_max_str)) {
-            float increment_min = std::stof(increment_min_str);
-            float increment_max = std::stof(increment_max_str);
+            Decimal increment_min(increment_min_str);
+            Decimal increment_max(increment_max_str);
 
-            current_increment_value_ += std::stof(increment_value_str);
+            current_increment_value_ += Decimal(increment_value_str);
 
             if (current_increment_value_ < increment_min) {
                 current_increment_value_ = cycle_increments_is_allowed_ ? increment_max : increment_min;
             } else if (current_increment_value_ > increment_max) {
                 current_increment_value_ = cycle_increments_is_allowed_ ? increment_min : increment_max;
             }
-            value = std::to_string(current_increment_value_);
+            value = current_increment_value_.str();
             return true;
         }
     }
