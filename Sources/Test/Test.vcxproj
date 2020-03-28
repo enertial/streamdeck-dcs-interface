@@ -35,7 +35,7 @@
   <ItemGroup>
     <ClCompile Include="DcsInterfaceTest.cpp" />
     <ClCompile Include="DcsSocketTest.cpp" />
-    <ClCompile Include="NumericStringUtilitiesTest.cpp" />
+    <ClCompile Include="StringUtilitiesTest.cpp" />
     <ClCompile Include="StreamdeckContextTest.cpp" />
   </ItemGroup>
   <ItemGroup>

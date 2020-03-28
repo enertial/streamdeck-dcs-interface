@@ -61,19 +61,24 @@ void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager)
 }
 
 void StreamdeckContext::updateContextSettings(const json &settings) {
-    // TODO: Allow comparsion of strings in addition to numeric values.
-
+    // Read in settings.
     const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
     const std::string dcs_id_compare_condition_raw =
         EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
     const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
     const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
+    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
+    string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
+    std::stringstream string_monitor_mapping_raw;
+    string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
 
+    // Process status of settings.
     const bool compare_monitor_is_populated = is_integer(dcs_id_compare_monitor_raw);
     const bool comparison_value_is_populated = is_number(dcs_id_comparison_value_raw);
     compare_monitor_is_set_ = compare_monitor_is_populated && comparison_value_is_populated;
     string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
 
+    // Update internal settings of class instance.
     if (compare_monitor_is_set_) {
         dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
         dcs_id_comparison_value_ = std::stof(dcs_id_comparison_value_raw);
@@ -89,10 +94,14 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
 
     if (string_monitor_is_set_) {
         dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
+        if (!string_monitor_passthrough_) {
+            string_monitor_mapping_.clear();
+            std::pair<std::string, std::string> key_and_value;
+            while (pop_key_and_value(string_monitor_mapping_raw, ',', ':', key_and_value)) {
+                string_monitor_mapping_[key_and_value.first] = key_and_value.second;
+            }
+        }
     }
-
-    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
-    string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
 }
 
 void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,

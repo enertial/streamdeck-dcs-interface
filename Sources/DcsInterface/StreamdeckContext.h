@@ -3,7 +3,7 @@
 #pragma once
 
 #include "DcsInterface.h"
-#include "NumericStringUtilities.h"
+#include "StringUtilities.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"
@@ -75,6 +75,8 @@ class StreamdeckContext {
                                      std::string &value);
     bool determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value);
 
+    std::map<std::string, std::string> parse_string_mapping(const std::string);
+
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 
     // Context settings.
@@ -91,4 +93,6 @@ class StreamdeckContext {
     float dcs_id_comparison_value_ = 0.0F;                         // Value to compare DCS ID compare monitor value to.
     int dcs_id_string_monitor_ = 0;                                // DCS ID to monitor for context title.
     bool string_monitor_passthrough_ = true; // Flag set by user to passthrough string to title unaltered.
+    std::map<std::string, std::string>
+        string_monitor_mapping_; // Map of received values to title text to display on context.
 };

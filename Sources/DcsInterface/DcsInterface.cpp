@@ -3,7 +3,7 @@
 #include "pch.h"
 
 #include "DcsInterface.h"
-#include "NumericStringUtilities.h"
+#include "StringUtilities.h"
 
 DcsInterface::DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
     : dcs_socket_(rx_port, tx_port, ip_address) {}
@@ -16,19 +16,12 @@ void DcsInterface::update_dcs_state() {
     std::string token;
     if (std::getline(recv_msg, token, header_delimiter)) {
         // Iterate through tokens received from single message.
-        const char token_delimiter = ':';
-        while (std::getline(recv_msg, token, token_delimiter)) {
-            // Parse token string of the form:
-            //   "<dcs_id>=<reported_value>"
-            const std::string delim = "=";
-            const auto delim_loc = token.find(delim);
-            const std::string key = token.substr(0, delim_loc);
-
-            // Reported value is found after delimiter until a newline character or end of string.
-            const auto token_start = delim_loc + delim.size();
-            const auto token_end = token.find('\n');
-            const std::string reported_value = token.substr(token_start, token_end - token_start);
-            handle_received_token(key, reported_value);
+        std::pair<std::string, std::string> key_and_value;
+        while (pop_key_and_value(recv_msg, ':', '=', key_and_value)) {
+            // Strip any trailing newline chars from value.
+            auto value_end_loc = key_and_value.second.find_last_not_of('\n');
+            std::string value = key_and_value.second.substr(0, value_end_loc + 1);
+            handle_received_token(key_and_value.first, value);
         }
     }
 }
