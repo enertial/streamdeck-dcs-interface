@@ -49,10 +49,10 @@ function addDefaultSettings(action, settings) {
     /* DEFAULT SETTINGS SPECIFIED HERE */
     if (action.includes("switch")) {
         document.getElementById("switch_button_settings").hidden = false;
-        if (!settings.hasOwnProperty("send_when_first_state")) {
+        if (!settings.hasOwnProperty("send_when_first_state_value")) {
             settings["send_when_first_state_value"] = "1";
         }
-        if (!settings.hasOwnProperty("send_when_second_state")) {
+        if (!settings.hasOwnProperty("send_when_second_state_value")) {
             settings["send_when_second_state_value"] = "-1";
         }
     }
