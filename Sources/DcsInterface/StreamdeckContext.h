@@ -3,6 +3,7 @@
 #pragma once
 
 #include "DcsInterface.h"
+#include "Decimal.h"
 #include "StringUtilities.h"
 
 #ifndef UNIT_TEST
