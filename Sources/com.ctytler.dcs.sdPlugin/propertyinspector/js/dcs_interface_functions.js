@@ -58,13 +58,13 @@ function addDefaultSettings(action, settings) {
     }
     else if (action.includes("increment")) {
         document.getElementById("increment_button_settings").hidden = false;
-        if (!settings.hasOwnProperty("send_increment_value")) {
+        if (!settings.hasOwnProperty("increment_value")) {
             settings["increment_value"] = "0.1";
         }
-        if (!settings.hasOwnProperty("send_increment_min")) {
+        if (!settings.hasOwnProperty("increment_min")) {
             settings["increment_min"] = "0";
         }
-        if (!settings.hasOwnProperty("send_increment_max")) {
+        if (!settings.hasOwnProperty("increment_max")) {
             settings["increment_max"] = "1";
         }
         if (!settings.hasOwnProperty("increment_cycle_allowed_check")) {
