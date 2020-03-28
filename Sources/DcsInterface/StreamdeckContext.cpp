@@ -53,6 +53,8 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
     const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
     const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
     // Set boolean from checkbox using default false value if it doesn't exist in "settings".
+    const std::string string_monitor_vertical_spacing_raw =
+        EPLJSONUtils::GetStringByName(settings, "string_monitor_vertical_spacing");
     string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
     std::stringstream string_monitor_mapping_raw;
     string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
@@ -79,6 +81,9 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
 
     if (string_monitor_is_set_) {
         dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
+        if (is_integer(string_monitor_vertical_spacing_raw)) {
+            string_monitor_vertical_spacing_ = std::stoi(string_monitor_vertical_spacing_raw);
+        }
         if (!string_monitor_passthrough_) {
             string_monitor_mapping_.clear();
             std::pair<std::string, std::string> key_and_value;
@@ -136,12 +141,23 @@ StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonit
 }
 
 std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value) {
+    std::string title;
     if (string_monitor_passthrough_) {
-        return current_game_string_value;
+        title = current_game_string_value;
     } else {
-        std::string title_value = string_monitor_mapping_[current_game_string_value];
-        return std::move(title_value);
+        title = string_monitor_mapping_[current_game_string_value];
     }
+    // Apply vertical spacing.
+    if (string_monitor_vertical_spacing_ < 0) {
+        for (int i = 0; i > string_monitor_vertical_spacing_; --i) {
+            title = "\n" + title;
+        }
+    } else {
+        for (int i = 0; i < string_monitor_vertical_spacing_; ++i) {
+            title = title + "\n";
+        }
+    }
+    return std::move(title);
 }
 
 bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value) {

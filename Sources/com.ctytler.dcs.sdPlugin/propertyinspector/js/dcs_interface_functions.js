@@ -85,6 +85,9 @@ function addDefaultSettings(action, settings) {
     if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
         settings["dcs_id_comparison_value"] = "0";
     }
+    if (!settings.hasOwnProperty("string_monitor_vertical_spacing")) {
+        settings["string_monitor_vertical_spacing"] = "0";
+    }
     if (!settings.hasOwnProperty("string_monitor_passthrough_check")) {
         settings["string_monitor_passthrough_check"] = true;
     }

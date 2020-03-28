@@ -110,7 +110,8 @@ class StreamdeckContext {
     CompareConditionType dcs_id_compare_condition_ = GREATER_THAN; // Comparison to use for DCS ID compare monitor.
     Decimal dcs_id_comparison_value_;                              // Value to compare DCS ID compare monitor value to.
     int dcs_id_string_monitor_ = 0;                                // DCS ID to monitor for context title.
-    bool string_monitor_passthrough_ = true; // Flag set by user to passthrough string to title unaltered.
+    int string_monitor_vertical_spacing_ = 0; // Vertical spacing (number of '\n') to include before or after title.
+    bool string_monitor_passthrough_ = true;  // Flag set by user to passthrough string to title unaltered.
     std::map<std::string, std::string>
         string_monitor_mapping_; // Map of received values to title text to display on context.
 };
