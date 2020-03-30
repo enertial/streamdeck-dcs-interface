@@ -33,6 +33,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="DcsIdLookupTest.cpp" />
     <ClCompile Include="DcsInterfaceTest.cpp" />
     <ClCompile Include="DcsSocketTest.cpp" />
     <ClCompile Include="DecimalTest.cpp" />
@@ -40,6 +41,9 @@
     <ClCompile Include="StreamdeckContextTest.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Vendor\lua-5.3.5\Lua.vcxproj">
+      <Project>{59eec206-84e0-4842-b89e-2025fd78e589}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Windows\com.ctytler.dcs.sdPlugin.vcxproj">
       <Project>{f76362ac-339a-4f56-8c7b-d73a560670c4}</Project>
       <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
