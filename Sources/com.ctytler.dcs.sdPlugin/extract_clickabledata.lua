@@ -47,7 +47,11 @@ end
 function get_device_name(device_id)
 	for device,id in pairs(devices) do
 		if (id == device_id) then
-			return device
+			if (device == nil) then
+				return ""
+			else
+				return device
+			end
 		end
 	end
 end

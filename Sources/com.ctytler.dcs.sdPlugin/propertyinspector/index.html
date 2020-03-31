@@ -145,7 +145,9 @@
     </details>
 
     <div class="sdpi-item">
-      <div class="sdpi-item-label">Settings</div>
+      <button class="sdpi-item-value" id="external_id_lookup_window_button" onclick="callbackIdLookupButtonPress()">
+        ID Lookup
+      </button>
       <button class="sdpi-item-value" id="external_help_window_button" onclick="callbackHelpButtonPress()">
         Help
       </button>
@@ -162,7 +164,10 @@
   <script src="js/common.js"></script>
   <script src="js/common_pi.js"></script>
   <script src="js/index_pi.js"></script>
-  <script src="js/dcs_interface_functions.js"></script>
+  <script src="js/dcs_interface_default_settings.js"></script>
+  <script src="js/dcs_interface_plugin_comms_functions.js"></script>
+  <script src="js/pi_settings_visibility_functions.js"></script>
+  <script src="js/pi_external_windows_functions.js"></script>
 
 </body>
 
