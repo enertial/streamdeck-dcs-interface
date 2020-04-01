@@ -40,6 +40,35 @@ function gotCallbackFromIdLookupWindow(parameter) {
         sendPayloadToPlugin({ event: "RequestIdLookup", dcs_install_path: parameter.payload.dcs_install_path, module: parameter.payload.module });
     }
 
+    if (parameter.event == 'ImportDcsCommand') {
+        settings["button_id"] = parameter.payload.button_id;
+        settings["device_id"] = parameter.payload.device_id;
+        settings["press_value"] = parameter.payload.click_value;
+        settings["release_value"] = "0";
+        settings["send_when_first_state_value"] = parameter.payload.click_value;
+        settings["send_when_second_state_value"] = "0";
+        settings["increment_value"] = parameter.payload.click_value;
+        settings["increment_min"] = parameter.payload.limit_min;
+        settings["increment_max"] = parameter.payload.limit_max;
+        console.log('setSettings....', settings);
+        $SD.api.setSettings($SD.uuid, settings);
+        updateUI(settings);
+    }
+
+    if (parameter.event == 'ImportImageChange') {
+        settings["dcs_id_compare_monitor"] = parameter.payload.dcs_id;
+        console.log('setSettings....', settings);
+        $SD.api.setSettings($SD.uuid, settings);
+        updateUI(settings);
+    }
+
+    if (parameter.event == 'ImportTextChange') {
+        settings["dcs_id_string_monitor"] = parameter.payload.dcs_id;
+        console.log('setSettings....', settings);
+        $SD.api.setSettings($SD.uuid, settings);
+        updateUI(settings);
+    }
+
     console.log("Callback from ID lookup window: ", parameter);
 }
 

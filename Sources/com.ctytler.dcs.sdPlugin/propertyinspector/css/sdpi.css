@@ -481,8 +481,22 @@ td:hover,
 .sdpi-item-value > ol > li:hover:nth-child(even),
 li:hover:nth-child(even),
 */
-td:hover {
-  background-color: rgba(255, 255, 255, 0.1);
+thead {
+  color: rgba(0, 0, 0, 0.74);
+  background-color: #8a8a8a96;
+  /*color: rgb(83, 74, 50);*/
+}
+tbody tr:hover {
+  /*background-color: rgb(66, 46, 46);*/
+  color: rgb(144, 162, 185);
+}
+tr.highlighted td {
+  background-color: rgb(69, 81, 148);
+  color: rgba(228, 228, 228, 0.774);
+}
+.clickabledata_div {
+  overflow: scroll;
+  height: 100px;
 }
 
 td.selected:hover,

@@ -52,45 +52,39 @@
 
 	<div class="sdpi-wrapper">
 		<div id="connection_settings_div">
-			<div class="sdpi-heading">DCS World Installation Directory</div>
-			<div class="wrap">
-				<p>Please identify your DCS World installation directory so button IDs can be queried. </p>
 
-			</div>
-
-			<div class="wrap" style="max-width: 600px;">
+			<div class="verticalgap" style="height: 5px;"></div>
+			<div class="wrap" style="max-width: 700px;">
 
 				<div class="sdpi-item">
-					<div class="sdpi-item-label">DCS World Install Directory</div>
+					<div>
+						<p><b>DCS World Install Directory: </b></p>
+					</div>
 					<input id="dcs_install_path" class="sdpi-item-value" type="text"
 						value="C:\Program Files\Eagle Dynamics\DCS World OpenBeta"
 						placeholder="Default: C:\Program Files\Eagle Dynamics\DCS World" />
 
-					<button id="dcs_install_path_save_button" type="button" value="Save"
-						onclick="callbackSaveDcsInstallPath()">Save</button>
+					<button id="dcs_install_path_save_button" type="button" value="Update"
+						onclick="RequestInstalledModules()">Update</button>
 				</div>
 			</div>
 		</div>
 
 		<div class="sdpi-heading">DCS Module Clickable Data</div>
-		<div class="wrap" style="max-width: 300px;">
+		<div class="wrap" style="max-width: 800px;">
 			<div class="sdpi-item" id="modules">
 				<div class="sdpi-item-label">Select Module</div>
 				<select class="sdpi-item-value select" id="select_module" onchange="callbackRequestIdLookup()">
 				</select>
-			</div>
-		</div>
-		<div class="wrap" style="max-width: 400px;">
-			<br></br>
-			<div class="sdpi-item">
+				<div class="horizontalgap" style="width:150px"></div>
 				<input id="clickabledata_table_search" class="sdpi-item-value" type="text" value=""
-					placeholder="Search.." onchange="searchTable()" />
+					placeholder="Search.." oninput="searchTable()" />
 			</div>
 		</div>
 
-		<div class="wrap" style="min-width: 900px;">
-			<div class="sdpi-item" id="clickabledata_table">
-				<table class="sdpi-item-value no-select" width="70%">
+		<div class="wrap" style="min-width: 900px; max-height: 600px; overflow: scroll;">
+			<div class="sdpi-item" id="clickabledata_div">
+				<table class="sdpi-item-value no-select" id="clickabledata_table" width="70%">
 					<thead>
 						<tr>
 							<td><b>Device (ID)</b></td>
@@ -104,103 +98,53 @@
 							<td><b>Description</b></td>
 						</tr>
 					</thead>
-					<tbody></tbody>
+					<tbody>
+					</tbody>
 				</table>
 			</div>
 		</div>
 
-	</div>
+		<div class="verticalgap" style="height: 10px;"></div>
+		<div id="import_selection_div" hidden>
+			<div class="wrap" style="max-width: 400px">
+				<div class="sdpi-item" id="modules">
+					<div>
+						<p><b>Import Selected Item to: </b></p>
+					</div>
+					<div class="horizontalgap" style="width:5px"></div>
+					<button id="import_id_to_command_button" type="button" value="Import Device/Button ID"
+						onclick="callbackImportDcsCommandAndImageChange()">DCS Command & Image State (Default)</button>
+				</div>
+			</div>
+			<div class="wrap" style="max-width: 400px">
+				<div class="sdpi-item" id="modules">
+					<div>
+						<p><b>or: </b></p>
+					</div>
+					<div class="horizontalgap" style="width:5px"></div>
+					<button id="import_id_to_command_button" type="button" value="Import Device/Button ID"
+						onclick="callbackImportDcsCommand()">DCS Command</button>
+					<div class="horizontalgap" style="width:10px"></div>
+					<button id="import_id_to_comparison_monitor" type="button"
+						value="Import DCS ID to Comparison Monitor" onclick="callbackImportImageChange()">Image State
+						Change</button>
+					<div class="horizontalgap" style="width:10px"></div>
+					<button id="import_id_to_string_monitor" type="button" value="Import DCS ID to String Monitor"
+						onclick="callbackImportTextChange()">Title Text Change</button>
+				</div>
+			</div>
+			<div class="wrap" style="max-width: 700px">
+				<div class="sdpi-item" id="modules">
+					<div>
+						<p>Note: Import sets ID vales, but you should still check and set the DCS command values
+							manually after importing</p>
+					</div>
+				</div>
+			</div>
 
-	<script>
-		function callbackSaveDcsInstallPath() {
-			var dcs_install_path = document.getElementById("dcs_install_path").value;
-			sendmessage("RequestInstalledModules", dcs_install_path);
-		}
+		</div>
 
-		function gotInstalledModules(installed_modules_list) {
-			var select_elem = document.getElementById("select_module");
-			for (module of installed_modules_list) {
-				var option = document.createElement('option');
-				option.appendChild(document.createTextNode(module));
-				option.value = module;
-				select_elem.append(option);
-			}
-		}
-
-		function callbackRequestIdLookup() {
-			var select_elem = document.getElementById("select_module");
-			var module = select_elem.options[select_elem.selectedIndex].value;
-			var dcs_install_path = document.getElementById("dcs_install_path").value;
-			var payload = { "dcs_install_path": dcs_install_path, "module": module };
-			sendmessage("RequestIdLookup", payload);
-			console.log("Request ID Lookup for: ", payload);
-			document.getElementById("clickabledata_table_search").value = "";
-		}
-
-		function gotClickabledata(clickabledata_elements) {
-			// Create rows in a new table body so it is easy to replace any old content.
-			var new_table_body = document.createElement('tbody');
-			clickabledata_elements.sort();
-			for (const element of clickabledata_elements) {
-				var split_elem = element.split(',');
-				var new_row = new_table_body.insertRow();
-				new_row.insertCell(0).appendChild(document.createTextNode(split_elem[0])); // Device
-				new_row.insertCell(1).appendChild(document.createTextNode(split_elem[1])); // Button ID
-				new_row.insertCell(2).appendChild(document.createTextNode(split_elem[2])); // Element
-				new_row.insertCell(3).appendChild(document.createTextNode(split_elem[3])); // Type
-				new_row.insertCell(4).appendChild(document.createTextNode(split_elem[4])); // DCS ID
-				new_row.insertCell(5).appendChild(document.createTextNode(split_elem[5])); // Click Value
-				new_row.insertCell(6).appendChild(document.createTextNode(split_elem[6])); // Limit Min
-				new_row.insertCell(7).appendChild(document.createTextNode(split_elem[7])); // Limit Max
-				new_row.insertCell(8).appendChild(document.createTextNode(split_elem[8])); // Description
-			}
-			var document_table_body = document.getElementById("clickabledata_table").getElementsByTagName('tbody')[0];
-			document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
-			console.log("Loaded elements: ", clickabledata_elements);
-		}
-
-
-		function searchTable() {
-			console.log("Sorting");
-			var query = document.getElementById("clickabledata_table_search").value.toUpperCase();
-			var table = document.getElementById("clickabledata_table");
-			var tr = table.getElementsByTagName("td")[0];
-			for (var i = 0; i < tr.length; i++) {
-				var td = tr[i].getElementsByTagName("td")[0];
-				if (td) {
-					var row_text = td.textContent || td.innerText;
-					console.log("Row text: ", row_text);
-					if (row_text.toUpperCase().indexOf(query) >= 0) {
-						tr[i].style.display = "";
-					}
-					else {
-						tr[i].style.display = "none";
-					}
-				}
-			}
-		}
-
-
-		/** Functions for communication with original window **/
-
-		function loaded() {
-			setTimeout(() => {
-				// this is just a quick message to Property Inspector (you should see it in the console)
-				window.opener.gotCallbackFromWindow("Message from window: " + new Date().toLocaleTimeString());
-			}, 1000);
-
-		};
-
-		function sendmessage(event, payload) {
-			// Calls function from original (Property Inspector) window.
-			var msg = { "event": event }
-			if (payload) {
-				msg["payload"] = payload;
-			}
-			window.opener.gotCallbackFromIdLookupWindow(msg);
-		}
-
-	</script>
+		<script src="js/id_lookup_window_functions.js"></script>
 
 </body>
 
