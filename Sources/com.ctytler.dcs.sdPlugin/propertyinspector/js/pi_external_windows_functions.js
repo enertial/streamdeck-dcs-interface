@@ -32,6 +32,11 @@ function callbackCommsSettingsButtonPress() {
 
 /** Callback functions for working with external window **/
 function gotCallbackFromIdLookupWindow(parameter) {
+    if (parameter.event == 'UpdateDcsInstallPathSettings') {
+        console.log("Set Global Settings: ", parameter.payload)
+        $SD.api.setGlobalSettings($SD.uuid, parameter.payload);
+    }
+
     if (parameter.event == "RequestInstalledModules") {
         sendPayloadToPlugin({ event: "RequestInstalledModules", dcs_install_path: parameter.payload });
     }

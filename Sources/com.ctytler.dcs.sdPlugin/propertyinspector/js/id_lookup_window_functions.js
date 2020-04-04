@@ -26,6 +26,8 @@ function sendmessage(event, payload) {
 function RequestInstalledModules() {
     var dcs_install_path = document.getElementById("dcs_install_path").value;
     sendmessage("RequestInstalledModules", dcs_install_path);
+    const settings = { "dcs_install_path": dcs_install_path };
+    sendmessage("UpdateGlobalSettings", settings);
 }
 
 function gotInstalledModules(installed_modules_list) {
