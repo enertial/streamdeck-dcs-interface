@@ -19,7 +19,7 @@ class Decimal {
      * @brief Returns a string representation of the decimal value.
      *
      */
-    std::string str();
+    std::string str() const;
 
     /**
      * @brief Overloaded summation operators allow add and subtract while maintaining precision of highest-exponent

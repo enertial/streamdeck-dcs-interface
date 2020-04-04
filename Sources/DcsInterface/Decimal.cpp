@@ -10,7 +10,7 @@ Decimal::Decimal() : significant_digits_(0), exponent_(0) {}
 Decimal::Decimal(std::string number) { string_to_decimal(number); }
 Decimal::Decimal(int significant_digits, int exponent) : significant_digits_(significant_digits), exponent_(exponent) {}
 
-std::string Decimal::str() {
+std::string Decimal::str() const {
     std::string value_as_decimal = std::to_string(significant_digits_);
     if (exponent_ > 0) {
         size_t neg_sign_offset = (significant_digits_ < 0) ? 1 : 0;
@@ -24,7 +24,7 @@ std::string Decimal::str() {
 }
 
 void Decimal::string_to_decimal(std::string number) {
-    auto decimal_loc = number.find(".");
+    const auto decimal_loc = number.find(".");
     if (decimal_loc == std::string::npos) {
         // No decimal point in string, assume integer.
         significant_digits_ = std::stoi(number);
@@ -51,21 +51,21 @@ int Decimal::get_as_higher_exponent(const int higher_exponent) const {
  */
 
 Decimal operator+(const Decimal &lhs, const Decimal &rhs) {
-    int precision = (std::max)(lhs.exponent_, rhs.exponent_);
+    const int precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return Decimal(lhs.get_as_higher_exponent(precision) + rhs.get_as_higher_exponent(precision), precision);
 }
 
 Decimal operator-(const Decimal &lhs, const Decimal &rhs) {
-    int precision = (std::max)(lhs.exponent_, rhs.exponent_);
+    const int precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return Decimal(lhs.get_as_higher_exponent(precision) - rhs.get_as_higher_exponent(precision), precision);
 }
 
 bool operator<(const Decimal &lhs, const Decimal &rhs) {
-    int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
+    const int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return lhs.get_as_higher_exponent(common_precision) < rhs.get_as_higher_exponent(common_precision);
 }
 
 bool operator==(const Decimal &lhs, const Decimal &rhs) {
-    int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
+    const int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return lhs.get_as_higher_exponent(common_precision) == rhs.get_as_higher_exponent(common_precision);
 }
