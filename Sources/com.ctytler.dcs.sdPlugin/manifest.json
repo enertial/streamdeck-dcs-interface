@@ -1,17 +1,17 @@
 {
   "Actions": [
     {
-      "Icon": "images/switch_down",
-      "Name": "Switch",
+      "Icon": "images/Chrome_Switch_Low",
+      "Name": "Switch Input",
       "States": [
         {
-          "Image": "images/switch_down",
+          "Image": "images/Chrome_Switch_Low",
           "TitleAlignment": "middle",
           "FontFamily": "Tahoma",
           "FontSize": "17"
         },
         {
-          "Image": "images/switch_up",
+          "Image": "images/Chrome_Switch_High",
           "TitleAlignment": "middle",
           "FontFamily": "Tahoma",
           "FontSize": "17"
@@ -45,7 +45,7 @@
     },
     {
       "Icon": "images/Button_UFC_Blank",
-      "Name": "Static Button/Display (UFC)",
+      "Name": "Momentary Button/Display (UFC)",
       "States": [
         {
           "Image": "images/Button_UFC_Blank",
@@ -61,7 +61,7 @@
     },
     {
       "Icon": "images/display_icon",
-      "Name": "Static Button/Display (Text)",
+      "Name": "Momentary Button/Display (Text)",
       "States": [
         {
           "Image": "images/display_wide",
@@ -97,18 +97,18 @@
       "UUID": "com.ctytler.dcs.increment.dial.two-state"
     },
     {
-      "Icon": "images/Rotary_Dial_Half_0",
+      "Icon": "images/Rotary_Switch_Half_0",
       "Name": "Incremental Input (Text Above)",
       "States": [
         {
-          "Image": "images/Rotary_Dial_Half_0",
-          "TitleAlignment": "middle",
+          "Image": "images/Rotary_Switch_Half_0",
+          "TitleAlignment": "top",
           "FontFamily": "Tahoma",
           "FontSize": "17"
         },
         {
-          "Image": "images/Rotary_Dial_Half_1",
-          "TitleAlignment": "middle",
+          "Image": "images/Rotary_Switch_Half_1",
+          "TitleAlignment": "top",
           "FontFamily": "Tahoma",
           "FontSize": "17"
         }
