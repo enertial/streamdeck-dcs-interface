@@ -15,6 +15,7 @@
 
 #include "Common/EPLJSONUtils.h"
 #include "Common/ESDConnectionManager.h"
+#include "DcsInterface/DcsIdLookup.h"
 #include "DcsInterface/DcsInterfaceParameters.h"
 
 class CallBackTimer {
@@ -166,5 +167,27 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
         }
         mConnectionManager->SendToPropertyInspector(
             inAction, inContext, json({{"event", "DebugDcsGameState"}, {"current_game_state", current_game_state}}));
+    }
+
+    if (event == "RequestInstalledModules") {
+        const std::string dcs_install_path = EPLJSONUtils::GetStringByName(inPayload, "dcs_install_path");
+        const std::string modules_subdir = "/mods/aircraft/";
+        const json installed_modules_list = get_installed_modules(dcs_install_path, modules_subdir);
+        mConnectionManager->SendToPropertyInspector(
+            inAction, inContext, json({{"event", "InstalledModules"}, {"installed_modules", installed_modules_list}}));
+    }
+
+    if (event == "RequestIdLookup") {
+        const std::string dcs_install_path = EPLJSONUtils::GetStringByName(inPayload, "dcs_install_path");
+        const std::string module = EPLJSONUtils::GetStringByName(inPayload, "module");
+        json clickabledata = get_clickabledata(dcs_install_path, module, "extract_clickabledata.lua");
+        // json clickabledata_items;
+        // auto iter = clickabledata.begin();
+        // for (auto i = 0; i < 50; ++i) {
+        //    clickabledata_items.push_back(iter.value());
+        //    iter++;
+        //}
+        mConnectionManager->SendToPropertyInspector(
+            inAction, inContext, json({{"event", "Clickabledata"}, {"clickabledata", clickabledata}}));
     }
 }

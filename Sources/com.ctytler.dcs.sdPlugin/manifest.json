@@ -122,7 +122,7 @@
   "Author": "Charlie Tytler",
   "CodePathWin": "dcs_interface.exe",
   "PropertyInspectorPath": "propertyinspector/index.html",
-  "DefaultWindowSize": [750, 650],
+  "DefaultWindowSize": [950, 850],
   "Description": "Allows buttons which communicate with Digital Combat Simulator (DCS)",
   "Name": "DCS Interface",
   "Icon": "images/plugin_icon",
