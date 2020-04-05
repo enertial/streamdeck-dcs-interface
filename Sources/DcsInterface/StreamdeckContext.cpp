@@ -157,7 +157,7 @@ std::string StreamdeckContext::determineTitleForStringMonitor(const std::string 
             title = title + "\n";
         }
     }
-    return std::move(title);
+    return title;
 }
 
 bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value) {

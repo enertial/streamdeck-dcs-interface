@@ -20,7 +20,7 @@ std::string Decimal::str() const {
         }
         value_as_decimal.insert(value_as_decimal.size() - exponent_, ".");
     }
-    return std::move(value_as_decimal);
+    return value_as_decimal;
 }
 
 void Decimal::string_to_decimal(std::string number) {

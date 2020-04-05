@@ -21,7 +21,7 @@ json get_installed_modules(const std::string &dcs_install_path, const std::strin
                 module_abs_path.substr(mods_subdir_str_loc + module_subdir.size(), module_abs_path.size()));
         }
     }
-    return std::move(installed_modules);
+    return installed_modules;
 }
 
 json get_clickabledata(const std::string &dcs_install_path,
@@ -51,12 +51,12 @@ json get_clickabledata(const std::string &dcs_install_path,
     const int file_status = luaL_loadfile(lua_state, lua_script.c_str());
     if (file_status != 0) {
         lua_close(lua_state);
-        return std::move(clickabledata_items);
+        return clickabledata_items;
     }
     const int script_status = lua_pcall(lua_state, 0, LUA_MULTRET, 0);
     if (script_status != 0) {
         lua_close(lua_state);
-        return std::move(clickabledata_items);
+        return clickabledata_items;
     }
 
     // Handle each of the return values one at a time.
@@ -68,5 +68,5 @@ json get_clickabledata(const std::string &dcs_install_path,
     // close the Lua state
     lua_close(lua_state);
 
-    return std::move(clickabledata_items);
+    return clickabledata_items;
 }
