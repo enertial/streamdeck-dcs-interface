@@ -50,6 +50,8 @@ class MyStreamDeckPlugin : public ESDBasePlugin {
     void DeviceDidConnect(const std::string &inDeviceID, const json &inDeviceInfo) override;
     void DeviceDidDisconnect(const std::string &inDeviceID) override;
 
+    void DidReceiveGlobalSettings(const json &inPayload) override;
+
     void SendToPlugin(const std::string &inAction,
                       const std::string &inContext,
                       const json &inPayload,

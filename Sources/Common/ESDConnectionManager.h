@@ -44,6 +44,8 @@ public:
 	void ShowOKForContext(const std::string& inContext);
 	void SetSettings(const json &inSettings, const std::string& inContext);
 	void SetState(int inState, const std::string& inContext);
+	void GetGlobalSettings();
+	void SetGlobalSettings(const json& inSettings);
 	void SendToPropertyInspector(const std::string& inAction, const std::string& inContext, const json &inPayload);
 	void SwitchToProfile(const std::string& inDeviceID, const std::string& inProfileName);
 	void LogMessage(const std::string& inMessage);
