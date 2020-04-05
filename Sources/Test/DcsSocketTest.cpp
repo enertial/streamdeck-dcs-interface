@@ -6,6 +6,16 @@
 
 namespace test {
 
+TEST(DcsSocketTest, empty_connection_settings) { EXPECT_THROW(DcsSocket dcs_socket("", "", ""), std::runtime_error); }
+
+TEST(DcsSocketTest, invalid_connection_port_settings) {
+    EXPECT_THROW(DcsSocket dcs_socket("19ab", "abc", "127.0.0.1"), std::runtime_error);
+}
+
+TEST(DcsSocketTest, invalid_connection_ip_addr_settings) {
+    EXPECT_THROW(DcsSocket dcs_socket("1908", "1909", "127001"), std::runtime_error);
+}
+
 class DcsSocketTestFixture : public ::testing::Test {
   public:
     DcsSocketTestFixture()
@@ -26,7 +36,7 @@ TEST_F(DcsSocketTestFixture, send_and_receive) {
 
 TEST_F(DcsSocketTestFixture, unavailable_port_bind) {
     // Expect exception thrown if try to bind a new socket to same rx_port.
-    EXPECT_ANY_THROW(DcsSocket duplicate_socket(common_port, "1801", ip_address));
+    EXPECT_THROW(DcsSocket duplicate_socket(common_port, "1801", ip_address), std::runtime_error);
 }
 
 TEST_F(DcsSocketTestFixture, receive_timeout) {

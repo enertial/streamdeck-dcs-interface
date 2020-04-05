@@ -36,9 +36,10 @@ class ESDConnectionManager {
 TEST(StreamdeckContextTest, update_context_state_when_no_dcs) {
     // Test -- With an unpopulated game state in dcs_interface, try to update context state.
     StreamdeckContext test_context("def456");
-    DcsInterface dcs_interface("2304", "2305", "127.0.0.1");
+    DcsConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
+    DcsInterface dcs_interface(connection_settings);
     ESDConnectionManager esd_connection_manager;
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     // Expect no state or title change as default context state and title values have not changed.
     EXPECT_EQ(esd_connection_manager.context_, "");
 }
@@ -46,8 +47,12 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs) {
 class StreamdeckContextTestFixture : public ::testing::Test {
   public:
     StreamdeckContextTestFixture()
-        : dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress),
-          mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress), fixture_context(fixture_context_id) {
+        : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
+          mock_dcs(connection_settings.tx_port, connection_settings.rx_port, connection_settings.ip_address),
+          dcs_interface(connection_settings), fixture_context(fixture_context_id) {
+
+        // Consume intial reset command sent to to mock_dcs.
+        (void)mock_dcs.DcsReceive();
 
         // Send a single message from mock DCS that contains update for monitored ID.
         std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
@@ -55,19 +60,14 @@ class StreamdeckContextTestFixture : public ::testing::Test {
         dcs_interface.update_dcs_state();
     }
 
-    DcsInterface dcs_interface;                  // DCS Interface to test.
+    DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
     DcsSocket mock_dcs;                          // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface;                  // DCS Interface to test.
     ESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     StreamdeckContext fixture_context;
 
     // Create StreamdeckContext to test without any defined settings.
     static inline std::string fixture_context_id = "abc123";
-
-    // Constants to be used for providing a valid DcsInterface.
-    static inline std::string kDcsListenerPort = "1908"; // Port number to receive DCS updates from.
-    static inline std::string kDcsSendPort = "1909";     // Port number which DCS commands will be sent to.
-    static inline std::string kDcsIpAddress =
-        "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
 };
 
 TEST_F(StreamdeckContextTestFixture, update_context_state_dcs_id_compare) {
@@ -77,7 +77,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_dcs_id_compare) {
                            {"dcs_id_compare_condition", "EQUAL_TO"},
                            {"dcs_id_comparison_value", "2.0"}};
     StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
@@ -87,7 +87,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_passthr
     const std::string context_id = "def456";
     const json settings = {{"dcs_id_string_monitor", "2026"}, {"string_monitor_passthrough_check", true}};
     StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
 }
@@ -99,7 +99,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_vertica
                            {"string_monitor_vertical_spacing", "2"},
                            {"string_monitor_passthrough_check", true}};
     StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR\n\n");
 }
@@ -111,7 +111,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_vertica
                            {"string_monitor_vertical_spacing", "-4"},
                            {"string_monitor_passthrough_check", true}};
     StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "\n\n\n\nTEXT_STR");
 }
@@ -123,7 +123,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping
                            {"string_monitor_passthrough_check", false},
                            {"string_monitor_mapping", "0.0:A,0.1:B,0.2:C"}};
     StreamdeckContext fixture_context(context_id, settings);
-    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "B");
 }
@@ -135,7 +135,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping
                            {"string_monitor_passthrough_check", false},
                            {"string_monitor_mapping", "0.0:A,0.1:B,0.2:C"}};
     StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "B");
 
@@ -143,14 +143,14 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping
     std::string new_mock_dcs_message = "header*2027=0.6";
     mock_dcs.DcsSend(new_mock_dcs_message);
     dcs_interface.update_dcs_state();
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
+    test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "");
 }
 
 TEST_F(StreamdeckContextTestFixture, update_context_settings) {
     // Test 1 -- With no settings defined, streamdeck context should not send update.
-    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test 2 -- With populated settings, streamdeck context should try to update context state.
@@ -160,7 +160,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_settings) {
                      {"dcs_id_string_monitor", "2026"},
                      {"string_monitor_passthrough_check", true}};
     fixture_context.updateContextSettings(settings);
-    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, fixture_context_id);
     EXPECT_EQ(esd_connection_manager.state_, 1);
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
@@ -171,7 +171,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_settings) {
                 {"dcs_id_comparison_value", ""},
                 {"dcs_id_string_monitor", ""}};
     fixture_context.updateContextSettings(settings);
-    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, fixture_context_id);
     EXPECT_EQ(esd_connection_manager.state_, 0);
     EXPECT_EQ(esd_connection_manager.title_, "");
@@ -207,14 +207,14 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_zero) {
     dcs_interface.update_dcs_state();
 
     esd_connection_manager.clear_buffer();
-    context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_equals.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
     esd_connection_manager.clear_buffer();
-    context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_less_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
     EXPECT_EQ(esd_connection_manager.state_, 1);
     esd_connection_manager.clear_buffer();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
 }
 
@@ -225,13 +225,13 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_lesser_va
     dcs_interface.update_dcs_state();
 
     esd_connection_manager.clear_buffer();
-    context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_equals.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
     esd_connection_manager.clear_buffer();
-    context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_less_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
     esd_connection_manager.clear_buffer();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
 }
 
@@ -242,15 +242,15 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_equal_val
     dcs_interface.update_dcs_state();
 
     esd_connection_manager.clear_buffer();
-    context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_equals.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
     EXPECT_EQ(esd_connection_manager.state_, 1);
     esd_connection_manager.clear_buffer();
-    context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_less_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
     EXPECT_EQ(esd_connection_manager.state_, 0);
     esd_connection_manager.clear_buffer();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
 }
 
@@ -261,14 +261,14 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_greater_v
     dcs_interface.update_dcs_state();
 
     esd_connection_manager.clear_buffer();
-    context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_equals.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
     EXPECT_EQ(esd_connection_manager.state_, 0);
     esd_connection_manager.clear_buffer();
-    context_with_less_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_less_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
     esd_connection_manager.clear_buffer();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_greater_than");
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
@@ -280,7 +280,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_integer) 
     const std::string mock_dcs_message = "header*123=20";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_alphanumeric) {
@@ -288,7 +288,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_alphanume
     const std::string mock_dcs_message = "header*123=20a";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_empty) {
@@ -297,7 +297,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_empty) {
     const std::string mock_dcs_message = "header*123=";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_dcs_id_float) {
@@ -305,7 +305,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_dcs_id_fl
     const std::string mock_dcs_message = "header*123.0=2.0";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_with_settings_id_as_float) {
@@ -316,7 +316,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_with_setting
     const std::string mock_dcs_message = "header*123=2.0";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_with_invalid_settings_comparison_value) {
@@ -328,7 +328,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_with_invalid
     const std::string mock_dcs_message = "header*123=2.0";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_with_leading_spaces) {
@@ -340,7 +340,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_wit
     const std::string mock_dcs_message = "header*123=   002";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_with_trailing_space) {
@@ -351,13 +351,13 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_wit
     const std::string mock_dcs_message = "header*123=2.0";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
-    context_with_greater_than.updateContextState(dcs_interface, &esd_connection_manager);
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, force_send_state_update) {
     // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
-    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test -- force send will send current state regardless of state change.
@@ -398,7 +398,7 @@ class StreamdeckContextKeyPressTestFixture : public StreamdeckContextTestFixture
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_button_id) {
     payload["settings"]["button_id"] = "abc";
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -407,7 +407,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_button_id) {
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_device_id) {
     payload["settings"]["device_id"] = "32.4";
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -415,7 +415,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_device_id) {
 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary) {
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + press_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -423,7 +423,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary) {
 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_momentary) {
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + release_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -432,7 +432,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_momentary) {
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary_empty_value) {
     payload["settings"]["press_value"] = "";
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -440,7 +440,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary_empty_valu
 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_first_state) {
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command =
         "C" + device_id + "," + std::to_string(3000 + button_id) + "," + send_when_first_state_value;
@@ -450,7 +450,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_first_stat
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_second_state) {
     payload["state"] = 1;
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command =
         "C" + device_id + "," + std::to_string(3000 + button_id) + "," + send_when_second_state_value;
@@ -459,7 +459,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_second_sta
 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch) {
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";
@@ -469,7 +469,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch) {
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_empty_value) {
     payload["settings"]["send_when_first_state_value"] = "";
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -477,7 +477,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_empty_value) 
 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment) {
     const std::string action = "com.ctytler.dcs.increment.two-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_value;
@@ -488,7 +488,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple) 
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
     for (int i = 0; i < 5; ++i) {
-        fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -500,7 +500,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_to_max) {
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
     for (int i = 0; i < 15; ++i) {
-        fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -513,7 +513,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_cycle_max_
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
     for (int i = 0; i < 11; ++i) {
-        fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -526,7 +526,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple_n
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
     for (int i = 0; i < 5; ++i) {
-        fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -539,7 +539,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_t
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
     for (int i = 0; i < 15; ++i) {
-        fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -553,7 +553,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
     for (int i = 0; i < 1; ++i) {
-        fixture_context.handleButtonEvent(dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -563,7 +563,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
 
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_increment) {
     const std::string action = "com.ctytler.dcs.increment.two-state";
-    fixture_context.handleButtonEvent(dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";
@@ -583,7 +583,7 @@ TEST_F(StreamdeckContextTestFixture, class_instances_within_container) {
     ctx_map["ctx_c"] = StreamdeckContext("ctx_c", {{"dcs_id_string_monitor", "3"}});
 
     // Update state through map key.
-    ctx_map["ctx_b"].updateContextState(dcs_interface, &esd_connection_manager);
+    ctx_map["ctx_b"].updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_b");
     EXPECT_EQ(esd_connection_manager.title_, "b");
 
@@ -591,7 +591,7 @@ TEST_F(StreamdeckContextTestFixture, class_instances_within_container) {
     ctx_map["ctx_b"].updateContextSettings({{"dcs_id_string_monitor", "1"}});
 
     // Test that new settings are reflected in state send.
-    ctx_map["ctx_b"].updateContextState(dcs_interface, &esd_connection_manager);
+    ctx_map["ctx_b"].updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "ctx_b");
     EXPECT_EQ(esd_connection_manager.title_, "a");
 }

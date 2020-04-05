@@ -58,11 +58,22 @@ class MyStreamDeckPlugin : public ESDBasePlugin {
                       const std::string &inDeviceID) override;
 
   private:
+    /**
+     * @brief Periodic function which continually updates Streamdeck button contexts according to DCS game state.
+     */
     void UpdateFromGameState();
+
+    /**
+     * @brief Helper function to extract connection settings from global settings
+     *
+     * @param global_settings Json object of global settings received from Streamdeck.
+     * @return DcsConnectionSettings
+     */
+    DcsConnectionSettings get_connection_settings(const json &global_settings);
 
     std::mutex mVisibleContextsMutex;
     std::unordered_map<std::string, StreamdeckContext> mVisibleContexts = {};
 
     CallBackTimer *mTimer;
-    DcsInterface dcs_interface_;
+    DcsInterface *dcs_interface_ = nullptr;
 };

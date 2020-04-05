@@ -5,8 +5,16 @@
 #include "DcsInterface.h"
 #include "StringUtilities.h"
 
-DcsInterface::DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address)
-    : dcs_socket_(rx_port, tx_port, ip_address) {}
+DcsInterface::DcsInterface(const DcsConnectionSettings &settings)
+    : dcs_socket_(settings.rx_port, settings.tx_port, settings.ip_address), connection_settings_(settings) {
+    // Send a reset to request a resend of data in case DCS mission is already running.
+    send_dcs_reset_command();
+}
+
+bool DcsInterface::connection_settings_match(const DcsConnectionSettings &settings) {
+    return ((settings.rx_port == connection_settings_.rx_port) && (settings.tx_port == connection_settings_.tx_port) &&
+            (settings.ip_address == connection_settings_.ip_address));
+}
 
 void DcsInterface::update_dcs_state() {
     // Receive next UDP message from DCS and strip header.
@@ -52,7 +60,7 @@ void DcsInterface::handle_received_token(const std::string &key, const std::stri
         current_game_state_[std::stoi(key)] = value;
     } else if (key == "File") {
         current_game_module_ = value;
-    } else if (key == "Ikarus" || key == "DAC") {
+    } else if (key == "Ikarus" || key == "DAC" || key == "DCS") {
         // Stop is received when user has quit mission -- game state should be cleared.
         if (value == "stop") {
             clear_game_state();

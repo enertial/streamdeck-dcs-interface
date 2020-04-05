@@ -13,19 +13,19 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
     updateContextSettings(settings);
 }
 
-void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager) {
+void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConnectionManager *mConnectionManager) {
     // Initialize to default values.
     ContextState updated_state = FIRST;
     std::string updated_title = "";
 
     if (compare_monitor_is_set_) {
-        const std::string current_game_value_raw = dcs_interface.get_value_of_dcs_id(dcs_id_compare_monitor_);
+        const std::string current_game_value_raw = dcs_interface->get_value_of_dcs_id(dcs_id_compare_monitor_);
         if (is_number(current_game_value_raw)) {
             updated_state = determineStateForCompareMonitor(Decimal(current_game_value_raw));
         }
     }
     if (string_monitor_is_set_) {
-        const std::string current_game_string_value = dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
+        const std::string current_game_string_value = dcs_interface->get_value_of_dcs_id(dcs_id_string_monitor_);
         if (!current_game_string_value.empty()) {
             updated_title = determineTitleForStringMonitor(current_game_string_value);
         }
@@ -94,7 +94,7 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
     }
 }
 
-void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
+void StreamdeckContext::handleButtonEvent(DcsInterface *dcs_interface,
                                           const KeyEvent event,
                                           const std::string &action,
                                           const json &inPayload) {
@@ -118,7 +118,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
         }
 
         if (send_command) {
-            dcs_interface.send_dcs_command(std::stoi(button_id), device_id, value);
+            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, value);
         }
     }
 }

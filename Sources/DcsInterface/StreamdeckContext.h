@@ -26,7 +26,7 @@ class StreamdeckContext {
      * @param dcs_interface Interface to DCS containing current game state.
      * @param mConnectionManager Interface to StreamDeck.
      */
-    void updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager);
+    void updateContextState(DcsInterface *dcs_interface, ESDConnectionManager *mConnectionManager);
 
     /**
      * @brief Forces an update to the Streamdeck of the context's current state be sent.
@@ -51,7 +51,7 @@ class StreamdeckContext {
      * @param action Type of button action - used to determine momentary, swtich, or increment button type.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void handleButtonEvent(DcsInterface &dcs_interface,
+    void handleButtonEvent(DcsInterface *dcs_interface,
                            const KeyEvent event,
                            const std::string &action,
                            const json &inPayload);

@@ -12,6 +12,13 @@
 DWORD socket_timeout_ms = 100;
 
 DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address) {
+    // Detect any missing input settings.
+    if (rx_port.empty() || tx_port.empty() || ip_address.empty()) {
+        const std::string error_msg =
+            "Missing values from requested IP: " + ip_address + " Rx_Port: " + rx_port + " Tx_Port: " + tx_port;
+        throw std::runtime_error(error_msg);
+    }
+
     // Initialize Windows Sockets DLL to version 2.2.
     WSADATA wsaData;
     const auto err = WSAStartup(MAKEWORD(2, 2), &wsaData);
@@ -30,15 +37,22 @@ DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, con
 
     // Define local receive port.
     addrinfo *local_port;
-    getaddrinfo(ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
+    const auto getaddr_result = getaddrinfo(ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
+    if (getaddr_result != 0) {
+        const std::string error_msg = "Could not get valid address info from requested IP: " + ip_address +
+                                      " Rx_Port: " + rx_port + " Tx_Port: " + tx_port +
+                                      " -- WSA Error: " + std::to_string(WSAGetLastError());
+        WSACleanup();
+        throw std::runtime_error(error_msg);
+    }
 
     // Bind local socket to receive port.
     socket_id_ = socket(local_port->ai_family, local_port->ai_socktype, local_port->ai_protocol);
     setsockopt(socket_id_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&socket_timeout_ms, sizeof(socket_timeout_ms));
-    const auto result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
+    const auto bind_result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
     freeaddrinfo(local_port);
 
-    if (result == SOCKET_ERROR) {
+    if (bind_result == SOCKET_ERROR) {
         const std::string error_msg =
             "Could not bind UDP address to socket -- WSA Error: " + std::to_string(WSAGetLastError());
         closesocket(socket_id_);

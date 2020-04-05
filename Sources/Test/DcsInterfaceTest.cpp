@@ -6,20 +6,35 @@
 
 namespace test {
 
+TEST(DcsInterfaceTest, invalid_connection_port_settings) {
+    DcsConnectionSettings connection_settings = {"19ab", "abc", "127.0.0.1"};
+    EXPECT_THROW(DcsInterface dcs_interface(connection_settings), std::runtime_error);
+}
+
+TEST(DcsInterfaceTest, dcs_reset_command_on_construction) {
+    DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
+    DcsSocket mock_dcs(connection_settings.tx_port, connection_settings.rx_port, connection_settings.ip_address);
+    DcsInterface dcs_interface(connection_settings);
+
+    // Test that the reset message "R" is received by DCS on creation of DcsInterface.
+    std::stringstream ss = mock_dcs.DcsReceive();
+    EXPECT_EQ("R", ss.str());
+}
+
 class DcsInterfaceTestFixture : public ::testing::Test {
   public:
     DcsInterfaceTestFixture()
-        : dcs_interface(kDcsListenerPort, kDcsSendPort, kDcsIpAddress),
-          mock_dcs(kDcsSendPort, kDcsListenerPort, kDcsIpAddress) {}
+        : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
+          mock_dcs(connection_settings.tx_port, connection_settings.rx_port, connection_settings.ip_address),
+          dcs_interface(connection_settings) {
 
-    DcsInterface dcs_interface; // DCS Interface to test.
+        // Consume intial reset command sent to to mock_dcs.
+        (void)mock_dcs.DcsReceive();
+    }
+
+    DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
     DcsSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
-
-    // Constants to be used for providing a valid DcsInterface.
-    static inline std::string kDcsListenerPort = "1908"; // Port number to receive DCS updates from.
-    static inline std::string kDcsSendPort = "1909";     // Port number which DCS commands will be sent to.
-    static inline std::string kDcsIpAddress =
-        "127.0.0.1"; // IP Address on which to communicate with DCS -- Default LocalHost.
+    DcsInterface dcs_interface; // DCS Interface to test.
 };
 
 TEST_F(DcsInterfaceTestFixture, empty_game_state_on_initialization) {

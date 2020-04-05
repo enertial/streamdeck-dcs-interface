@@ -54,11 +54,9 @@ class CallBackTimer {
     std::thread _thd;
 };
 
-MyStreamDeckPlugin::MyStreamDeckPlugin() : dcs_interface_(kDcsListenerPort, kDcsSendPort, kDcsIpAddress) {
+MyStreamDeckPlugin::MyStreamDeckPlugin() {
     mTimer = new CallBackTimer();
     mTimer->start(10, [this]() { this->UpdateFromGameState(); });
-    // Send a reset to command in case DCS mission is already running.
-    dcs_interface_.send_dcs_reset_command();
 }
 
 MyStreamDeckPlugin::~MyStreamDeckPlugin() {
@@ -68,6 +66,52 @@ MyStreamDeckPlugin::~MyStreamDeckPlugin() {
         delete mTimer;
         mTimer = nullptr;
     }
+    if (dcs_interface_ != nullptr) {
+        delete dcs_interface_;
+        dcs_interface_ = nullptr;
+    }
+}
+
+DcsConnectionSettings MyStreamDeckPlugin::get_connection_settings(const json &global_settings) {
+    const std::string ip_address_request = EPLJSONUtils::GetStringByName(global_settings, "ip_address");
+    const std::string listener_port_request = EPLJSONUtils::GetStringByName(global_settings, "listener_port");
+    const std::string send_port_request = EPLJSONUtils::GetStringByName(global_settings, "send_port");
+    const bool user_settings_valid =
+        (!ip_address_request.empty() && !listener_port_request.empty() && !send_port_request.empty());
+
+    DcsConnectionSettings connection_settings;
+    if (user_settings_valid) {
+        connection_settings.rx_port = listener_port_request;
+        connection_settings.tx_port = send_port_request;
+        connection_settings.ip_address = ip_address_request;
+    } else {
+        connection_settings.rx_port = kDefaultDcsListenerPort;
+        connection_settings.tx_port = kDefaultDcsSendPort;
+        connection_settings.ip_address = kDefaultDcsIpAddress;
+    }
+    return connection_settings;
+}
+
+void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload) {
+    json settings;
+    EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
+    DcsConnectionSettings connection_settings = get_connection_settings(settings);
+
+    // If settings have changed, close DcsInterface so it can be re-opened with new connection.
+    if (dcs_interface_ != nullptr && !dcs_interface_->connection_settings_match(connection_settings)) {
+        delete dcs_interface_;
+        dcs_interface_ = nullptr;
+    }
+
+    // Create first instance of DCS Interface only done under DidReceiveGlobalSettings to allow for any stored settings
+    // to be used before binding socket to default port values.
+    if (dcs_interface_ == nullptr) {
+        try {
+            dcs_interface_ = new DcsInterface(connection_settings);
+        } catch (const std::exception &e) {
+            std::cerr << "Exception: " << e.what() << std::endl;
+        }
+    }
 }
 
 void MyStreamDeckPlugin::UpdateFromGameState() {
@@ -75,15 +119,17 @@ void MyStreamDeckPlugin::UpdateFromGameState() {
     // Warning: UpdateFromGameState() is running in the timer thread
     //
 
-    // Update the DCS game state in memory, then update each Streamdeck button context.
-    dcs_interface_.update_dcs_state();
+    if (dcs_interface_ != nullptr) {
+        // Update the DCS game state in memory, then update each Streamdeck button context.
+        dcs_interface_->update_dcs_state();
 
-    if (mConnectionManager != nullptr) {
-        mVisibleContextsMutex.lock();
-        for (auto &elem : mVisibleContexts) {
-            elem.second.updateContextState(dcs_interface_, mConnectionManager);
+        if (mConnectionManager != nullptr) {
+            mVisibleContextsMutex.lock();
+            for (auto &elem : mVisibleContexts) {
+                elem.second.updateContextState(dcs_interface_, mConnectionManager);
+            }
+            mVisibleContextsMutex.unlock();
         }
-        mVisibleContextsMutex.unlock();
     }
 }
 
@@ -91,13 +137,15 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
                                           const std::string &inContext,
                                           const json &inPayload,
                                           const std::string &inDeviceID) {
-    mVisibleContextsMutex.lock();
-    mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_DOWN, inAction, inPayload);
-    // The Streamdeck will by default change a context's state after a button action, so a force send of the
-    // current context's state will keep the button state in sync with the plugin. (Not performed for switches
-    // as generally the change in state is desired there).
-    mVisibleContexts[inContext].forceSendState(mConnectionManager);
-    mVisibleContextsMutex.unlock();
+    if (dcs_interface_ != nullptr) {
+        mVisibleContextsMutex.lock();
+        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_DOWN, inAction, inPayload);
+        // The Streamdeck will by default change a context's state after a button action, so a force send of the
+        // current context's state will keep the button state in sync with the plugin. (Not performed for switches
+        // as generally the change in state is desired there).
+        mVisibleContexts[inContext].forceSendState(mConnectionManager);
+        mVisibleContextsMutex.unlock();
+    }
 }
 
 void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
@@ -105,12 +153,14 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
                                         const json &inPayload,
                                         const std::string &inDeviceID) {
 
-    mVisibleContextsMutex.lock();
-    mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_UP, inAction, inPayload);
-    // The Streamdeck will by default change a context's state after a button action, so a force send of the current
-    // context's state will keep the button state in sync with the plugin.
-    mVisibleContexts[inContext].forceSendState(mConnectionManager);
-    mVisibleContextsMutex.unlock();
+    if (dcs_interface_ != nullptr) {
+        mVisibleContextsMutex.lock();
+        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_UP, inAction, inPayload);
+        // The Streamdeck will by default change a context's state after a button action, so a force send of the current
+        // context's state will keep the button state in sync with the plugin.
+        mVisibleContexts[inContext].forceSendState(mConnectionManager);
+        mVisibleContextsMutex.unlock();
+    }
 }
 
 void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
@@ -122,7 +172,9 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
     mVisibleContexts[inContext] = StreamdeckContext(inContext, settings);
-    mVisibleContexts[inContext].updateContextState(dcs_interface_, mConnectionManager);
+    if (dcs_interface_ != nullptr) {
+        mVisibleContexts[inContext].updateContextState(dcs_interface_, mConnectionManager);
+    }
     mVisibleContextsMutex.unlock();
 }
 
@@ -137,7 +189,10 @@ void MyStreamDeckPlugin::WillDisappearForAction(const std::string &inAction,
 }
 
 void MyStreamDeckPlugin::DeviceDidConnect(const std::string &inDeviceID, const json &inDeviceInfo) {
-    // Nothing to do.
+    // Request global settings from Streamdeck.
+    if (mConnectionManager != nullptr) {
+        mConnectionManager->GetGlobalSettings();
+    }
 }
 
 void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID) {
@@ -160,13 +215,24 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
     }
 
     if (event == "RequestDcsStateUpdate") {
-        const std::map<int, std::string> dcs_id_values = dcs_interface_.debug_get_current_game_state();
-        json current_game_state;
-        for (const auto &[key, value] : dcs_id_values) {
-            current_game_state[std::to_string(key)] = value;
+        if (dcs_interface_ == nullptr) {
+            mConnectionManager->SendToPropertyInspector(inAction,
+                                                        inContext,
+                                                        json({{"event", "DebugDcsGameState"},
+                                                              {"current_game_state", ""},
+                                                              {"error", "DcsInterface not connected"}}));
+
+        } else {
+            const std::map<int, std::string> dcs_id_values = dcs_interface_->debug_get_current_game_state();
+            json current_game_state;
+            for (const auto &[key, value] : dcs_id_values) {
+                current_game_state[std::to_string(key)] = value;
+            }
+            mConnectionManager->SendToPropertyInspector(
+                inAction,
+                inContext,
+                json({{"event", "DebugDcsGameState"}, {"current_game_state", current_game_state}}));
         }
-        mConnectionManager->SendToPropertyInspector(
-            inAction, inContext, json({{"event", "DebugDcsGameState"}, {"current_game_state", current_game_state}}));
     }
 
     if (event == "RequestInstalledModules") {
@@ -181,12 +247,6 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
         const std::string dcs_install_path = EPLJSONUtils::GetStringByName(inPayload, "dcs_install_path");
         const std::string module = EPLJSONUtils::GetStringByName(inPayload, "module");
         json clickabledata = get_clickabledata(dcs_install_path, module, "extract_clickabledata.lua");
-        // json clickabledata_items;
-        // auto iter = clickabledata.begin();
-        // for (auto i = 0; i < 50; ++i) {
-        //    clickabledata_items.push_back(iter.value());
-        //    iter++;
-        //}
         mConnectionManager->SendToPropertyInspector(
             inAction, inContext, json({{"event", "Clickabledata"}, {"clickabledata", clickabledata}}));
     }

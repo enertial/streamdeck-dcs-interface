@@ -8,17 +8,29 @@
 #include <string>
 #include <vector>
 
+using DcsConnectionSettings = struct {
+    std::string rx_port;    // UDP port to receive updates from DCS.
+    std::string tx_port;    // UDP port to send commands to DCS.
+    std::string ip_address; //  UDP IP address to send commands to DCS (Default is LocalHost).
+};
+
 class DcsInterface {
 
   public:
     /**
      * @brief Construct a new Dcs Interface object
      *
-     * @param rx_port UDP port to receive updates from DCS.
-     * @param tx_port UDP port to send commands to DCS.
-     * @param ip_address UDP IP address to send commands to DCS (Default is LocalHost).
+     * @param settings Connection settings to use for DCS Socket.
      */
-    DcsInterface(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address);
+    DcsInterface(const DcsConnectionSettings &settings);
+
+    /**
+     * @brief Checks if the provided connection settings match the internally stored settings.
+     *
+     * @param settings Connection settings used for DCS Socket.
+     * @return True if provided connection settings match internal settings.
+     */
+    bool connection_settings_match(const DcsConnectionSettings &settings);
 
     /**
      * @brief Receives DCS value updates, updating DcsInterface's internal current game state.
@@ -77,8 +89,9 @@ class DcsInterface {
      */
     void handle_received_token(const std::string &key, const std::string &value);
 
-    DcsSocket dcs_socket_;            // UDP Socket connection for communicating with DCS lua export scripts.
-    std::string current_game_module_; // Stores the current aircraft module name being used in game.
+    DcsConnectionSettings connection_settings_; // Stored connection settings used for DCS Socket.
+    DcsSocket dcs_socket_;                      // UDP Socket connection for communicating with DCS lua export scripts.
+    std::string current_game_module_;           // Stores the current aircraft module name being used in game.
     std::map<int, std::string>
         current_game_state_; // Maps DCS ID keys of received values to their most recently published values.
 };
