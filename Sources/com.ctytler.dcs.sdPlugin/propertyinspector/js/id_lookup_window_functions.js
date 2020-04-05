@@ -32,16 +32,39 @@ function RequestInstalledModules() {
 
 function gotInstalledModules(installed_modules_list) {
     var select_elem = document.getElementById("select_module");
+    // Remove any previously listed modules from dropdown.
     while (select_elem.options.length > 0) {
         select_elem.remove(0);
     }
-    for (module of installed_modules_list) {
+
+    // Populate dropdown with received modules with modification.
+    modified_modules_list = modifyInstalledModulesList(installed_modules_list);
+    for (module of modified_modules_list) {
         var option = document.createElement('option');
         option.appendChild(document.createTextNode(module));
         option.value = module;
         select_elem.append(option);
     }
     callbackRequestIdLookup();
+}
+
+function modifyInstalledModulesList(installed_modules_list) {
+    modified_list = [];
+    if (installed_modules_list.length > 0) {
+        modified_list.push("General"); // Make "General" the first module listed.
+        for ([idx, module] of installed_modules_list.entries()) {
+            if (module == "L-39C") {
+                installed_modules_list.push("L-39ZA")
+            }
+            if (module == "C-101") {
+                installed_modules_list[idx] = "C-101CC";
+                installed_modules_list.push("C-101EB");
+            }
+        }
+        installed_modules_list.sort();
+        modified_list = modified_list.concat(installed_modules_list);
+    }
+    return modified_list;
 }
 
 function callbackRequestIdLookup() {

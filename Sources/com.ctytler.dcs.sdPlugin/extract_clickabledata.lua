@@ -14,10 +14,10 @@ class_type =
 }
 
 -- Mock out the get_option_value and get_aircraft_type functions that don't exist in this environment.
-function get_option_value(x)
-	return nil
+function get_aircraft_type()
+	return module_name
 end
-function get_aircraft_type(x)
+function get_option_value(x)
 	return nil
 end
 
@@ -121,14 +121,21 @@ end
 function load_module(module_name)
 	LockOn_Options = {}
 
-	LockOn_Options.script_path = dcs_install_path..[[\Mods\aircraft\]]..module_name..[[\Cockpit\]]
+	-- Specialty case handling for odd multi-version modules.
+	if string.match(module_name,"C-101") then
+		LockOn_Options.script_path = dcs_install_path..[[\Mods\aircraft\C-101\Cockpit\]]..module_name..[[\]]
+	elseif string.match(module_name,"L-39") then
+		L_39ZA = string.match(module_name, "L-39ZA")
+		LockOn_Options.script_path = dcs_install_path..[[\Mods\aircraft\L-39C\Cockpit\]]
+		dofile(LockOn_Options.script_path.."devices.lua")
+	else
+		LockOn_Options.script_path = dcs_install_path..[[\Mods\aircraft\]]..module_name..[[\Cockpit\]]
+	end
+
 	file_path_valid = loadfile(LockOn_Options.script_path.."clickabledata.lua")
 	if file_path_valid == nil then
 		LockOn_Options.script_path = LockOn_Options.script_path..[[Scripts\]]
 	end
-
-	-- Run devices.lua in case a module is relying on it being a global variable and not including it (L-39C).
-	dofile(LockOn_Options.script_path.."devices.lua")
 
 	dofile(LockOn_Options.script_path.."clickabledata.lua")
 	
