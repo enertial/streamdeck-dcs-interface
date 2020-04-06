@@ -45,15 +45,15 @@ function len(table)
 end
 
 function get_device_name(device_id)
+    device_name = ""
 	for device,id in pairs(devices) do
 		if (id == device_id) then
-			if (device == nil) then
-				return ""
-			else
-				return device
+			if (device ~= nil) then
+				device_name = device
 			end
 		end
-	end
+    end
+    return device_name
 end
 
 function get_class_enum_label(class)
@@ -74,7 +74,10 @@ end
 
 function get_index_value(table, index)
 	if (table ~= nil) then
-		return table[index]
+        value = table[index]
+        if (value ~= nil) then
+            return value
+        end
 	end
 	return ""
 end
@@ -110,6 +113,9 @@ function collect_element_attributes(elements)
 					arg_lim1 = arg_lim
 				end
 			end
+            if (device_id == nil) then
+                device_id = "" 
+            end
 			count = count + 1
 			collected_element_attributes[count] = string.format('%s(%s),%s,%s,%s,%s,%s,%s,%s,%s',
 					device_name, device_id, command_id, element_name, class_name, arg, arg_value, arg_lim1, arg_lim2, hint)
@@ -132,16 +138,17 @@ function load_module(module_name)
 		LockOn_Options.script_path = dcs_install_path..[[\Mods\aircraft\]]..module_name..[[\Cockpit\]]
 	end
 
-	file_path_valid = loadfile(LockOn_Options.script_path.."clickabledata.lua")
-	if file_path_valid == nil then
+	script_to_run = loadfile(LockOn_Options.script_path.."clickabledata.lua")
+	if script_to_run == nil then
 		LockOn_Options.script_path = LockOn_Options.script_path..[[Scripts\]]
+		script_to_run = loadfile(LockOn_Options.script_path.."clickabledata.lua")
 	end
 
-	dofile(LockOn_Options.script_path.."clickabledata.lua")
+	script_to_run()
 	
 	element_list = collect_element_attributes(elements)
 	return element_list
 end
 
 list = load_module(module_name)
-return table.unpack(list)
+return unpack(list)

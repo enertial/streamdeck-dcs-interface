@@ -241,7 +241,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Vendor\lua-5.3.5\Lua.vcxproj">
+    <ProjectReference Include="..\Vendor\lua-5.1.5\Lua.vcxproj">
       <Project>{59eec206-84e0-4842-b89e-2025fd78e589}</Project>
     </ProjectReference>
   </ItemGroup>

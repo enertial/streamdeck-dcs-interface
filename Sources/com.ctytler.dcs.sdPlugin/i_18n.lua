@@ -7,6 +7,10 @@ function i_18n.setLocale(newLocale)
   assert(i_18n.locales[currentLocale], ("The locale %q was unknown"):format(newLocale))
 end
 
+function i_18n.get_locale()
+  return "en", "US"
+end
+
 local function translate(id)
   local result = id
   return result

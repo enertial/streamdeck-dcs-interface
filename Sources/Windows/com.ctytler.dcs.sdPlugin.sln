@@ -7,7 +7,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "com.ctytler.dcs.sdPlugin", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Test", "..\Test\Test.vcxproj", "{81582F07-E000-4049-B302-BF98D6ED1B41}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "..\Vendor\lua-5.3.5\Lua.vcxproj", "{59EEC206-84E0-4842-B89E-2025FD78E589}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Lua", "..\Vendor\lua-5.1.5\Lua.vcxproj", "{59EEC206-84E0-4842-B89E-2025FD78E589}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

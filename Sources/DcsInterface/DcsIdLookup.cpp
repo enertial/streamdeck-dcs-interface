@@ -4,7 +4,7 @@
 
 #include "DcsIdLookup.h"
 
-#include "../Vendor/lua-5.3.5/src/lua.hpp"
+#include "../Vendor/lua-5.1.5/etc/lua.hpp"
 
 #include <filesystem>
 #include <iostream>
@@ -33,12 +33,8 @@ json get_clickabledata(const std::string &dcs_install_path,
     lua_State *lua_state;
     lua_state = luaL_newstate();
 
-    // load necessary Lua libraries
-    luaL_requiref(lua_state, "base", luaopen_base, 1);
-    luaL_requiref(lua_state, "package", luaopen_package, 1);
-    luaL_requiref(lua_state, "table", luaopen_table, 1);
-    luaL_requiref(lua_state, "string", luaopen_string, 1);
-    luaL_requiref(lua_state, "io", luaopen_io, 1);
+    // load Lua libraries
+    luaL_openlibs(lua_state);
 
     // Write variables to lua, the below sends to lua: [module_name = "A-10C"]
     lua_pushstring(lua_state, dcs_install_path.c_str());
