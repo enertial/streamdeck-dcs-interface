@@ -68,13 +68,26 @@ function modifyInstalledModulesList(installed_modules_list) {
 }
 
 function callbackRequestIdLookup() {
+    clearTableContents()
     var select_elem = document.getElementById("select_module");
     var module = select_elem.options[select_elem.selectedIndex].value;
-    var dcs_install_path = document.getElementById("dcs_install_path").value;
-    var payload = { "dcs_install_path": dcs_install_path, "module": module };
-    sendmessage("RequestIdLookup", payload);
-    console.log("Request ID Lookup for: ", payload);
+    if (module == "General" || module == "Flaming Cliffs") {
+        // Use the stored general commands from included .js file.
+        gotClickabledata(general_commands)
+    }
+    else {
+        var dcs_install_path = document.getElementById("dcs_install_path").value;
+        var payload = { "dcs_install_path": dcs_install_path, "module": module };
+        sendmessage("RequestIdLookup", payload);
+        console.log("Request ID Lookup for: ", payload);
+    }
+}
 
+
+
+/**  Table Handling Functions **/
+
+function clearTableContents() {
     document.getElementById("clickabledata_table_search").value = "";
     document.getElementById("import_selection_div").hidden = true;
     var tbody = document.getElementById("clickabledata_table").getElementsByTagName("tbody")[0];
@@ -83,11 +96,6 @@ function callbackRequestIdLookup() {
     }
     selected_row = "";
 }
-
-
-
-/**  Table Handling Functions **/
-
 
 function gotClickabledata(clickabledata_elements) {
     // Create rows in a new table body so it is easy to replace any old content.
