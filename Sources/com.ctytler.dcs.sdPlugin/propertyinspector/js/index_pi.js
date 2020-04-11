@@ -77,6 +77,7 @@ $SD.on('connected', (jsn) => {
 
     if (settings) {
         updateUI(settings);
+        callbackDisableRelease(settings["disable_release_check"]);
         callbackStringMonitorPassthroughCheck(settings["string_monitor_passthrough_check"]);
         console.log("Loaded settings: ", settings);
     }

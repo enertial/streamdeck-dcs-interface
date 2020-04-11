@@ -39,15 +39,21 @@
         <input id="device_id" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
       </div>
 
-      <div id="momentary_button_settings" hidden>
-        <div class="sdpi-item" id="send_while_released">
-          <div class="sdpi-item-label">Send Value while Released</div>
-          <input id="release_value" class="sdpi-item-value" type="text" placeholder="Example: 0" />
-        </div>
-
+      <div id="momentary_button_settings">
         <div class="sdpi-item" id="send_while_pressed">
           <div class="sdpi-item-label">Send Value while Pressed</div>
           <input id="press_value" class="sdpi-item-value" type="text" placeholder="Example: 1" />
+        </div>
+
+        <div class="sdpi-item" id="send_while_released">
+          <div class="sdpi-item-label">Send Value while Released</div>
+          <input id="release_value" class="sdpi-item-value" type="text" placeholder="Example: 0" />
+
+          <div type="checkbox" class="sdpi-item">
+            <input class="sdpi-item-value" id="disable_release_check" type="checkbox" value="check"
+              onclick="callbackDisableRelease(checked)" />
+            <label for="disable_release_check"><span></span>Disable</label>
+          </div>
         </div>
       </div>
 

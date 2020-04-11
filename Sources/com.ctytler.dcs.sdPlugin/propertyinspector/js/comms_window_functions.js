@@ -1,3 +1,8 @@
+// Copyright 2020, Charles Tytler
+
+/**
+ * Called when window is opened.
+ */
 function loaded() {
     restoreGlobalSettings(window.opener.global_settings);
 };

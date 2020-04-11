@@ -101,10 +101,10 @@ TEST_F(DcsInterfaceTestFixture, update_dcs_state_end_of_mission) {
 }
 
 TEST_F(DcsInterfaceTestFixture, send_dcs_command) {
-    const int button_id = 250;
+    const int button_id = 3250;
     const std::string device_id = "24";
     const std::string value = "1";
-    // Message is sent prepended with "C" prepended and 3000 added to Button ID.
+    // Message is sent prepended with "C".
     const std::string expected_msg_buffer = "C24,3250,1";
 
     dcs_interface.send_dcs_command(button_id, device_id, value);

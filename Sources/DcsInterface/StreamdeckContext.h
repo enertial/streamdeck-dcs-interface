@@ -104,6 +104,7 @@ class StreamdeckContext {
     std::string current_title_ = "";           // Stored title of the context.
     Decimal current_increment_value_;          // Stored value for increment button types.
     bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
+    bool disable_release_value_ = false;       // Flag set by user settings for momentary button types.
 
     // Stored settings extracted from user-filled fields.
     int dcs_id_compare_monitor_ = 0; // DCS ID to monitor for context state setting according to value comparison.

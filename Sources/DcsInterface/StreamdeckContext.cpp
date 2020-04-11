@@ -164,7 +164,9 @@ bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, con
     if (event == KEY_DOWN) {
         value = EPLJSONUtils::GetStringByName(settings, "press_value");
     } else {
-        value = EPLJSONUtils::GetStringByName(settings, "release_value");
+        if (!EPLJSONUtils::GetBoolByName(settings, "disable_release_check")) {
+            value = EPLJSONUtils::GetStringByName(settings, "release_value");
+        }
     }
     const bool is_valid = value.empty() ? false : true;
     return is_valid;

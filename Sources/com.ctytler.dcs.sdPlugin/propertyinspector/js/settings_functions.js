@@ -24,6 +24,26 @@ function callbackReceivedGlobalSettings(stored_global_settings) {
 /** Functions to set default settings **/
 
 
+function addDefaultGlobalSettings(settings) {
+    if (!settings.hasOwnProperty("ip_address")) {
+        settings["ip_address"] = "127.0.0.1";
+    }
+    if (!settings.hasOwnProperty("listener_port")) {
+        settings["listener_port"] = "1725";
+    }
+    if (!settings.hasOwnProperty("send_port")) {
+        settings["send_port"] = "26027";
+    }
+    if (!settings.hasOwnProperty("dcs_install_path")) {
+        settings["dcs_install_path"] = "C:\\Program Files\\Eagle Dynamics\\DCS World";
+    }
+    if (!settings.hasOwnProperty("last_selected_module")) {
+        settings["last_selected_module"] = "";
+    }
+    return settings;
+}
+
+
 /**
  * Adds default values to any unpopulated settings fields according to action type.
  */
@@ -64,6 +84,9 @@ function addDefaultSettings(action, settings) {
         if (!settings.hasOwnProperty("press_value")) {
             settings["press_value"] = "1";
         }
+        if (!settings.hasOwnProperty("disable_release_check")) {
+            settings["disable_release_check"] = false;
+        }
     }
 
     if (!settings.hasOwnProperty("dcs_id_comparison_value")) {
@@ -79,28 +102,23 @@ function addDefaultSettings(action, settings) {
     return settings;
 }
 
-function addDefaultGlobalSettings(settings) {
-    if (!settings.hasOwnProperty("ip_address")) {
-        settings["ip_address"] = "127.0.0.1";
-    }
-    if (!settings.hasOwnProperty("listener_port")) {
-        settings["listener_port"] = "1725";
-    }
-    if (!settings.hasOwnProperty("send_port")) {
-        settings["send_port"] = "26027";
-    }
-    if (!settings.hasOwnProperty("dcs_install_path")) {
-        settings["dcs_install_path"] = "C:\\Program Files\\Eagle Dynamics\\DCS World";
-    }
-    if (!settings.hasOwnProperty("last_selected_module")) {
-        settings["last_selected_module"] = "";
-    }
-    return settings;
-}
-
 
 /** Functions to display optional settings sections **/
 
+function callbackDisableRelease(isChecked) {
+    console.log("Disable release: ", isChecked);
+    var release_elem = document.getElementById("release_value");
+    if (isChecked) {
+        release_elem.disabled = true;
+        release_elem.style.backgroundColor = "#222222";
+        release_elem.style.color = "#333333";
+    }
+    else {
+        release_elem.disabled = false;
+        release_elem.style.backgroundColor = "";
+        release_elem.style.color = "";
+    }
+}
 
 /**
  * @function callbackStringMonitorPassthroughCheck

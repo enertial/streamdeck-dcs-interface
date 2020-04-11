@@ -376,6 +376,7 @@ class StreamdeckContextKeyPressTestFixture : public StreamdeckContextTestFixture
                      {"device_id", device_id},
                      {"press_value", press_value},
                      {"release_value", release_value},
+                     {"disable_release_check", false},
                      {"send_when_first_state_value", send_when_first_state_value},
                      {"send_when_second_state_value", send_when_second_state_value},
                      {"increment_value", increment_value},
@@ -417,7 +418,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary) {
     const std::string action = "com.ctytler.dcs.static.button.one-state";
     fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + press_value;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + press_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -425,7 +426,16 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_momentary) {
     const std::string action = "com.ctytler.dcs.static.button.one-state";
     fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + release_value;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + release_value;
+    EXPECT_EQ(expected_command, ss_received.str());
+}
+
+TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_momentary_release_send_disabled) {
+    payload["settings"]["disable_release_check"] = true;
+    const std::string action = "com.ctytler.dcs.static.button.one-state";
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    const std::stringstream ss_received = mock_dcs.DcsReceive();
+    std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -443,7 +453,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_first_stat
     fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command =
-        "C" + device_id + "," + std::to_string(3000 + button_id) + "," + send_when_first_state_value;
+        "C" + device_id + "," + std::to_string(button_id) + "," + send_when_first_state_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -453,7 +463,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_second_sta
     fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command =
-        "C" + device_id + "," + std::to_string(3000 + button_id) + "," + send_when_second_state_value;
+        "C" + device_id + "," + std::to_string(button_id) + "," + send_when_second_state_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -480,7 +490,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment) {
     fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_value;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -492,7 +502,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple) 
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + "0.5";
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + "0.5";
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -504,7 +514,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_to_max) {
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_max;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_max;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -517,7 +527,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_cycle_max_
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_min;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_min;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -530,7 +540,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple_n
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_min;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_min;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -543,7 +553,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_t
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_min;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_min;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -557,7 +567,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
         ss_received = mock_dcs.DcsReceive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
-    std::string expected_command = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + increment_max;
+    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_max;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
