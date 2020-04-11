@@ -1,5 +1,8 @@
 // Copyright 2020, Charles Tytler
 
+
+/** Functions to open external windows **/
+
 /**
  * Opens an external window when button is clicked.
  */
@@ -27,12 +30,11 @@ function callbackCommsSettingsButtonPress() {
 
 
 
-
 /** Functions for communication with external ID Lookup window **/
 
 /** Callback functions for working with external window **/
 function gotCallbackFromIdLookupWindow(parameter) {
-    if (parameter.event == 'UpdateDcsInstallPathSettings') {
+    if (parameter.event == 'UpdateGlobalSettings') {
         console.log("Set Global Settings: ", parameter.payload)
         $SD.api.setGlobalSettings($SD.uuid, parameter.payload);
     }
@@ -97,7 +99,7 @@ function gotCallbackFromCommsWindow(parameter) {
         $SD.api.getGlobalSettings($SD.uuid);
     }
 
-    if (parameter.event == 'updateConnectionSettings') {
+    if (parameter.event == 'updateGlobalSettings') {
         console.log("Set Global Settings: ", parameter.payload)
         $SD.api.setGlobalSettings($SD.uuid, parameter.payload);
     }
@@ -107,12 +109,6 @@ function gotCallbackFromCommsWindow(parameter) {
     }
 
     console.log("Callback from comms window: ", parameter);
-}
-
-function sendToCommsWindowSettings(global_settings) {
-    if (window.commsWindow) {
-        window.commsWindow.gotGlobalSettingsFromPI(global_settings);
-    }
 }
 
 function sendToCommsWindowDcsGameState(current_game_state) {

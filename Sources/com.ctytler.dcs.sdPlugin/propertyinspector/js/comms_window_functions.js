@@ -1,27 +1,42 @@
+function loaded() {
+    restoreGlobalSettings(window.opener.global_settings);
+};
+
 
 function callbackUpdateConnectionSettings() {
-    const settings = {
-        "ip_address": document.getElementById("ip_address").value,
-        "listener_port": document.getElementById("listener_port").value,
-        "send_port": document.getElementById("send_port").value
-    };
-    sendmessage("updateConnectionSettings", settings);
+    window.opener.global_settings["ip_address"] = document.getElementById("ip_address").value;
+    window.opener.global_settings["listener_port"] = document.getElementById("listener_port").value;
+    window.opener.global_settings["send_port"] = document.getElementById("send_port").value;
+    sendmessage("updateGlobalSettings", window.opener.global_settings);
 }
 
-function gotGlobalSettingsFromPI(settings) {
+/**
+ * Restores previously set global settings saved from a previous Streamdeck context.
+ * 
+ * @param settings Global settings json stored by Streamdeck program
+ */
+function restoreGlobalSettings(settings) {
     document.getElementById("ip_address").value = settings.ip_address;
     document.getElementById("listener_port").value = settings.listener_port;
     document.getElementById("send_port").value = settings.send_port;
     // Fields and button remain hidden until we've received settings from PI
     // to avoid showing the wrong information.
     document.getElementById("connection_settings_div").hidden = false;
-    console.log("Got settings: ", settings);
+    console.log("Restored global settings: ", settings);
 }
 
+/**
+ * Sends a message to the plugin requesting a refresh of the DCS game state.
+ */
 function callbackRefreshDcsGameState() {
     sendmessage("refreshDcsState");
 }
 
+/**
+ * Populates rows of table with the DCS ID and values from received DCS game state.
+ * 
+ * @param {json} current_game_state 
+ */
 function gotDcsGameState(current_game_state) {
     // Create rows in a new table body so it is easy to replace any old content.
     var new_table_body = document.createElement('tbody');
@@ -38,15 +53,12 @@ function gotDcsGameState(current_game_state) {
 
 /** Functions for communication with original window **/
 
-function loaded() {
-    setTimeout(() => {
-        // this is just a quick message to Property Inspector (you should see it in the console)
-        window.opener.gotCallbackFromWindow("Message from window: " + new Date().toLocaleTimeString());
-    }, 1000);
-    sendmessage("requestGlobalSettings")
-
-};
-
+/**
+ * Sends a message to the DCS Interface plugin with the "event" type and a json payload.
+ * 
+ * @param {string} event 
+ * @param {json} payload 
+ */
 function sendmessage(event, payload) {
     // Calls function from original (Property Inspector) window.
     var msg = { "event": event }

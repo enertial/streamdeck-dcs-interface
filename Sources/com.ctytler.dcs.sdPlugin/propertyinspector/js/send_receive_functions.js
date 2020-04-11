@@ -29,10 +29,6 @@ function sendSettingsToPlugin() {
     sendPayloadToPlugin(payload);
 }
 
-function callbackReceivedGlobalSettings(global_settings) {
-    global_settings = addDefaultGlobalSettings(global_settings);
-    sendToCommsWindowSettings(global_settings);
-}
 
 /**
  * 'ReceivedPayloadFromPlugin' handles all messages sent from Plugin to Property Inspector.

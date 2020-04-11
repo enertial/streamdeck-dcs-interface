@@ -45,7 +45,7 @@ std::string DcsInterface::get_value_of_dcs_id(const int dcs_id) {
 }
 
 void DcsInterface::send_dcs_command(const int button_id, const std::string &device_id, const std::string &value) {
-    const std::string message_assembly = "C" + device_id + "," + std::to_string(3000 + button_id) + "," + value;
+    const std::string message_assembly = "C" + device_id + "," + std::to_string(button_id) + "," + value;
     dcs_socket_.DcsSend(message_assembly);
 }
 
