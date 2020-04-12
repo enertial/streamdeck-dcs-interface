@@ -74,7 +74,10 @@ function gotInstalledModules(installed_modules_list) {
 function modifyInstalledModulesList(installed_modules_list) {
     modified_list = [];
     if (installed_modules_list != null) {
-        modified_list.push("General"); // Make "General" the first module listed.
+        // The below line is commented out because it needs modification to DCS-ExportScript to use.
+        // The file `lib/Tools.lua` can be edited to allow non-Flaming Cliffs modules to use Device ID == 2000.
+        // modified_list.push("General"); // Make "General" the first module listed.
+
         for ([idx, module] of installed_modules_list.entries()) {
             if (module == "L-39C") {
                 installed_modules_list.push("L-39ZA")
