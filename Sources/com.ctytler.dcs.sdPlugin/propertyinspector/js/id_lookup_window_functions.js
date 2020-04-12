@@ -139,6 +139,7 @@ function setSelectedModule(module) {
 function clearTableContents() {
     document.getElementById("clickabledata_table_search").value = "";
     document.getElementById("import_selection_div").hidden = true;
+    document.getElementById("type_hints_text").hidden = true;
     var tbody = document.getElementById("clickabledata_table").getElementsByTagName("tbody")[0];
     while (tbody.getElementsByTagName("tr").length > 0) {
         tbody.deleteRow(0);
@@ -171,6 +172,8 @@ function gotClickabledata(clickabledata_elements) {
     }
     var document_table_body = document.getElementById("clickabledata_table").getElementsByTagName('tbody')[0];
     document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
+
+    document.getElementById("type_hints_text").hidden = false;
 }
 
 /**
@@ -205,10 +208,12 @@ function selectRow(elem) {
     if (selected_row == elem) {
         selected_row = '';
         document.getElementById("import_selection_div").hidden = true;
+        document.getElementById("type_hints_text").hidden = false;
     }
     else {
         elem.classList.toggle("highlighted");
         document.getElementById("import_selection_div").hidden = false;
+        document.getElementById("type_hints_text").hidden = true;
         selected_row = elem;
     }
 }
@@ -216,15 +221,20 @@ function selectRow(elem) {
 
 /** ID Import Button onClick Functions **/
 
-function callbackImportDcsCommandAndImageChange() {
-    callbackImportDcsCommand();
+function callbackImportSwitchFirstToSecond() {
+    callbackImportDcsCommand("1st_to_2nd");
+    callbackImportImageChange();
+}
+
+function callbackImportSwitchSecondToFirst() {
+    callbackImportDcsCommand("2nd_to_1st");
     callbackImportImageChange();
 }
 
 /**
  * Imports ID elements for all button type command settings.
  */
-function callbackImportDcsCommand() {
+function callbackImportDcsCommand(switch_direction = "") {
     var td = selected_row.getElementsByTagName("td");
     var device_str = td[0].textContent;
     var device_id = device_str.split("(").pop().split(")")[0];
@@ -234,7 +244,8 @@ function callbackImportDcsCommand() {
         "dcs_id": td[4].textContent,
         "click_value": td[5].textContent,
         "limit_min": td[6].textContent,
-        "limit_max": td[7].textContent
+        "limit_max": td[7].textContent,
+        "switch_direction": switch_direction
     };
     sendmessage("ImportDcsCommand", payload);
 }

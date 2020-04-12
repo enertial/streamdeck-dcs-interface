@@ -52,12 +52,16 @@ function gotCallbackFromIdLookupWindow(parameter) {
         settings["device_id"] = parameter.payload.device_id;
         settings["press_value"] = parameter.payload.click_value;
         settings["release_value"] = "0";
-        settings["send_when_first_state_value"] = parameter.payload.click_value;
-        settings["send_when_second_state_value"] = "0";
         settings["dcs_id_increment_monitor"] = parameter.payload.dcs_id;
         settings["increment_value"] = parameter.payload.click_value;
         settings["increment_min"] = parameter.payload.limit_min;
         settings["increment_max"] = parameter.payload.limit_max;
+        if (parameter.payload.switch_direction == "1st_to_2nd") {
+            settings["send_when_first_state_value"] = parameter.payload.click_value;
+        }
+        if (parameter.payload.switch_direction == "2nd_to_1st") {
+            settings["send_when_second_state_value"] = parameter.payload.click_value;
+        }
         console.log('setSettings....', settings);
         $SD.api.setSettings($SD.uuid, settings);
         updateUI(settings);
