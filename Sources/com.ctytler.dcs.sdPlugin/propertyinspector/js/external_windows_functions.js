@@ -65,6 +65,7 @@ function gotCallbackFromIdLookupWindow(parameter) {
         console.log('setSettings....', settings);
         $SD.api.setSettings($SD.uuid, settings);
         updateUI(settings);
+        sendSettingsToPlugin();
     }
 
     if (parameter.event == 'ImportImageChange') {
@@ -72,6 +73,7 @@ function gotCallbackFromIdLookupWindow(parameter) {
         console.log('setSettings....', settings);
         $SD.api.setSettings($SD.uuid, settings);
         updateUI(settings);
+        sendSettingsToPlugin();
     }
 
     if (parameter.event == 'ImportTextChange') {
@@ -79,6 +81,7 @@ function gotCallbackFromIdLookupWindow(parameter) {
         console.log('setSettings....', settings);
         $SD.api.setSettings($SD.uuid, settings);
         updateUI(settings);
+        sendSettingsToPlugin();
     }
 
     console.log("Callback from ID lookup window: ", parameter);
