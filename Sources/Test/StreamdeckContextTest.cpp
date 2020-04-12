@@ -379,10 +379,13 @@ class StreamdeckContextKeyPressTestFixture : public StreamdeckContextTestFixture
                      {"disable_release_check", false},
                      {"send_when_first_state_value", send_when_first_state_value},
                      {"send_when_second_state_value", send_when_second_state_value},
+                     {"dcs_id_increment_monitor", dcs_id_increment_monitor},
                      {"increment_value", increment_value},
                      {"increment_min", increment_min},
                      {"increment_max", increment_max},
-                     {"increment_cycle_allowed_check", false}}}}) {}
+                     {"increment_cycle_allowed_check", false}}}}) {
+        fixture_context.updateContextSettings(payload["settings"]);
+    }
 
     int button_id = 2;
     std::string device_id = "23";
@@ -390,6 +393,7 @@ class StreamdeckContextKeyPressTestFixture : public StreamdeckContextTestFixture
     std::string release_value = "5";
     std::string send_when_first_state_value = "6";
     std::string send_when_second_state_value = "7";
+    std::string dcs_id_increment_monitor = "321";
     std::string increment_value = "0.1";
     std::string increment_min = "0";
     std::string increment_max = "1";
@@ -491,6 +495,24 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment) {
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_value;
+    EXPECT_EQ(expected_command, ss_received.str());
+}
+
+TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_after_external_increment_change) {
+    // Receive a value update from DCS game state for increment monitor.
+    const std::string external_increment_start = "0.5";
+    // Send a single message from mock DCS that contains update for monitored ID.
+    std::string mock_dcs_message = "header*" + dcs_id_increment_monitor + "=" + external_increment_start;
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+
+    const std::string action = "com.ctytler.dcs.increment.two-state";
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    const std::stringstream ss_received = mock_dcs.DcsReceive();
+    const Decimal expected_increment_value = Decimal(external_increment_start) + Decimal(increment_value);
+    std::string expected_command =
+        "C" + device_id + "," + std::to_string(button_id) + "," + expected_increment_value.str();
     EXPECT_EQ(expected_command, ss_received.str());
 }
 

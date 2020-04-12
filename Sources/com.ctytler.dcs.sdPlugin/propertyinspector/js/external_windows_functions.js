@@ -54,6 +54,7 @@ function gotCallbackFromIdLookupWindow(parameter) {
         settings["release_value"] = "0";
         settings["send_when_first_state_value"] = parameter.payload.click_value;
         settings["send_when_second_state_value"] = "0";
+        settings["dcs_id_increment_monitor"] = parameter.payload.dcs_id;
         settings["increment_value"] = parameter.payload.click_value;
         settings["increment_min"] = parameter.payload.limit_min;
         settings["increment_max"] = parameter.payload.limit_max;

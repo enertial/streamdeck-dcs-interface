@@ -18,6 +18,13 @@ void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConne
     ContextState updated_state = FIRST;
     std::string updated_title = "";
 
+    if (increment_monitor_is_set_) {
+        const std::string current_game_value_raw = dcs_interface->get_value_of_dcs_id(dcs_id_increment_monitor_);
+        if (is_number(current_game_value_raw)) {
+            current_increment_value_ = Decimal(current_game_value_raw);
+        }
+    }
+
     if (compare_monitor_is_set_) {
         const std::string current_game_value_raw = dcs_interface->get_value_of_dcs_id(dcs_id_compare_monitor_);
         if (is_number(current_game_value_raw)) {
@@ -47,6 +54,8 @@ void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager)
 
 void StreamdeckContext::updateContextSettings(const json &settings) {
     // Read in settings.
+    const std::string dcs_id_increment_monitor_raw =
+        EPLJSONUtils::GetStringByName(settings, "dcs_id_increment_monitor");
     const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
     const std::string dcs_id_compare_condition_raw =
         EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
@@ -60,12 +69,17 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
     string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
 
     // Process status of settings.
+    increment_monitor_is_set_ = is_integer(dcs_id_increment_monitor_raw);
     const bool compare_monitor_is_populated = is_integer(dcs_id_compare_monitor_raw);
     const bool comparison_value_is_populated = is_number(dcs_id_comparison_value_raw);
     compare_monitor_is_set_ = compare_monitor_is_populated && comparison_value_is_populated;
     string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
 
     // Update internal settings of class instance.
+    if (increment_monitor_is_set_) {
+        dcs_id_increment_monitor_ = std::stoi(dcs_id_increment_monitor_raw);
+    }
+
     if (compare_monitor_is_set_) {
         dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
         dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);

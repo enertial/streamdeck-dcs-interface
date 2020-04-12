@@ -145,8 +145,12 @@ function callbackStringMonitorPassthroughCheck(isChecked) {
  */
 function callbackClearDcsCommand() {
     delete settings["button_id"];
+    delete settings["device_id"];
+    delete settings["dcs_id_increment_monitor"];
     $SD.api.setSettings($SD.uuid, settings);
     button_id.value = "";
+    device_id.value = "";
+    dcs_id_increment_monitor.value = "";
     // Don't need to send to plugin as it always reads in latest settings on button push.
     console.log("Clear DCS Command", settings);
 }

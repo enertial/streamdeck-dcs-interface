@@ -231,6 +231,7 @@ function callbackImportDcsCommand() {
     payload = {
         "device_id": device_id,
         "button_id": td[1].textContent,
+        "dcs_id": td[4].textContent,
         "click_value": td[5].textContent,
         "limit_min": td[6].textContent,
         "limit_max": td[7].textContent

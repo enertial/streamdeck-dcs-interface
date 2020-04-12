@@ -96,8 +96,9 @@ class StreamdeckContext {
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 
     // Status of user-filled fields.
-    bool compare_monitor_is_set_ = false; // True if all DCS ID comparison monitor settings have been set.
-    bool string_monitor_is_set_ = false;  // True if all DCS ID string monitor settings have been set.
+    bool increment_monitor_is_set_ = false; // True if a DCS ID increment monitor setting has been set.
+    bool compare_monitor_is_set_ = false;   // True if all DCS ID comparison monitor settings have been set.
+    bool string_monitor_is_set_ = false;    // True if all DCS ID string monitor settings have been set.
 
     // Context state.
     ContextState current_state_ = FIRST;       // Stored state of the context.
@@ -107,7 +108,8 @@ class StreamdeckContext {
     bool disable_release_value_ = false;       // Flag set by user settings for momentary button types.
 
     // Stored settings extracted from user-filled fields.
-    int dcs_id_compare_monitor_ = 0; // DCS ID to monitor for context state setting according to value comparison.
+    int dcs_id_increment_monitor_ = 0; // DCS ID to monitor for updating current increment value from game state.
+    int dcs_id_compare_monitor_ = 0;   // DCS ID to monitor for context state setting according to value comparison.
     CompareConditionType dcs_id_compare_condition_ = GREATER_THAN; // Comparison to use for DCS ID compare monitor.
     Decimal dcs_id_comparison_value_;                              // Value to compare DCS ID compare monitor value to.
     int dcs_id_string_monitor_ = 0;                                // DCS ID to monitor for context title.
