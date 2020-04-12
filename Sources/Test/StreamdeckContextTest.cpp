@@ -121,7 +121,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping
     const std::string context_id = "def456";
     const json settings = {{"dcs_id_string_monitor", "2027"},
                            {"string_monitor_passthrough_check", false},
-                           {"string_monitor_mapping", "0.0:A,0.1:B,0.2:C"}};
+                           {"string_monitor_mapping", "0.0=A,0.1=B,0.2=C"}};
     StreamdeckContext fixture_context(context_id, settings);
     fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
@@ -133,7 +133,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping
     const std::string context_id = "def456";
     const json settings = {{"dcs_id_string_monitor", "2027"},
                            {"string_monitor_passthrough_check", false},
-                           {"string_monitor_mapping", "0.0:A,0.1:B,0.2:C"}};
+                           {"string_monitor_mapping", "0.0=A,0.1=B,0.2=C"}};
     StreamdeckContext test_context(context_id, settings);
     test_context.updateContextState(&dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);

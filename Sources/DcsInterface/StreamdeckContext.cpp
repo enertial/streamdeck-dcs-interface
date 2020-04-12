@@ -101,7 +101,7 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
         if (!string_monitor_passthrough_) {
             string_monitor_mapping_.clear();
             std::pair<std::string, std::string> key_and_value;
-            while (pop_key_and_value(string_monitor_mapping_raw, ',', ':', key_and_value)) {
+            while (pop_key_and_value(string_monitor_mapping_raw, ',', '=', key_and_value)) {
                 string_monitor_mapping_[key_and_value.first] = key_and_value.second;
             }
         }
