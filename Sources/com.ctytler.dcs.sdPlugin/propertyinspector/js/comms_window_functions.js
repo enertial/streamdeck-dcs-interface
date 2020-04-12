@@ -45,13 +45,22 @@ function callbackRefreshDcsGameState() {
 function gotDcsGameState(current_game_state) {
     // Create rows in a new table body so it is easy to replace any old content.
     var new_table_body = document.createElement('tbody');
-    for (const id of Object.keys(current_game_state)) {
-        var new_row = new_table_body.insertRow();
-        var dcs_id_cell = new_row.insertCell(0);
-        var value_cell = new_row.insertCell(1);
-        dcs_id_cell.appendChild(document.createTextNode(id));
-        value_cell.appendChild(document.createTextNode(current_game_state[id]));
+
+    if (current_game_state == null) {
+        document.getElementById("no_module_detected_text").hidden = false;
     }
+    else {
+        document.getElementById("no_module_detected_text").hidden = true;
+
+        for (const id of Object.keys(current_game_state)) {
+            var new_row = new_table_body.insertRow();
+            var dcs_id_cell = new_row.insertCell(0);
+            var value_cell = new_row.insertCell(1);
+            dcs_id_cell.appendChild(document.createTextNode(id));
+            value_cell.appendChild(document.createTextNode(current_game_state[id]));
+        }
+    }
+
     var document_table_body = document.getElementById("game_state_table").getElementsByTagName('tbody')[0];
     document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
 }
