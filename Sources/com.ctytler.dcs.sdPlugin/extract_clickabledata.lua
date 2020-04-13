@@ -109,6 +109,12 @@ function collect_element_attributes(elements)
 				if (type(arg_lim) == "table") then
 					arg_lim1 = arg_lim[1]
 					arg_lim2 = arg_lim[2]
+					-- Repeat this for further nesting (found in JF-17)
+					if (type(arg_lim1) == "table") then
+						arg_lim = arg_lim1
+						arg_lim1 = arg_lim[1]
+						arg_lim2 = arg_lim[2]
+					end
 				elseif (type(arg_lim) == "number") then
 					arg_lim1 = arg_lim
 				end

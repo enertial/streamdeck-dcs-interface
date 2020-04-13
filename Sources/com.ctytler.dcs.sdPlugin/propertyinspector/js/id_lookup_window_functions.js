@@ -108,6 +108,7 @@ function callbackRequestIdLookup() {
         else {
             var dcs_install_path = document.getElementById("dcs_install_path").value;
             var payload = { "dcs_install_path": dcs_install_path, "module": module };
+            gotClickabledata(cached_commands[module]); // Load cached data until new data arrives.
             sendmessage("RequestIdLookup", payload);
             console.log("Request ID Lookup for: ", payload);
         }
@@ -156,27 +157,29 @@ function clearTableContents() {
  * @param {Json} clickabledata_elements 
  */
 function gotClickabledata(clickabledata_elements) {
-    // Create rows in a new table body so it is easy to replace any old content.
-    var new_table_body = document.createElement('tbody');
-    clickabledata_elements.sort();
-    for (const element of clickabledata_elements) {
-        var split_elem = element.split(',');
-        var new_row = new_table_body.insertRow();
-        new_row.insertCell(0).appendChild(document.createTextNode(split_elem[0])); // Device
-        new_row.insertCell(1).appendChild(document.createTextNode(split_elem[1])); // Button ID
-        new_row.insertCell(2).appendChild(document.createTextNode(split_elem[2])); // Element
-        new_row.insertCell(3).appendChild(document.createTextNode(split_elem[3])); // Type
-        new_row.insertCell(4).appendChild(document.createTextNode(split_elem[4])); // DCS ID
-        new_row.insertCell(5).appendChild(document.createTextNode(split_elem[5])); // Click Value
-        new_row.insertCell(6).appendChild(document.createTextNode(split_elem[6])); // Limit Min
-        new_row.insertCell(7).appendChild(document.createTextNode(split_elem[7])); // Limit Max
-        new_row.insertCell(8).appendChild(document.createTextNode(split_elem[8])); // Description
-        new_row.addEventListener('click', function () { selectRow(this) });
-    }
-    var document_table_body = document.getElementById("clickabledata_table").getElementsByTagName('tbody')[0];
-    document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
+    if (clickabledata_elements.length > 0) {
+        // Create rows in a new table body so it is easy to replace any old content.
+        var new_table_body = document.createElement('tbody');
+        clickabledata_elements.sort();
+        for (const element of clickabledata_elements) {
+            var split_elem = element.split(',');
+            var new_row = new_table_body.insertRow();
+            new_row.insertCell(0).appendChild(document.createTextNode(split_elem[0])); // Device
+            new_row.insertCell(1).appendChild(document.createTextNode(split_elem[1])); // Button ID
+            new_row.insertCell(2).appendChild(document.createTextNode(split_elem[2])); // Element
+            new_row.insertCell(3).appendChild(document.createTextNode(split_elem[3])); // Type
+            new_row.insertCell(4).appendChild(document.createTextNode(split_elem[4])); // DCS ID
+            new_row.insertCell(5).appendChild(document.createTextNode(split_elem[5])); // Click Value
+            new_row.insertCell(6).appendChild(document.createTextNode(split_elem[6])); // Limit Min
+            new_row.insertCell(7).appendChild(document.createTextNode(split_elem[7])); // Limit Max
+            new_row.insertCell(8).appendChild(document.createTextNode(split_elem[8])); // Description
+            new_row.addEventListener('click', function () { selectRow(this) });
+        }
+        var document_table_body = document.getElementById("clickabledata_table").getElementsByTagName('tbody')[0];
+        document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
 
-    document.getElementById("type_hints_text").hidden = false;
+        document.getElementById("type_hints_text").hidden = false;
+    }
 }
 
 /**
