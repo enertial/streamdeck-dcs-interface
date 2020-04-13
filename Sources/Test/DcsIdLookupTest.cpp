@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include "../Common/EPLJSONUtils.h"
 #include "../DcsInterface/DcsIdLookup.cpp"
 
 namespace test {
@@ -17,7 +18,8 @@ TEST(DcsIdLookupTest, nonexistant_lua_file) {
     // Test that a bad path will return an empty json container.
     const std::string lua_script = "non-existant-file.lua";
     json returned_values = get_clickabledata("path", "module", lua_script);
-    EXPECT_TRUE(returned_values.empty());
+    EXPECT_EQ("Lua file load error: 6", EPLJSONUtils::GetStringByName(returned_values, "result"));
+    EXPECT_EQ(0, returned_values["clickabledata_items"].size());
 }
 
 } // namespace test

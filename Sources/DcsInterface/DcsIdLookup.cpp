@@ -27,7 +27,9 @@ json get_installed_modules(const std::string &dcs_install_path, const std::strin
 json get_clickabledata(const std::string &dcs_install_path,
                        const std::string &module_name,
                        const std::string &lua_script) {
-    json clickabledata_items;
+    json clickabledata_and_result;
+    clickabledata_and_result["clickabledata_items"] = json::array();
+    clickabledata_and_result["result"] = "";
 
     // create new Lua state
     lua_State *lua_state;
@@ -47,22 +49,25 @@ json get_clickabledata(const std::string &dcs_install_path,
     const int file_status = luaL_loadfile(lua_state, lua_script.c_str());
     if (file_status != 0) {
         lua_close(lua_state);
-        return clickabledata_items;
+        clickabledata_and_result["result"] = "Lua file load error: " + std::to_string(file_status);
+        return clickabledata_and_result;
     }
     const int script_status = lua_pcall(lua_state, 0, LUA_MULTRET, 0);
     if (script_status != 0) {
         lua_close(lua_state);
-        return clickabledata_items;
+        clickabledata_and_result["result"] = "Lua script runtime error: " + std::to_string(script_status);
+        return clickabledata_and_result;
     }
 
     // Handle each of the return values one at a time.
     while ((lua_gettop(lua_state) - lua_stack_size) > 0) {
-        clickabledata_items.push_back(lua_tostring(lua_state, lua_gettop(lua_state)));
+        clickabledata_and_result["result"] = "success";
+        clickabledata_and_result["clickabledata_items"].push_back(lua_tostring(lua_state, lua_gettop(lua_state)));
         lua_pop(lua_state, 1);
     }
 
     // close the Lua state
     lua_close(lua_state);
 
-    return clickabledata_items;
+    return clickabledata_and_result;
 }

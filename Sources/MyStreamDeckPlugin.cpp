@@ -109,7 +109,7 @@ void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload) {
         try {
             dcs_interface_ = new DcsInterface(connection_settings);
         } catch (const std::exception &e) {
-            std::cerr << "Exception: " << e.what() << std::endl;
+            mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
         }
     }
 }
@@ -246,8 +246,14 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
     if (event == "RequestIdLookup") {
         const std::string dcs_install_path = EPLJSONUtils::GetStringByName(inPayload, "dcs_install_path");
         const std::string module = EPLJSONUtils::GetStringByName(inPayload, "module");
-        json clickabledata = get_clickabledata(dcs_install_path, module, "extract_clickabledata.lua");
+        json clickabledata_and_result = get_clickabledata(dcs_install_path, module, "extract_clickabledata.lua");
+        const std::string lua_result = EPLJSONUtils::GetStringByName(clickabledata_and_result, "result");
+        if (lua_result != "success") {
+            mConnectionManager->LogMessage(module + " Clickabledata Result: " + lua_result);
+        }
         mConnectionManager->SendToPropertyInspector(
-            inAction, inContext, json({{"event", "Clickabledata"}, {"clickabledata", clickabledata}}));
+            inAction,
+            inContext,
+            json({{"event", "Clickabledata"}, {"clickabledata", clickabledata_and_result["clickabledata_items"]}}));
     }
 }
