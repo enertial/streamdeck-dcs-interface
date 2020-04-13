@@ -84,8 +84,7 @@
     <p>The remaining settings differ according to what type of DCS Interface button is used and can be categorized into
         Momentary, Increment, and Switch.</p>
     <h3 id="momentary-button-settings">Momentary Button settings</h3>
-    <p>The momentary buttons are used to send commands to clickabledata items of BTN type, or LEV type in special cases,
-        see note below.</p>
+    <p>The momentary buttons are used to send commands to clickabledata items of BTN type.</p>
     <p><strong>Send Value while Pressed</strong> -- This is the value that is sent immediately upon pressing the
         Streamdeck button. By default most buttons will use <code>1</code> for a pressed value. Sometimes pairs of
         buttons (such as up/down arrow buttons on a panel) will have <code>1</code> as the pressed value for the up
@@ -97,11 +96,6 @@
     <p><strong>Disable (Send Release) Check</strong> -- The checkbox next to the &quot;Send Value while Released&quot;
         will disable any command being sent when releasing a button.</p>
     <p><em>Note: Repetition of sent value while button is held pressed is not supported at this time.</em></p>
-    <p><strong>Use with Axis (LEV) Type</strong> -- Some of the volume knobs and comms channel selectors are designed to
-        accept axis input, and they expect a single value to increment their value. For example a volume knob with
-        limits 0,1 can be rotated with small rotations by setting &quot;Send Value while Pressed&quot; to
-        <code>0.01</code> and disabling the release value (as the release value will just interfere). To rotate a
-        greater amount per press, increase the send value.</p>
     <h3 id="increment-settings">Increment Settings</h3>
     <p>Increment buttons are used for clickabledata items of TUMB type, which are rotary dials or other items that have
         multiple values you want to iterate through.</p>
@@ -244,8 +238,7 @@
             but sometimes +/-0.1 also).</li>
         <li>LEV: Click value is the increment value within the range, however is often listed as 0 in the table. For
             these you will need to manually enter a Send value in Command settings that provides a desirable response.
-            The momentary button with the &quot;Send on Release&quot; disabled is recommended for providing axis-like
-            input.</li>
+        </li>
     </ul>
     <p><em>Limit Min</em> -- The minimum value the item can be commanded to.<br>
         <em>Limit Max</em> -- The maximum value the item can be commanded to.<br>
