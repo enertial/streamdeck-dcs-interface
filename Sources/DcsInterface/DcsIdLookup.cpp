@@ -12,16 +12,22 @@
 #include <vector>
 
 json get_installed_modules(const std::string &dcs_install_path, const std::string &module_subdir) {
-    json installed_modules;
+    json installed_modules_and_result;
+    installed_modules_and_result["installed_modules"] = json::array();
+    installed_modules_and_result["result"] = "";
     if (std::filesystem::exists(dcs_install_path + module_subdir)) {
         for (const auto &dir : std::filesystem::directory_iterator(dcs_install_path + module_subdir)) {
             const std::string module_abs_path = dir.path().string();
             const auto mods_subdir_str_loc = module_abs_path.find(module_subdir);
-            installed_modules.push_back(
+            installed_modules_and_result["installed_modules"].push_back(
                 module_abs_path.substr(mods_subdir_str_loc + module_subdir.size(), module_abs_path.size()));
         }
+        installed_modules_and_result["result"] = "success";
+    } else {
+        installed_modules_and_result["result"] =
+            "DCS Install path [" + dcs_install_path + module_subdir + "] not found.";
     }
-    return installed_modules;
+    return installed_modules_and_result;
 }
 
 json get_clickabledata(const std::string &dcs_install_path,
