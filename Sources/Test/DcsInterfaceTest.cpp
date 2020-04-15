@@ -13,7 +13,7 @@ TEST(DcsInterfaceTest, invalid_connection_port_settings) {
 
 TEST(DcsInterfaceTest, dcs_reset_command_on_construction) {
     DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
-    DcsSocket mock_dcs(connection_settings.tx_port, connection_settings.rx_port, connection_settings.ip_address);
+    DcsSocket mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port);
     DcsInterface dcs_interface(connection_settings);
 
     // Test that the reset message "R" is received by DCS on creation of DcsInterface.
@@ -25,7 +25,7 @@ class DcsInterfaceTestFixture : public ::testing::Test {
   public:
     DcsInterfaceTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
-          mock_dcs(connection_settings.tx_port, connection_settings.rx_port, connection_settings.ip_address),
+          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           dcs_interface(connection_settings) {
 
         // Consume intial reset command sent to to mock_dcs.

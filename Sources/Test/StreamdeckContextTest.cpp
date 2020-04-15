@@ -48,7 +48,7 @@ class StreamdeckContextTestFixture : public ::testing::Test {
   public:
     StreamdeckContextTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
-          mock_dcs(connection_settings.tx_port, connection_settings.rx_port, connection_settings.ip_address),
+          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           dcs_interface(connection_settings), fixture_context(fixture_context_id) {
 
         // Consume intial reset command sent to to mock_dcs.
