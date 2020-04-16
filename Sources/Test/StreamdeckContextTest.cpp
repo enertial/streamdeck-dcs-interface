@@ -292,9 +292,16 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_alphanume
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_empty) {
-
     // Send game state as empty -- should treat as string and not try comparison.
     const std::string mock_dcs_message = "header*123=";
+    mock_dcs.DcsSend(mock_dcs_message);
+    dcs_interface.update_dcs_state();
+    context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.state_, 0);
+}
+TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_string_of_spaces) {
+    // Send game state value as string of spaces -- should treat as (non-numeric) string and not try comparison.
+    const std::string mock_dcs_message = "header*123=    ";
     mock_dcs.DcsSend(mock_dcs_message);
     dcs_interface.update_dcs_state();
     context_with_greater_than.updateContextState(&dcs_interface, &esd_connection_manager);
