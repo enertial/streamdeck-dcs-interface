@@ -6,29 +6,31 @@
 #include <stdlib.h>
 
 bool is_integer(const std::string &str) {
-    if (str.empty()) {
-        return false;
-    } else {
+    if (!str.empty()) {
         // Add special handling for stripping of trailing spaces
         const std::string str_trailing_spaces_stripped = str.substr(0, str.find_last_not_of(" ") + 1);
-        // Check if all characters are base 10 digits (0-9).
-        char *ptr_to_first_non_numeric_char;
-        strtol(str_trailing_spaces_stripped.c_str(), &ptr_to_first_non_numeric_char, 10);
-        return (*ptr_to_first_non_numeric_char == '\0');
+        if (!str_trailing_spaces_stripped.empty()) {
+            // Check if all characters are base 10 digits (0-9).
+            char *ptr_to_first_non_numeric_char;
+            strtol(str_trailing_spaces_stripped.c_str(), &ptr_to_first_non_numeric_char, 10);
+            return (*ptr_to_first_non_numeric_char == '\0');
+        }
     }
+    return false;
 }
 
 bool is_number(const std::string &str) {
-    if (str.empty()) {
-        return false;
-    } else {
+    if (!str.empty()) {
         // Add special handling for stripping of trailing spaces
         const std::string str_trailing_spaces_stripped = str.substr(0, str.find_last_not_of(" ") + 1);
-        // Check if all characters can be converted to a floating point number.
-        char *ptr_to_first_non_numeric_char;
-        strtof(str_trailing_spaces_stripped.c_str(), &ptr_to_first_non_numeric_char);
-        return (*ptr_to_first_non_numeric_char == '\0');
+        if (!str_trailing_spaces_stripped.empty()) {
+            // Check if all characters can be converted to a floating point number.
+            char *ptr_to_first_non_numeric_char;
+            strtof(str_trailing_spaces_stripped.c_str(), &ptr_to_first_non_numeric_char);
+            return (*ptr_to_first_non_numeric_char == '\0');
+        }
     }
+    return false;
 }
 
 bool pop_key_and_value(std::stringstream &ss,

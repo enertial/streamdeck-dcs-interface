@@ -30,6 +30,11 @@ TEST(StringUtilitiesTest, is_integer_with_trailing_spaces) {
     EXPECT_EQ(std::stoi("0   "), 0);
 }
 
+TEST(StringUtilitiesTest, is_integer_with_only_spaces) {
+    EXPECT_FALSE(is_integer(" "));
+    EXPECT_FALSE(is_integer("    "));
+}
+
 TEST(StringUtilitiesTest, is_integer_with_alpha_chars) {
     EXPECT_FALSE(is_integer("25a"));
     EXPECT_FALSE(is_integer("b-25"));
@@ -65,6 +70,11 @@ TEST(StringUtilitiesTest, is_number_with_trailing_spaces) {
     EXPECT_EQ(std::stod("-25  "), -25);
     EXPECT_TRUE(is_number("0   "));
     EXPECT_EQ(std::stod("0   "), 0);
+}
+
+TEST(StringUtilitiesTest, is_number_with_only_spaces) {
+    EXPECT_FALSE(is_number(" "));
+    EXPECT_FALSE(is_number("    "));
 }
 
 TEST(StringUtilitiesTest, is_number_with_alpha_chars) {

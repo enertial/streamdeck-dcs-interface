@@ -11,7 +11,7 @@
 // Set default timeout for socket.
 DWORD socket_timeout_ms = 100;
 
-DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, const std::string &ip_address) {
+DcsSocket::DcsSocket(const std::string &ip_address, const std::string &rx_port, const std::string &tx_port) {
     // Detect any missing input settings.
     if (rx_port.empty() || tx_port.empty() || ip_address.empty()) {
         const std::string error_msg =
@@ -60,26 +60,36 @@ DcsSocket::DcsSocket(const std::string &rx_port, const std::string &tx_port, con
         throw std::runtime_error(error_msg);
     }
 
-    // Define send destination port.
-    getaddrinfo(ip_address.c_str(), tx_port.c_str(), &hints, &dest_port_);
+    if (tx_port != "dynamic") {
+        // Define send destination port.
+        addrinfo *send_to_port;
+        getaddrinfo(ip_address.c_str(), tx_port.c_str(), &hints, &send_to_port);
+        dest_addr_ = *send_to_port->ai_addr;
+        dest_addr_len_ = static_cast<int>(send_to_port->ai_addrlen);
+        freeaddrinfo(send_to_port);
+    }
 }
 
 DcsSocket::~DcsSocket() {
     // Delete opened socket.
-    freeaddrinfo(dest_port_);
     closesocket(socket_id_);
     WSACleanup();
 }
 
 std::stringstream DcsSocket::DcsReceive() {
     // Sender address - dummy variable as it is unused outside recvfrom.
-    sockaddr_in sender_addr;
+    sockaddr sender_addr;
     int sender_addr_size = sizeof(sender_addr);
 
     // Receive next UDP message.
     constexpr int MAX_UDP_MSG_SIZE = 1024; // Maximum UDP buffer size to read.
     char msg[MAX_UDP_MSG_SIZE] = {};
-    (void)recvfrom(socket_id_, msg, MAX_UDP_MSG_SIZE, 0, (SOCKADDR *)&sender_addr, &sender_addr_size);
+    (void)recvfrom(socket_id_, msg, MAX_UDP_MSG_SIZE, 0, &sender_addr, &sender_addr_size);
+
+    if (dest_addr_len_ == 0) {
+        dest_addr_ = sender_addr;
+        dest_addr_len_ = sender_addr_size;
+    }
 
     std::stringstream ss;
     ss << msg;
@@ -87,10 +97,5 @@ std::stringstream DcsSocket::DcsReceive() {
 }
 
 void DcsSocket::DcsSend(const std::string &message) {
-    (void)sendto(socket_id_,
-                 message.c_str(),
-                 static_cast<int>(message.length()),
-                 0,
-                 dest_port_->ai_addr,
-                 static_cast<int>(dest_port_->ai_addrlen));
+    (void)sendto(socket_id_, message.c_str(), static_cast<int>(message.length()), 0, &dest_addr_, dest_addr_len_);
 }

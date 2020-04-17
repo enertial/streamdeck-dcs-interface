@@ -10,8 +10,9 @@ namespace test {
 TEST(DcsIdLookupTest, get_installed_modules_bad_path) {
     const std::string dcs_install_path = "non-existant-path";
     const std::string module_subdir = "/Test/";
-    json found_files = get_installed_modules(dcs_install_path, module_subdir);
-    EXPECT_TRUE(found_files.empty());
+    json found_files_and_result = get_installed_modules(dcs_install_path, module_subdir);
+    EXPECT_EQ("DCS Install path [non-existant-path/Test/] not found.", found_files_and_result["result"]);
+    EXPECT_EQ(0, found_files_and_result["installed_modules"].size());
 }
 
 TEST(DcsIdLookupTest, nonexistant_lua_file) {

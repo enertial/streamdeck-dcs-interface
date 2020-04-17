@@ -6,7 +6,7 @@
 #include "StringUtilities.h"
 
 DcsInterface::DcsInterface(const DcsConnectionSettings &settings)
-    : dcs_socket_(settings.rx_port, settings.tx_port, settings.ip_address), connection_settings_(settings) {
+    : dcs_socket_(settings.ip_address, settings.rx_port, settings.tx_port), connection_settings_(settings) {
     // Send a reset to request a resend of data in case DCS mission is already running.
     send_dcs_reset_command();
 }

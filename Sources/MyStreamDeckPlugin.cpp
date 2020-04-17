@@ -238,9 +238,16 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
     if (event == "RequestInstalledModules") {
         const std::string dcs_install_path = EPLJSONUtils::GetStringByName(inPayload, "dcs_install_path");
         const std::string modules_subdir = "/mods/aircraft/";
-        const json installed_modules_list = get_installed_modules(dcs_install_path, modules_subdir);
+        const json installed_modules_and_result = get_installed_modules(dcs_install_path, modules_subdir);
+        const std::string result = EPLJSONUtils::GetStringByName(installed_modules_and_result, "result");
+        if (result != "success") {
+            mConnectionManager->LogMessage("Get Installed Modules Failure: " + result);
+        }
         mConnectionManager->SendToPropertyInspector(
-            inAction, inContext, json({{"event", "InstalledModules"}, {"installed_modules", installed_modules_list}}));
+            inAction,
+            inContext,
+            json({{"event", "InstalledModules"},
+                  {"installed_modules", installed_modules_and_result["installed_modules"]}}));
     }
 
     if (event == "RequestIdLookup") {
