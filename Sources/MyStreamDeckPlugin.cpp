@@ -174,6 +174,7 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     mVisibleContexts[inContext] = StreamdeckContext(inContext, settings);
     if (dcs_interface_ != nullptr) {
         mVisibleContexts[inContext].updateContextState(dcs_interface_, mConnectionManager);
+        mVisibleContexts[inContext].forceSendState(mConnectionManager);
     }
     mVisibleContextsMutex.unlock();
 }
