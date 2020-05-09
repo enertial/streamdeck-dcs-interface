@@ -140,10 +140,6 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
     if (dcs_interface_ != nullptr) {
         mVisibleContextsMutex.lock();
         mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_DOWN, inAction, inPayload);
-        // The Streamdeck will by default change a context's state after a button action, so a force send of the
-        // current context's state will keep the button state in sync with the plugin. (Not performed for switches
-        // as generally the change in state is desired there).
-        mVisibleContexts[inContext].forceSendState(mConnectionManager);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -158,7 +154,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
         mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_UP, inAction, inPayload);
         // The Streamdeck will by default change a context's state after a button action, so a force send of the current
         // context's state will keep the button state in sync with the plugin.
-        mVisibleContexts[inContext].forceSendState(mConnectionManager);
+        mVisibleContexts[inContext].forceSendStateAfterDelay(3);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -173,8 +169,8 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
     mVisibleContexts[inContext] = StreamdeckContext(inContext, settings);
     if (dcs_interface_ != nullptr) {
+        mVisibleContexts[inContext].forceSendStateAfterDelay(0);
         mVisibleContexts[inContext].updateContextState(dcs_interface_, mConnectionManager);
-        mVisibleContexts[inContext].forceSendState(mConnectionManager);
     }
     mVisibleContextsMutex.unlock();
 }
