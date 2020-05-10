@@ -55,6 +55,10 @@ void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConne
     }
 }
 
+void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager) {
+    mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+}
+
 void StreamdeckContext::forceSendStateAfterDelay(const int delay_count) {
     delay_for_force_send_state_.emplace(delay_count);
 }

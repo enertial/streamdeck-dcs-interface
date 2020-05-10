@@ -368,6 +368,17 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update) {
     EXPECT_EQ(esd_connection_manager.context_, "");
 
     // Test -- force send will send current state regardless of state change.
+    fixture_context.forceSendState(&esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "abc123");
+    EXPECT_EQ(esd_connection_manager.state_, 0);
+}
+
+TEST_F(StreamdeckContextTestFixture, force_send_state_update_with_zero_delay) {
+    // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+
+    // Test -- force send will send current state regardless of state change.
     int delay_count = 0;
     fixture_context.forceSendStateAfterDelay(delay_count);
     fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
