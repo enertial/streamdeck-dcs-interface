@@ -51,6 +51,8 @@ The momentary buttons are used to send commands to clickabledata items of BTN ty
 
 _Note: Repetition of sent value while button is held pressed is not supported at this time._
 
+**Use with Axis (LEV) Type** -- Some of the radio frequency and comms channel selectors are designed to accept axis input, and they expect a single value to increment their value. For example a volume knob with limits 0,1 can be rotated with small rotations by setting "Send Value while Pressed" to `0.01` and disabling the release value (as the release value will just interfere). To rotate a greater amount per press, increase the send value.
+
 ### Increment Settings
 
 Increment buttons are used for clickabledata items of TUMB type, which are rotary dials or other items that have multiple values you want to iterate through.
@@ -167,7 +169,7 @@ _Click Value_ -- The value sent for a left/right click of the mouse. May have di
 - BTN: Click value is generally the "pressed" button value (usually 1).
 - TUMB (Rotary Knobs): This is the value the knob will be incremented within the range (usually +/-0.1).
 - TUMB (Switches): This is the value the switch will be incremented within the range on click (usually +/-1, but sometimes +/-0.1 also).
-- LEV: Click value is the increment value within the range, however is often listed as 0 in the table. For these you will need to manually enter a Send value in Command settings that provides a desirable response.
+- LEV: Click value is the increment value within the range, however is often listed as 0 in the table. For these you will need to manually enter a Send value in Command settings that provides a desirable response. (Note: depending on the item you will need either an increment type to vary the values sent, or a momentary button with the "Send on Release" disabled to provide a constant increase/decrease value).
 
 _Limit Min_ -- The minimum value the item can be commanded to.  
  _Limit Max_ -- The maximum value the item can be commanded to.  

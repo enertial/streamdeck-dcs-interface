@@ -46,10 +46,21 @@ void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConne
         current_title_ = updated_title;
         mConnectionManager->SetTitle(current_title_, context_, kESDSDKTarget_HardwareAndSoftware);
     }
+
+    if (delay_for_force_send_state_) {
+        if (delay_for_force_send_state_.value()-- <= 0) {
+            mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+            delay_for_force_send_state_.reset();
+        }
+    }
 }
 
 void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager) {
     mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+}
+
+void StreamdeckContext::forceSendStateAfterDelay(const int delay_count) {
+    delay_for_force_send_state_.emplace(delay_count);
 }
 
 void StreamdeckContext::updateContextSettings(const json &settings) {
@@ -190,7 +201,7 @@ bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
                                                     const ContextState state,
                                                     const json &settings,
                                                     std::string &value) {
-    if (event == KEY_DOWN) {
+    if (event == KEY_UP) {
         if (state == FIRST) {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
         } else {

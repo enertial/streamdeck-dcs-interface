@@ -373,6 +373,46 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update) {
     EXPECT_EQ(esd_connection_manager.state_, 0);
 }
 
+TEST_F(StreamdeckContextTestFixture, force_send_state_update_with_zero_delay) {
+    // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+
+    // Test -- force send will send current state regardless of state change.
+    int delay_count = 0;
+    fixture_context.forceSendStateAfterDelay(delay_count);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "abc123");
+    EXPECT_EQ(esd_connection_manager.state_, 0);
+}
+
+TEST_F(StreamdeckContextTestFixture, force_send_state_update_after_delay) {
+    // Test -- force send will send current state regardless of state change.
+    int delay_count = 3;
+    fixture_context.forceSendStateAfterDelay(delay_count);
+    while (delay_count > 0) {
+        fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+        EXPECT_EQ(esd_connection_manager.context_, "");
+        delay_count--;
+    }
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "abc123");
+    EXPECT_EQ(esd_connection_manager.state_, 0);
+}
+
+TEST_F(StreamdeckContextTestFixture, force_send_state_update_negative_delay) {
+    // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "");
+
+    // Test -- force send will occur as delay is already less than zero.
+    int delay_count = -3;
+    fixture_context.forceSendStateAfterDelay(delay_count);
+    fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
+    EXPECT_EQ(esd_connection_manager.context_, "abc123");
+    EXPECT_EQ(esd_connection_manager.state_, 0);
+}
+
 class StreamdeckContextKeyPressTestFixture : public StreamdeckContextTestFixture {
   public:
     StreamdeckContextKeyPressTestFixture()
@@ -459,38 +499,38 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary_empty_valu
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_first_state) {
+TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_in_first_state) {
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command =
         "C" + device_id + "," + std::to_string(button_id) + "," + send_when_first_state_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_in_second_state) {
+TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_in_second_state) {
     payload["state"] = 1;
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command =
         "C" + device_id + "," + std::to_string(button_id) + "," + send_when_second_state_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch) {
+TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch) {
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch_empty_value) {
+TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_empty_value) {
     payload["settings"]["send_when_first_state_value"] = "";
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
     const std::stringstream ss_received = mock_dcs.DcsReceive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
