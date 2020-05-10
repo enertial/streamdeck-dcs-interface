@@ -7,6 +7,7 @@
 - [Demo of Operation](#demo-of-operation)
 - [Installation](#installation)
     - [Downloads](#downloads)
+    - [Version Update](#version-update)
     - [Initial Configuration](#initial-configuration)
     - [Video Walkthrough](#video-walkthrough)
 - [Source code](#source-code)
@@ -49,6 +50,10 @@ More detailed instructions can be found in: [Settings Help Documentation](Source
 - To install the DCS Interface Streamdeck plugin, you will need to download and run the installer `com.ctytler.dcs.streamDeckPlugin` from [Releases](https://github.com/charlestytler/streamdeck-dcs-interface/releases).
 
 - Also within [Releases](https://github.com/charlestytler/streamdeck-dcs-interface/releases) is an optional `icon_library.zip` you can download for use with Streamdeck Profiles.
+
+### Version Update
+
+If you have a prior version already installed on your StreamDeck, you will have to uninstall it first before installing the latest version. To do this click the "More Actions..." button at the bottom-right of the StreamDeck GUI and click "Uninstall" next to the DCS Interface plugin.
 
 ### Initial Configuration
 
