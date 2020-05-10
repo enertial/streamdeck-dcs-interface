@@ -10,6 +10,7 @@
 #include "../Common/ESDConnectionManager.h"
 #endif
 
+#include <optional>
 #include <string>
 
 using KeyEvent = enum { KEY_DOWN, KEY_UP };
@@ -29,12 +30,12 @@ class StreamdeckContext {
     void updateContextState(DcsInterface *dcs_interface, ESDConnectionManager *mConnectionManager);
 
     /**
-     * @brief Forces an update to the Streamdeck of the context's current state be sent.
+     * @brief Forces an update to the Streamdeck of the context's current state be sent after a specified delay.
      *        (Normally an update is sent to the Streamdeck only on change of current state).
      *
-     * @param mConnectionManager Interface to StreamDeck.
+     * @param delay_count Number of frames before a force send of the context state is sent.
      */
-    void forceSendState(ESDConnectionManager *mConnectionManager);
+    void forceSendStateAfterDelay(const int delay_count);
 
     /**
      * @brief Updates settings from received json payload.
@@ -99,6 +100,10 @@ class StreamdeckContext {
     bool increment_monitor_is_set_ = false; // True if a DCS ID increment monitor setting has been set.
     bool compare_monitor_is_set_ = false;   // True if all DCS ID comparison monitor settings have been set.
     bool string_monitor_is_set_ = false;    // True if all DCS ID string monitor settings have been set.
+
+    // Optional settings.
+    std::optional<int> delay_for_force_send_state_; // When populated, requests a force send of state to Streamdeck
+                                                    // after counting down the stored delay value.
 
     // Context state.
     ContextState current_state_ = FIRST;       // Stored state of the context.
