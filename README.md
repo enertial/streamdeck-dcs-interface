@@ -55,6 +55,9 @@ More detailed instructions can be found in: [Settings Help Documentation](Source
 
 If you have a prior version already installed on your StreamDeck, you will have to uninstall it first before installing the latest version. To do this click the "More Actions..." button at the bottom-right of the StreamDeck GUI and click "Uninstall" next to the DCS Interface plugin.
 
+#### Identify installed version number:
+To see the version of the plugin installed on the StreamDeck, click the "More Actions..." button, each installed plugin will have the author and version number printed below its title.
+
 ### Initial Configuration
 
 If you plan to only use DCS Interface for Streamdeck with the DCS-ExportScript and not [Ikarus](https://github.com/s-d-a/Ikarus), you can modify the file `DCS-ExportScript\Config.lua` to have the following settings (where `IkarusPort` is changed from `1625` to `1725` for DCS Interface) to get everything connected:
