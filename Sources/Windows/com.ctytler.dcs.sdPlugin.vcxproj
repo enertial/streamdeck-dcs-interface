@@ -189,7 +189,7 @@
     <ClInclude Include="..\DcsInterface\DcsIdLookup.h" />
     <ClInclude Include="..\DcsInterface\DcsInterface.h" />
     <ClInclude Include="..\DcsInterface\DcsInterfaceParameters.h" />
-    <ClInclude Include="..\DcsInterface\Utilities\DcsSocket.h" />
+    <ClInclude Include="..\DcsInterface\Utilities\UdpSocket.h" />
     <ClInclude Include="..\DcsInterface\Utilities\Decimal.h" />
     <ClInclude Include="..\DcsInterface\StreamdeckContext.h" />
     <ClInclude Include="..\DcsInterface\Utilities\StringUtilities.h" />
@@ -223,7 +223,7 @@
     </ClCompile>
     <ClCompile Include="..\DcsInterface\DcsIdLookup.cpp" />
     <ClCompile Include="..\DcsInterface\DcsInterface.cpp" />
-    <ClCompile Include="..\DcsInterface\Utilities\DcsSocket.cpp" />
+    <ClCompile Include="..\DcsInterface\Utilities\UdpSocket.cpp" />
     <ClCompile Include="..\DcsInterface\Utilities\Decimal.cpp" />
     <ClCompile Include="..\DcsInterface\Utilities\StringUtilities.cpp" />
     <ClCompile Include="..\DcsInterface\StreamdeckContext.cpp" />
