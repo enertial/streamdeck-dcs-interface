@@ -3,7 +3,7 @@
 #include "pch.h"
 
 #include "DcsInterface.h"
-#include "StringUtilities.h"
+#include "Utilities/StringUtilities.h"
 
 DcsInterface::DcsInterface(const DcsConnectionSettings &settings)
     : dcs_socket_(settings.ip_address, settings.rx_port, settings.tx_port), connection_settings_(settings) {

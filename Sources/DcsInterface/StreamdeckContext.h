@@ -3,8 +3,8 @@
 #pragma once
 
 #include "DcsInterface.h"
-#include "Decimal.h"
-#include "StringUtilities.h"
+#include "Utilities/Decimal.h"
+#include "Utilities/StringUtilities.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"
