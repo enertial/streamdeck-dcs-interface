@@ -41,7 +41,7 @@ void Decimal::string_to_decimal(std::string number) {
 int Decimal::get_as_higher_exponent(const int higher_exponent) const {
     int significant_digits_at_higher_exponent = significant_digits_;
     for (int i = exponent_; i < higher_exponent; ++i) {
-        significant_digits_at_higher_exponent *= 10;
+        significant_digits_at_higher_exponent *= 100;
     }
     return significant_digits_at_higher_exponent;
 }
