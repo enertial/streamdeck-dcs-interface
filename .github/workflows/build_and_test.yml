@@ -1,4 +1,4 @@
-name: MSBuild
+name: C++ Unit Tests
 
 on:
   push:
@@ -34,5 +34,5 @@ jobs:
       # See https://docs.microsoft.com/visualstudio/msbuild/msbuild-command-line-reference
       run: msbuild /m /p:Configuration=${{env.BUILD_CONFIGURATION}} ${{env.SOLUTION_FILE_PATH}}
     
-    - name: Unit Tests
+    - name: Run C++ Unit Tests
       run: ./Sources/Windows/x64/Release/Test.exe
