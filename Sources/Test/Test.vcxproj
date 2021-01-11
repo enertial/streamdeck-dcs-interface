@@ -35,7 +35,7 @@
   <ItemGroup>
     <ClCompile Include="DcsIdLookupTest.cpp" />
     <ClCompile Include="DcsInterfaceTest.cpp" />
-    <ClCompile Include="DcsSocketTest.cpp" />
+    <ClCompile Include="UdpSocketTest.cpp" />
     <ClCompile Include="DecimalTest.cpp" />
     <ClCompile Include="StringUtilitiesTest.cpp" />
     <ClCompile Include="StreamdeckContextTest.cpp" />

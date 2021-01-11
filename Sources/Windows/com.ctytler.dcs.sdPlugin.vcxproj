@@ -189,10 +189,10 @@
     <ClInclude Include="..\DcsInterface\DcsIdLookup.h" />
     <ClInclude Include="..\DcsInterface\DcsInterface.h" />
     <ClInclude Include="..\DcsInterface\DcsInterfaceParameters.h" />
-    <ClInclude Include="..\DcsInterface\DcsSocket.h" />
-    <ClInclude Include="..\DcsInterface\Decimal.h" />
-    <ClInclude Include="..\DcsInterface\StreamdeckContext.h" />
-    <ClInclude Include="..\DcsInterface\StringUtilities.h" />
+    <ClInclude Include="..\StreamdeckContext\StreamdeckContext.h" />
+    <ClInclude Include="..\Utilities\Decimal.h" />
+    <ClInclude Include="..\Utilities\StringUtilities.h" />
+    <ClInclude Include="..\Utilities\UdpSocket.h" />
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -223,10 +223,10 @@
     </ClCompile>
     <ClCompile Include="..\DcsInterface\DcsIdLookup.cpp" />
     <ClCompile Include="..\DcsInterface\DcsInterface.cpp" />
-    <ClCompile Include="..\DcsInterface\DcsSocket.cpp" />
-    <ClCompile Include="..\DcsInterface\Decimal.cpp" />
-    <ClCompile Include="..\DcsInterface\StringUtilities.cpp" />
-    <ClCompile Include="..\DcsInterface\StreamdeckContext.cpp" />
+    <ClCompile Include="..\StreamdeckContext\StreamdeckContext.cpp" />
+    <ClCompile Include="..\Utilities\Decimal.cpp" />
+    <ClCompile Include="..\Utilities\StringUtilities.cpp" />
+    <ClCompile Include="..\Utilities\UdpSocket.cpp" />
     <ClCompile Include="..\MyStreamDeckPlugin.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>

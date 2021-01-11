@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsInterface/Decimal.cpp"
+#include "../Utilities/Decimal.cpp"
 
 namespace test {
 

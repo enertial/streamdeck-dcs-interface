@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../DcsInterface/StringUtilities.cpp"
+#include "../Utilities/StringUtilities.cpp"
 
 namespace test {
 

@@ -12,7 +12,7 @@
 
 #include "Common/ESDBasePlugin.h"
 #include "DcsInterface/DcsInterface.h"
-#include "DcsInterface/StreamdeckContext.h"
+#include "StreamdeckContext/StreamdeckContext.h"
 #include <mutex>
 #include <unordered_map>
 
