@@ -35,7 +35,7 @@ public:
     std::string title_ = "";
 };
 
-#include "../DcsInterface/StreamdeckContext.cpp"
+#include "../StreamdeckContext/StreamdeckContext.cpp"
 
 TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
 {

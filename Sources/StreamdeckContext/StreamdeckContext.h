@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "DcsInterface.h"
-#include "Utilities/Decimal.h"
-#include "Utilities/StringUtilities.h"
+#include "../DcsInterface/DcsInterface.h"
+#include "../Utilities/Decimal.h"
+#include "../Utilities/StringUtilities.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"
