@@ -126,7 +126,7 @@
   ],
   "SDKVersion": 2,
   "Author": "Charlie Tytler",
-  "CodePathWin": "dcs_interface.exe",
+  "CodePathWin": "bin/dcs_interface.exe",
   "DefaultWindowSize": [950, 850],
   "Description": "Allows buttons which communicate with Digital Combat Simulator (DCS)",
   "Name": "DCS Interface",
