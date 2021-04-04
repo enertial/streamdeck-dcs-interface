@@ -41,16 +41,28 @@ void DcsInterface::update_dcs_state()
 
 std::string DcsInterface::get_current_dcs_module() { return current_game_module_; }
 
-std::string DcsInterface::get_value_of_dcs_id(const int dcs_id)
+std::optional<std::string> DcsInterface::get_value_of_dcs_id(const int dcs_id)
 {
     if (current_game_state_.count(dcs_id) > 0)
     {
-        return current_game_state_[dcs_id];
+        if (!current_game_state_[dcs_id].empty())
+        {
+            return current_game_state_[dcs_id];
+        }
     }
-    else
+    return std::nullopt;
+}
+
+std::optional<Decimal> DcsInterface::get_decimal_of_dcs_id(const int dcs_id)
+{
+    if (current_game_state_.count(dcs_id) > 0)
     {
-        return "";
+        if (is_number(current_game_state_[dcs_id]))
+        {
+            return current_game_state_[dcs_id];
+        }
     }
+    return std::nullopt;
 }
 
 void DcsInterface::send_dcs_command(const int button_id, const std::string &device_id, const std::string &value)

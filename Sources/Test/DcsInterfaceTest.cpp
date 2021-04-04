@@ -58,10 +58,10 @@ namespace test
         dcs_interface.update_dcs_state();
 
         // Query for ID updates.
-        EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761));
-        EXPECT_EQ("2.00", dcs_interface.get_value_of_dcs_id(765));
-        EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026));
-        EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
+        EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761).value());
+        EXPECT_EQ("2.00", dcs_interface.get_value_of_dcs_id(765).value());
+        EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026).value());
+        EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027).value());
 
         // TEST 2 - Received values will overwrite their previous values.
         // Send a new message with one ID value updated.
@@ -70,11 +70,11 @@ namespace test
         dcs_interface.update_dcs_state();
 
         // Query for ID updates - Test that only the value for ID 765 has changed.
-        EXPECT_EQ("99.99", dcs_interface.get_value_of_dcs_id(765));
+        EXPECT_EQ("99.99", dcs_interface.get_value_of_dcs_id(765).value());
 
-        EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761));
-        EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026));
-        EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
+        EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761).value());
+        EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026).value());
+        EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027).value());
     }
 
     TEST_F(DcsInterfaceTestFixture, update_dcs_state_handle_newline_chars)
@@ -85,10 +85,10 @@ namespace test
         dcs_interface.update_dcs_state();
 
         // Query for ID updates.
-        EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761));
-        EXPECT_EQ("2.00", dcs_interface.get_value_of_dcs_id(765));
-        EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026));
-        EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027));
+        EXPECT_EQ("1", dcs_interface.get_value_of_dcs_id(761).value());
+        EXPECT_EQ("2.00", dcs_interface.get_value_of_dcs_id(765).value());
+        EXPECT_EQ("TEXT_STR", dcs_interface.get_value_of_dcs_id(2026).value());
+        EXPECT_EQ("4", dcs_interface.get_value_of_dcs_id(2027).value());
     }
 
     TEST_F(DcsInterfaceTestFixture, update_dcs_state_end_of_mission)
@@ -152,8 +152,64 @@ namespace test
 
     TEST_F(DcsInterfaceTestFixture, get_value_of_dcs_id_if_nonexistant)
     {
-        // Test that the default value of an empty string is returned for a DCS ID with no stored value.
-        EXPECT_EQ("", dcs_interface.get_value_of_dcs_id(999));
+        EXPECT_FALSE(dcs_interface.get_value_of_dcs_id(999));
+    }
+
+    TEST_F(DcsInterfaceTestFixture, get_value_of_dcs_id_with_valid_value)
+    {
+        std::string mock_dcs_message = "header*765=99.99";
+        mock_dcs.send(mock_dcs_message);
+        dcs_interface.update_dcs_state();
+
+        auto maybe_value = dcs_interface.get_value_of_dcs_id(765);
+        EXPECT_TRUE(maybe_value);
+        EXPECT_EQ(maybe_value.value(), "99.99");
+    }
+
+    TEST_F(DcsInterfaceTestFixture, get_value_of_dcs_id_if_empty)
+    {
+        std::string mock_dcs_message = "header*765=";
+        mock_dcs.send(mock_dcs_message);
+        dcs_interface.update_dcs_state();
+
+        auto maybe_value = dcs_interface.get_value_of_dcs_id(765);
+        EXPECT_FALSE(maybe_value);
+    }
+
+    TEST_F(DcsInterfaceTestFixture, get_decimal_of_dcs_id_if_nonexistant)
+    {
+        EXPECT_FALSE(dcs_interface.get_decimal_of_dcs_id(999));
+    }
+
+    TEST_F(DcsInterfaceTestFixture, get_decimal_of_dcs_id_with_valid_value)
+    {
+        std::string mock_dcs_message = "header*765=99.99";
+        mock_dcs.send(mock_dcs_message);
+        dcs_interface.update_dcs_state();
+
+        auto maybe_value = dcs_interface.get_decimal_of_dcs_id(765);
+        EXPECT_TRUE(maybe_value);
+        EXPECT_EQ(maybe_value.value(), Decimal("99.99"));
+    }
+
+    TEST_F(DcsInterfaceTestFixture, get_decimal_of_dcs_id_with_non_decimal_value)
+    {
+        std::string mock_dcs_message = "header*765=STRING";
+        mock_dcs.send(mock_dcs_message);
+        dcs_interface.update_dcs_state();
+
+        auto maybe_value = dcs_interface.get_decimal_of_dcs_id(765);
+        EXPECT_FALSE(maybe_value);
+    }
+
+    TEST_F(DcsInterfaceTestFixture, get_decimal_of_dcs_id_if_empty)
+    {
+        std::string mock_dcs_message = "header*765=";
+        mock_dcs.send(mock_dcs_message);
+        dcs_interface.update_dcs_state();
+
+        auto maybe_value = dcs_interface.get_value_of_dcs_id(765);
+        EXPECT_FALSE(maybe_value);
     }
 
     TEST_F(DcsInterfaceTestFixture, clear_game_state)

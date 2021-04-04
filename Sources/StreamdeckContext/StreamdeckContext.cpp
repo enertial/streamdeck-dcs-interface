@@ -19,22 +19,22 @@ void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConne
     std::string updated_title = "";
 
     if (increment_monitor_is_set_) {
-        const std::string current_game_value_raw = dcs_interface->get_value_of_dcs_id(dcs_id_increment_monitor_);
-        if (is_number(current_game_value_raw)) {
-            current_increment_value_ = Decimal(current_game_value_raw);
+        const std::optional<Decimal> maybe_current_game_value = dcs_interface->get_decimal_of_dcs_id(dcs_id_increment_monitor_);
+        if (maybe_current_game_value.has_value()) {
+            current_increment_value_ = maybe_current_game_value.value();
         }
     }
 
     if (compare_monitor_is_set_) {
-        const std::string current_game_value_raw = dcs_interface->get_value_of_dcs_id(dcs_id_compare_monitor_);
-        if (is_number(current_game_value_raw)) {
-            updated_state = determineStateForCompareMonitor(Decimal(current_game_value_raw));
+        const std::optional<Decimal> maybe_current_game_value = dcs_interface->get_decimal_of_dcs_id(dcs_id_compare_monitor_);
+        if (maybe_current_game_value.has_value()) {
+            updated_state = determineStateForCompareMonitor(maybe_current_game_value.value());
         }
     }
     if (string_monitor_is_set_) {
-        const std::string current_game_string_value = dcs_interface->get_value_of_dcs_id(dcs_id_string_monitor_);
-        if (!current_game_string_value.empty()) {
-            updated_title = determineTitleForStringMonitor(current_game_string_value);
+        const std::optional<std::string> maybe_current_game_value = dcs_interface->get_value_of_dcs_id(dcs_id_string_monitor_);
+        if (maybe_current_game_value.has_value()) {
+            updated_title = determineTitleForStringMonitor(maybe_current_game_value.value());
         }
     }
 
