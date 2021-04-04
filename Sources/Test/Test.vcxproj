@@ -33,6 +33,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <ItemGroup>
+    <ClCompile Include="ComparisonMonitorTest.cpp" />
     <ClCompile Include="DcsIdLookupTest.cpp" />
     <ClCompile Include="DcsInterfaceTest.cpp" />
     <ClCompile Include="UdpSocketTest.cpp" />

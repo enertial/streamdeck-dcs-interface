@@ -6,18 +6,16 @@
 
 #include "../Common/EPLJSONUtils.h"
 
-StreamdeckContext::StreamdeckContext(const std::string &context) { context_ = context; }
+StreamdeckContext::StreamdeckContext(const std::string &context) : context_{context} {};
 
-StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings)
+StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings) : context_{context}
 {
-    context_ = context;
     updateContextSettings(settings);
 }
 
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
     // Initialize to default values.
-    ContextState updated_state = ContextState::FIRST;
     std::string updated_title = "";
 
     if (increment_monitor_is_set_) {
@@ -28,13 +26,8 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
         }
     }
 
-    if (compare_monitor_is_set_) {
-        const std::optional<Decimal> maybe_current_game_value =
-            dcs_interface.get_decimal_of_dcs_id(dcs_id_compare_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            updated_state = determineStateForCompareMonitor(maybe_current_game_value.value());
-        }
-    }
+    const auto updated_state = comparison_monitor_.determineContextState(dcs_interface);
+
     if (string_monitor_is_set_) {
         const std::optional<std::string> maybe_current_game_value =
             dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
@@ -43,9 +36,9 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
         }
     }
 
-    if (updated_state != current_state_) {
-        current_state_ = updated_state;
-        mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+    if (updated_state.has_value() && (updated_state.value() != current_state_)) {
+        current_state_ = updated_state.value();
+        mConnectionManager->SetState(current_state_, context_);
     }
     if (updated_title != current_title_) {
         current_title_ = updated_title;
@@ -54,7 +47,7 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
 
     if (delay_for_force_send_state_) {
         if (delay_for_force_send_state_.value()-- <= 0) {
-            mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+            mConnectionManager->SetState(current_state_, context_);
             delay_for_force_send_state_.reset();
         }
     }
@@ -62,7 +55,7 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
 
 void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager)
 {
-    mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+    mConnectionManager->SetState(current_state_, context_);
 }
 
 void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
@@ -72,13 +65,12 @@ void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
 
 void StreamdeckContext::updateContextSettings(const json &settings)
 {
+
+    comparison_monitor_.update_settings(settings);
+
     // Read in settings.
     const std::string dcs_id_increment_monitor_raw =
         EPLJSONUtils::GetStringByName(settings, "dcs_id_increment_monitor");
-    const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
-    const std::string dcs_id_compare_condition_raw =
-        EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
-    const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
     const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
     // Set boolean from checkbox using default false value if it doesn't exist in "settings".
     const std::string string_monitor_vertical_spacing_raw =
@@ -89,27 +81,11 @@ void StreamdeckContext::updateContextSettings(const json &settings)
 
     // Process status of settings.
     increment_monitor_is_set_ = is_integer(dcs_id_increment_monitor_raw);
-    const bool compare_monitor_is_populated = is_integer(dcs_id_compare_monitor_raw);
-    const bool comparison_value_is_populated = is_number(dcs_id_comparison_value_raw);
-    compare_monitor_is_set_ = compare_monitor_is_populated && comparison_value_is_populated;
     string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
 
     // Update internal settings of class instance.
     if (increment_monitor_is_set_) {
         dcs_id_increment_monitor_ = std::stoi(dcs_id_increment_monitor_raw);
-    }
-
-    if (compare_monitor_is_set_) {
-        dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
-        dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);
-        if (dcs_id_compare_condition_raw == "EQUAL_TO") {
-            dcs_id_compare_condition_ = Comparison::EQUAL_TO;
-        } else if (dcs_id_compare_condition_raw == "LESS_THAN") {
-            dcs_id_compare_condition_ = Comparison::LESS_THAN;
-        } else // Default in Property Inspector html is GREATER_THAN.
-        {
-            dcs_id_compare_condition_ = Comparison::GREATER_THAN;
-        }
     }
 
     if (string_monitor_is_set_) {
@@ -143,8 +119,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
         bool send_command = false;
         std::string value = "";
         if (action.find("switch") != std::string::npos) {
-            const ContextState state =
-                EPLJSONUtils::GetIntByName(inPayload, "state") == 0 ? ContextState::FIRST : ContextState::SECOND;
+            const int state = EPLJSONUtils::GetIntByName(inPayload, "state");
             send_command = determineSendValueForSwitch(event, state, inPayload["settings"], value);
         } else if (action.find("increment") != std::string::npos) {
             send_command = determineSendValueForIncrement(event, inPayload["settings"], value);
@@ -156,24 +131,6 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
             dcs_interface.send_dcs_command(std::stoi(button_id), device_id, value);
         }
     }
-}
-
-StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonitor(const Decimal &current_game_value)
-{
-    bool set_context_state_to_second = false;
-    switch (dcs_id_compare_condition_) {
-    case Comparison::EQUAL_TO:
-        set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
-        break;
-    case Comparison::LESS_THAN:
-        set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
-        break;
-    case Comparison::GREATER_THAN:
-        set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
-        break;
-    }
-
-    return set_context_state_to_second ? ContextState::SECOND : ContextState::FIRST;
 }
 
 std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value)
@@ -211,12 +168,12 @@ bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, con
 }
 
 bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
-                                                    const ContextState state,
+                                                    const int state,
                                                     const json &settings,
                                                     std::string &value)
 {
     if (event == KeyEvent::RELEASED) {
-        if (state == ContextState::FIRST) {
+        if (state == 0) {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
         } else {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_second_state_value");

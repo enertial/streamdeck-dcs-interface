@@ -5,6 +5,7 @@
 #include "../DcsInterface/DcsInterface.h"
 #include "../Utilities/Decimal.h"
 #include "../Utilities/StringUtilities.h"
+#include "Monitors/ComparisonMonitor.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"
@@ -67,18 +68,6 @@ class StreamdeckContext
                            const json &inPayload);
 
   private:
-    enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };
-    enum class ContextState { FIRST = 0, SECOND };
-
-    /**
-     * @brief Determines what the context state should be according to current game value and comparison monitor
-     * settings.
-     *
-     * @param current_game_value Value receieved from DCS.
-     * @return ContextState      State the Streamdeck context should be set to.
-     */
-    ContextState determineStateForCompareMonitor(const Decimal &current_game_value);
-
     /**
      * @brief Determines what the context title should be according to current game value and string monitor settings.
      *
@@ -97,17 +86,16 @@ class StreamdeckContext
      * @return True if value should be sent to DCS.
      */
     bool determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value);
-    bool determineSendValueForSwitch(const KeyEvent event,
-                                     const ContextState state,
-                                     const json &settings,
-                                     std::string &value);
+    bool determineSendValueForSwitch(const KeyEvent event, const int state, const json &settings, std::string &value);
     bool determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value);
 
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 
+    // Monitors.
+    ComparisonMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
+
     // Status of user-filled fields.
     bool increment_monitor_is_set_ = false; // True if a DCS ID increment monitor setting has been set.
-    bool compare_monitor_is_set_ = false;   // True if all DCS ID comparison monitor settings have been set.
     bool string_monitor_is_set_ = false;    // True if all DCS ID string monitor settings have been set.
 
     // Optional settings.
@@ -115,17 +103,14 @@ class StreamdeckContext
                                                     // after counting down the stored delay value.
 
     // Context state.
-    ContextState current_state_ = ContextState::FIRST; // Stored state of the context.
-    std::string current_title_ = "";                   // Stored title of the context.
-    Decimal current_increment_value_;                  // Stored value for increment button types.
-    bool cycle_increments_is_allowed_ = false;         // Flag set by user settings for increment button types.
-    bool disable_release_value_ = false;               // Flag set by user settings for momentary button types.
+    int current_state_ = 0;                    // Stored state of the context.
+    std::string current_title_ = "";           // Stored title of the context.
+    Decimal current_increment_value_;          // Stored value for increment button types.
+    bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
+    bool disable_release_value_ = false;       // Flag set by user settings for momentary button types.
 
     // Stored settings extracted from user-filled fields.
-    int dcs_id_increment_monitor_ = 0; // DCS ID to monitor for updating current increment value from game state.
-    int dcs_id_compare_monitor_ = 0;   // DCS ID to monitor for context state setting according to value comparison.
-    Comparison dcs_id_compare_condition_ = Comparison::GREATER_THAN; // Comparison to use for DCS ID compare monitor.
-    Decimal dcs_id_comparison_value_;         // Value to compare DCS ID compare monitor value to.
+    int dcs_id_increment_monitor_ = 0;        // DCS ID to monitor for updating current increment value from game state.
     int dcs_id_string_monitor_ = 0;           // DCS ID to monitor for context title.
     int string_monitor_vertical_spacing_ = 0; // Vertical spacing (number of '\n') to include before or after title.
     bool string_monitor_passthrough_ = true;  // Flag set by user to passthrough string to title unaltered.
