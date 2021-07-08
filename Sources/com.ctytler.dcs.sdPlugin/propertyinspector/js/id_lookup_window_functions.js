@@ -108,7 +108,6 @@ function callbackRequestIdLookup() {
         else {
             var dcs_install_path = document.getElementById("dcs_install_path").value;
             var payload = { "dcs_install_path": dcs_install_path, "module": module };
-            gotClickabledata(cached_commands[module], true); // Load cached data until new data arrives.
             sendmessage("RequestIdLookup", payload);
             console.log("Request ID Lookup for: ", payload);
         }
@@ -156,7 +155,7 @@ function clearTableContents() {
  * 
  * @param {Json} clickabledata_elements 
  */
-function gotClickabledata(clickabledata_elements, is_cached_data = false) {
+function gotClickabledata(clickabledata_elements) {
     if (clickabledata_elements.length > 0) {
         // Create rows in a new table body so it is easy to replace any old content.
         var new_table_body = document.createElement('tbody');
@@ -179,12 +178,6 @@ function gotClickabledata(clickabledata_elements, is_cached_data = false) {
         document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
 
         document.getElementById("type_hints_text").hidden = false;
-
-        if (is_cached_data) {
-            document.getElementById("cached_data_in_use_notification").hidden = false;
-        } else {
-            document.getElementById("cached_data_in_use_notification").hidden = true;
-        }
     }
 }
 
