@@ -6,18 +6,15 @@
 
 #include "../Common/EPLJSONUtils.h"
 
-StreamdeckContext::StreamdeckContext(const std::string& context)
-{
-    context_ = context;
-}
+StreamdeckContext::StreamdeckContext(const std::string &context) { context_ = context; }
 
-StreamdeckContext::StreamdeckContext(const std::string& context, const json& settings)
+StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings)
 {
     context_ = context;
     updateContextSettings(settings);
 }
 
-void StreamdeckContext::updateContextState(DcsInterface* dcs_interface, ESDConnectionManager* mConnectionManager)
+void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConnectionManager *mConnectionManager)
 {
     // Initialize to default values.
     ContextState updated_state = ContextState::FIRST;
@@ -63,7 +60,7 @@ void StreamdeckContext::updateContextState(DcsInterface* dcs_interface, ESDConne
     }
 }
 
-void StreamdeckContext::forceSendState(ESDConnectionManager* mConnectionManager)
+void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager)
 {
     mConnectionManager->SetState(static_cast<int>(current_state_), context_);
 }
@@ -73,7 +70,7 @@ void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
     delay_for_force_send_state_.emplace(delay_count);
 }
 
-void StreamdeckContext::updateContextSettings(const json& settings)
+void StreamdeckContext::updateContextSettings(const json &settings)
 {
     // Read in settings.
     const std::string dcs_id_increment_monitor_raw =
@@ -109,7 +106,7 @@ void StreamdeckContext::updateContextSettings(const json& settings)
             dcs_id_compare_condition_ = Comparison::EQUAL_TO;
         } else if (dcs_id_compare_condition_raw == "LESS_THAN") {
             dcs_id_compare_condition_ = Comparison::LESS_THAN;
-        } else  // Default in Property Inspector html is GREATER_THAN.
+        } else // Default in Property Inspector html is GREATER_THAN.
         {
             dcs_id_compare_condition_ = Comparison::GREATER_THAN;
         }
@@ -130,10 +127,10 @@ void StreamdeckContext::updateContextSettings(const json& settings)
     }
 }
 
-void StreamdeckContext::handleButtonEvent(DcsInterface* dcs_interface,
+void StreamdeckContext::handleButtonEvent(DcsInterface *dcs_interface,
                                           const KeyEvent event,
-                                          const std::string& action,
-                                          const json& inPayload)
+                                          const std::string &action,
+                                          const json &inPayload)
 {
     const std::string button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
@@ -161,25 +158,25 @@ void StreamdeckContext::handleButtonEvent(DcsInterface* dcs_interface,
     }
 }
 
-StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonitor(const Decimal& current_game_value)
+StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonitor(const Decimal &current_game_value)
 {
     bool set_context_state_to_second = false;
     switch (dcs_id_compare_condition_) {
-        case Comparison::EQUAL_TO:
-            set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
-            break;
-        case Comparison::LESS_THAN:
-            set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
-            break;
-        case Comparison::GREATER_THAN:
-            set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
-            break;
+    case Comparison::EQUAL_TO:
+        set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
+        break;
+    case Comparison::LESS_THAN:
+        set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
+        break;
+    case Comparison::GREATER_THAN:
+        set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
+        break;
     }
 
     return set_context_state_to_second ? ContextState::SECOND : ContextState::FIRST;
 }
 
-std::string StreamdeckContext::determineTitleForStringMonitor(const std::string& current_game_string_value)
+std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value)
 {
     std::string title;
     if (string_monitor_passthrough_) {
@@ -200,7 +197,7 @@ std::string StreamdeckContext::determineTitleForStringMonitor(const std::string&
     return title;
 }
 
-bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json& settings, std::string& value)
+bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value)
 {
     if (event == KeyEvent::PRESSED) {
         value = EPLJSONUtils::GetStringByName(settings, "press_value");
@@ -215,8 +212,8 @@ bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, con
 
 bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
                                                     const ContextState state,
-                                                    const json& settings,
-                                                    std::string& value)
+                                                    const json &settings,
+                                                    std::string &value)
 {
     if (event == KeyEvent::RELEASED) {
         if (state == ContextState::FIRST) {
@@ -233,7 +230,7 @@ bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
     return false;
 }
 
-bool StreamdeckContext::determineSendValueForIncrement(const KeyEvent event, const json& settings, std::string& value)
+bool StreamdeckContext::determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value)
 {
     if (event == KeyEvent::PRESSED) {
         const std::string increment_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");

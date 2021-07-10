@@ -12,10 +12,7 @@
 
 #include "ESDUtilities.h"
 
-void ESDUtilities::DoSleep(int inMilliseconds)
-{
-    Sleep(inMilliseconds);
-}
+void ESDUtilities::DoSleep(int inMilliseconds) { Sleep(inMilliseconds); }
 
 static bool HasPrefix(const std::string &inString, const std::string &inPrefix)
 {

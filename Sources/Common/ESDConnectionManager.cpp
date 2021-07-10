@@ -94,8 +94,10 @@ void ESDConnectionManager::OnMessage(websocketpp::connection_hdl, WebsocketClien
     }
 }
 
-ESDConnectionManager::ESDConnectionManager(int inPort, const std::string &inPluginUUID,
-                                           const std::string &inRegisterEvent, const std::string &inInfo,
+ESDConnectionManager::ESDConnectionManager(int inPort,
+                                           const std::string &inPluginUUID,
+                                           const std::string &inRegisterEvent,
+                                           const std::string &inInfo,
                                            ESDBasePlugin *inPlugin)
     :
 
@@ -116,13 +118,14 @@ void ESDConnectionManager::Run()
         mWebsocket.init_asio();
 
         // Register our message handler
-        mWebsocket.set_open_handler(websocketpp::lib::bind(&ESDConnectionManager::OnOpen, this, &mWebsocket,
-                                                           websocketpp::lib::placeholders::_1));
-        mWebsocket.set_fail_handler(websocketpp::lib::bind(&ESDConnectionManager::OnFail, this, &mWebsocket,
-                                                           websocketpp::lib::placeholders::_1));
-        mWebsocket.set_close_handler(websocketpp::lib::bind(&ESDConnectionManager::OnClose, this, &mWebsocket,
-                                                            websocketpp::lib::placeholders::_1));
-        mWebsocket.set_message_handler(websocketpp::lib::bind(&ESDConnectionManager::OnMessage, this,
+        mWebsocket.set_open_handler(websocketpp::lib::bind(
+            &ESDConnectionManager::OnOpen, this, &mWebsocket, websocketpp::lib::placeholders::_1));
+        mWebsocket.set_fail_handler(websocketpp::lib::bind(
+            &ESDConnectionManager::OnFail, this, &mWebsocket, websocketpp::lib::placeholders::_1));
+        mWebsocket.set_close_handler(websocketpp::lib::bind(
+            &ESDConnectionManager::OnClose, this, &mWebsocket, websocketpp::lib::placeholders::_1));
+        mWebsocket.set_message_handler(websocketpp::lib::bind(&ESDConnectionManager::OnMessage,
+                                                              this,
                                                               websocketpp::lib::placeholders::_1,
                                                               websocketpp::lib::placeholders::_2));
 
@@ -167,7 +170,8 @@ void ESDConnectionManager::SetTitle(const std::string &inTitle, const std::strin
     mWebsocket.send(mConnectionHandle, jsonObject.dump(), websocketpp::frame::opcode::text, ec);
 }
 
-void ESDConnectionManager::SetImage(const std::string &inBase64ImageString, const std::string &inContext,
+void ESDConnectionManager::SetImage(const std::string &inBase64ImageString,
+                                    const std::string &inContext,
                                     ESDSDKTarget inTarget)
 {
     json jsonObject;
@@ -256,7 +260,8 @@ void ESDConnectionManager::SetState(int inState, const std::string &inContext)
     mWebsocket.send(mConnectionHandle, jsonObject.dump(), websocketpp::frame::opcode::text, ec);
 }
 
-void ESDConnectionManager::SendToPropertyInspector(const std::string &inAction, const std::string &inContext,
+void ESDConnectionManager::SendToPropertyInspector(const std::string &inAction,
+                                                   const std::string &inContext,
                                                    const json &inPayload)
 {
     json jsonObject;

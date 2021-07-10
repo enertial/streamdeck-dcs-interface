@@ -178,4 +178,4 @@ TEST(StringUtilitiesTest, pop_key_and_value_missing_token_delim)
     EXPECT_EQ("value1key2=value2", key_and_value.second);
 }
 
-}  // namespace test
+} // namespace test

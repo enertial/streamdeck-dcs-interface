@@ -7,10 +7,7 @@
 #include <algorithm>
 
 Decimal::Decimal() : significant_digits_(0), exponent_(0) {}
-Decimal::Decimal(std::string number)
-{
-    string_to_decimal(number);
-}
+Decimal::Decimal(std::string number) { string_to_decimal(number); }
 Decimal::Decimal(int significant_digits, int exponent) : significant_digits_(significant_digits), exponent_(exponent) {}
 
 std::string Decimal::str() const
@@ -56,25 +53,25 @@ int Decimal::get_as_higher_exponent(const int higher_exponent) const
  *  Operator Overloads
  */
 
-Decimal operator+(const Decimal& lhs, const Decimal& rhs)
+Decimal operator+(const Decimal &lhs, const Decimal &rhs)
 {
     const int precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return Decimal(lhs.get_as_higher_exponent(precision) + rhs.get_as_higher_exponent(precision), precision);
 }
 
-Decimal operator-(const Decimal& lhs, const Decimal& rhs)
+Decimal operator-(const Decimal &lhs, const Decimal &rhs)
 {
     const int precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return Decimal(lhs.get_as_higher_exponent(precision) - rhs.get_as_higher_exponent(precision), precision);
 }
 
-bool operator<(const Decimal& lhs, const Decimal& rhs)
+bool operator<(const Decimal &lhs, const Decimal &rhs)
 {
     const int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return lhs.get_as_higher_exponent(common_precision) < rhs.get_as_higher_exponent(common_precision);
 }
 
-bool operator==(const Decimal& lhs, const Decimal& rhs)
+bool operator==(const Decimal &lhs, const Decimal &rhs)
 {
     const int common_precision = (std::max)(lhs.exponent_, rhs.exponent_);
     return lhs.get_as_higher_exponent(common_precision) == rhs.get_as_higher_exponent(common_precision);

@@ -17,17 +17,10 @@ class ESDConnectionManager;
 class ESDBasePlugin
 {
   public:
-    ESDBasePlugin()
-    {
-    }
-    virtual ~ESDBasePlugin()
-    {
-    }
+    ESDBasePlugin() {}
+    virtual ~ESDBasePlugin() {}
 
-    void SetConnectionManager(ESDConnectionManager *inConnectionManager)
-    {
-        mConnectionManager = inConnectionManager;
-    }
+    void SetConnectionManager(ESDConnectionManager *inConnectionManager) { mConnectionManager = inConnectionManager; }
 
     virtual void KeyDownForAction(const std::string &inAction,
                                   const std::string &inContext,

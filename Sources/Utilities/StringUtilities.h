@@ -9,13 +9,13 @@
  * @brief Helper function to identify if a string represents an integer.
  *
  */
-bool is_integer(const std::string& str);
+bool is_integer(const std::string &str);
 
 /**
  * @brief Helper function to identify if a string represents a (decimal) number.
  *
  */
-bool is_number(const std::string& str);
+bool is_number(const std::string &str);
 
 /**
  * @brief Get the next key and value pair from a delimited stringstream.
@@ -28,7 +28,7 @@ bool is_number(const std::string& str);
  * @param key_and_value [out]  Pair of key and value strings.
  * @return True if a key-value pair was found, False if no remaining key-value pairs in stringstream.
  */
-bool pop_key_and_value(std::stringstream& ss,
+bool pop_key_and_value(std::stringstream &ss,
                        const char token_delim,
                        const char key_value_delim,
-                       std::pair<std::string, std::string>& key_and_value);
+                       std::pair<std::string, std::string> &key_and_value);

@@ -18,7 +18,8 @@
 
 class CallBackTimer;
 
-class MyStreamDeckPlugin : public ESDBasePlugin {
+class MyStreamDeckPlugin : public ESDBasePlugin
+{
   public:
     MyStreamDeckPlugin();
     virtual ~MyStreamDeckPlugin();

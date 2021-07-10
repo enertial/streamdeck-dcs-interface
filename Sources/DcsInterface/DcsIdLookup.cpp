@@ -11,13 +11,13 @@
 #include <string>
 #include <vector>
 
-json get_installed_modules(const std::string& dcs_install_path, const std::string& module_subdir)
+json get_installed_modules(const std::string &dcs_install_path, const std::string &module_subdir)
 {
     json installed_modules_and_result;
     installed_modules_and_result["installed_modules"] = json::array();
     installed_modules_and_result["result"] = "";
     if (std::filesystem::exists(dcs_install_path + module_subdir)) {
-        for (const auto& dir : std::filesystem::directory_iterator(dcs_install_path + module_subdir)) {
+        for (const auto &dir : std::filesystem::directory_iterator(dcs_install_path + module_subdir)) {
             const std::string module_abs_path = dir.path().string();
             const auto mods_subdir_str_loc = module_abs_path.find(module_subdir);
             installed_modules_and_result["installed_modules"].push_back(
@@ -31,16 +31,16 @@ json get_installed_modules(const std::string& dcs_install_path, const std::strin
     return installed_modules_and_result;
 }
 
-json get_clickabledata(const std::string& dcs_install_path,
-                       const std::string& module_name,
-                       const std::string& lua_script)
+json get_clickabledata(const std::string &dcs_install_path,
+                       const std::string &module_name,
+                       const std::string &lua_script)
 {
     json clickabledata_and_result;
     clickabledata_and_result["clickabledata_items"] = json::array();
     clickabledata_and_result["result"] = "";
 
     // create new Lua state
-    lua_State* lua_state;
+    lua_State *lua_state;
     lua_state = luaL_newstate();
 
     // load Lua libraries

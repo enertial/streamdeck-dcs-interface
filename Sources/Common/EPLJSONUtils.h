@@ -60,8 +60,8 @@ class EPLJSONUtils
     }
 
     //! Get string by name
-    static std::string GetStringByName(const json &inJSON, const std::string &inName,
-                                       const std::string &defaultValue = "")
+    static std::string
+    GetStringByName(const json &inJSON, const std::string &inName, const std::string &defaultValue = "")
     {
         // Check desired value exists
         json::const_iterator iter(inJSON.find(inName));
@@ -119,8 +119,8 @@ class EPLJSONUtils
     }
 
     //! Get unsigned integer by name
-    static unsigned int GetUnsignedIntByName(const json &inJSON, const std::string &inName,
-                                             unsigned int defaultValue = 0)
+    static unsigned int
+    GetUnsignedIntByName(const json &inJSON, const std::string &inName, unsigned int defaultValue = 0)
     {
         // Check desired value exists
         json::const_iterator iter(inJSON.find(inName));

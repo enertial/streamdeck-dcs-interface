@@ -6,10 +6,7 @@
 
 namespace test
 {
-TEST(UdpSocketTest, empty_connection_settings)
-{
-    EXPECT_THROW(UdpSocket dcs_socket("", "", ""), std::runtime_error);
-}
+TEST(UdpSocketTest, empty_connection_settings) { EXPECT_THROW(UdpSocket dcs_socket("", "", ""), std::runtime_error); }
 
 TEST(UdpSocketTest, invalid_connection_port_settings)
 {
@@ -23,7 +20,7 @@ TEST(UdpSocketTest, invalid_connection_ip_addr_settings)
 
 class UdpSocketTestFixture : public ::testing::Test
 {
-   public:
+  public:
     UdpSocketTestFixture()
         : sender_socket(ip_address, "1788", common_port), receiver_socket(ip_address, common_port, "1790")
     {
@@ -71,4 +68,4 @@ TEST_F(UdpSocketTestFixture, dynamic_tx_port_discovery)
     std::stringstream server_received_ss = server_socket.receive();
     EXPECT_EQ(test_msg_b, server_received_ss.str());
 }
-}  // namespace test
+} // namespace test

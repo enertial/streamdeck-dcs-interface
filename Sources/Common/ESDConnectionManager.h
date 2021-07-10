@@ -26,8 +26,11 @@ typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
 class ESDConnectionManager
 {
   public:
-    ESDConnectionManager(int inPort, const std::string &inPluginUUID, const std::string &inRegisterEvent,
-                         const std::string &inInfo, ESDBasePlugin *inPlugin);
+    ESDConnectionManager(int inPort,
+                         const std::string &inPluginUUID,
+                         const std::string &inRegisterEvent,
+                         const std::string &inInfo,
+                         ESDBasePlugin *inPlugin);
 
     // Start the event loop
     void Run();

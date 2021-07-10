@@ -25,4 +25,4 @@ TEST(DcsIdLookupTest, nonexistant_lua_file)
     EXPECT_EQ(0, returned_values["clickabledata_items"].size());
 }
 
-}  // namespace test
+} // namespace test

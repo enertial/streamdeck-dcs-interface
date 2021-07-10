@@ -45,15 +45,9 @@ static bool HasSuffix(const std::string &inString, const std::string &inSuffix)
            (inString.compare(inString.size() - inSuffix.size(), inSuffix.size(), inSuffix) == 0);
 }
 
-void ESDUtilities::DoSleep(int inMilliseconds)
-{
-    usleep(1000 * inMilliseconds);
-}
+void ESDUtilities::DoSleep(int inMilliseconds) { usleep(1000 * inMilliseconds); }
 
-static char GetFileSystemPathDelimiter()
-{
-    return '/';
-}
+static char GetFileSystemPathDelimiter() { return '/'; }
 
 std::string ESDUtilities::AddPathComponent(const std::string &inPath, const std::string &inComponentToAdd)
 {
