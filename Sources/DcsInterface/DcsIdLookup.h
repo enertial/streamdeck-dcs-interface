@@ -12,7 +12,7 @@ using json = nlohmann::json;
  * @param module_subdir    Subdirectory within installation directory that contains module folders ("/mods/aircraft/")
  * @return json            Json array of identified files
  */
-json get_installed_modules(const std::string &dcs_install_path, const std::string &module_subdir);
+json get_installed_modules(const std::string& dcs_install_path, const std::string& module_subdir);
 
 /**
  * @brief Extract clickabledata elements from a DCS World module.
@@ -22,6 +22,6 @@ json get_installed_modules(const std::string &dcs_install_path, const std::strin
  * @param lua_script       Lua script to run which should return comma-separated strings of clickabledata attributes.
  * @return json            Json array of comma-separated strings, each array element is one clickabledata element.
  */
-json get_clickabledata(const std::string &dcs_install_path,
-                       const std::string &module_name,
-                       const std::string &lua_script);
+json get_clickabledata(const std::string& dcs_install_path,
+                       const std::string& module_name,
+                       const std::string& lua_script);

@@ -9,8 +9,9 @@
  * summation and comparison while maintaining precision.
  *
  */
-class Decimal {
-  public:
+class Decimal
+{
+   public:
     Decimal();
     Decimal(std::string number);
     Decimal(int significant_digits, int exponent);
@@ -26,28 +27,30 @@ class Decimal {
      * Decimal.
      *
      */
-    friend Decimal operator+(const Decimal &lhs, const Decimal &rhs);
-    friend Decimal operator-(const Decimal &lhs, const Decimal &rhs);
-    inline Decimal &operator+=(const Decimal &rhs) {
+    friend Decimal operator+(const Decimal& lhs, const Decimal& rhs);
+    friend Decimal operator-(const Decimal& lhs, const Decimal& rhs);
+    inline Decimal& operator+=(const Decimal& rhs)
+    {
         *this = *this + rhs;
         return *this;
     }
-    inline Decimal &operator-=(const Decimal &rhs) {
+    inline Decimal& operator-=(const Decimal& rhs)
+    {
         *this = *this - rhs;
         return *this;
     }
 
-    friend bool operator<(const Decimal &lhs, const Decimal &rhs);
-    friend inline bool operator>(const Decimal &lhs, const Decimal &rhs) { return rhs < lhs; }
-    friend inline bool operator<=(const Decimal &lhs, const Decimal &rhs) { return !(lhs > rhs); }
-    friend inline bool operator>=(const Decimal &lhs, const Decimal &rhs) { return !(lhs < rhs); }
+    friend bool operator<(const Decimal& lhs, const Decimal& rhs);
+    friend inline bool operator>(const Decimal& lhs, const Decimal& rhs) { return rhs < lhs; }
+    friend inline bool operator<=(const Decimal& lhs, const Decimal& rhs) { return !(lhs > rhs); }
+    friend inline bool operator>=(const Decimal& lhs, const Decimal& rhs) { return !(lhs < rhs); }
 
-    friend bool operator==(const Decimal &lhs, const Decimal &rhs);
-    friend inline bool operator!=(const Decimal &lhs, const Decimal &rhs) { return !(lhs == rhs); }
+    friend bool operator==(const Decimal& lhs, const Decimal& rhs);
+    friend inline bool operator!=(const Decimal& lhs, const Decimal& rhs) { return !(lhs == rhs); }
 
-  private:
-    int significant_digits_; // The significant digits of the decimal value.
-    int exponent_;           // Exponent such that the numeric value = significant_digits * 10 ^ (exponent).
+   private:
+    int significant_digits_;  // The significant digits of the decimal value.
+    int exponent_;            // Exponent such that the numeric value = significant_digits * 10 ^ (exponent).
 
     /**
      * @brief Converts a string to a Decimal represtentation (significant_digits and exponent).

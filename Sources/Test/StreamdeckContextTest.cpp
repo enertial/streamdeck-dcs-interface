@@ -1,8 +1,8 @@
 // Copyright 2020 Charles Tytler
 
+#include <unordered_map>
 #include "../Windows/pch.h"
 #include "gtest/gtest.h"
-#include <unordered_map>
 
 // Create mock version of ESDConnectionManager for testing.
 #define UNIT_TEST
@@ -10,7 +10,7 @@ const int kESDSDKTarget_HardwareAndSoftware = 0;
 
 class ESDConnectionManager
 {
-public:
+   public:
     void SetState(int state, std::string context)
     {
         context_ = context;
@@ -51,13 +51,13 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
 
 class StreamdeckContextTestFixture : public ::testing::Test
 {
-public:
+   public:
     StreamdeckContextTestFixture()
-        : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
+        :  // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          dcs_interface(connection_settings), fixture_context(fixture_context_id)
+          dcs_interface(connection_settings),
+          fixture_context(fixture_context_id)
     {
-
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
 
@@ -68,9 +68,9 @@ public:
     }
 
     DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                          // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                  // DCS Interface to test.
-    ESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
+    UdpSocket mock_dcs;                           // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface;                   // DCS Interface to test.
+    ESDConnectionManager esd_connection_manager;  // Streamdeck connection manager, using mock class definition.
     StreamdeckContext fixture_context;
 
     // Create StreamdeckContext to test without any defined settings.
@@ -181,7 +181,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_settings)
 
     // Test 3 -- With cleared settings, streamdeck context should send default state and title.
     settings = {{"dcs_id_compare_monitor", ""},
-                {"dcs_id_compare_condition", "EQUAL_TO"}, //< selection type always has some value.
+                {"dcs_id_compare_condition", "EQUAL_TO"},  //< selection type always has some value.
                 {"dcs_id_comparison_value", ""},
                 {"dcs_id_string_monitor", ""}};
     fixture_context.updateContextSettings(settings);
@@ -193,9 +193,9 @@ TEST_F(StreamdeckContextTestFixture, update_context_settings)
 
 class StreamdeckContextComparisonTestFixture : public StreamdeckContextTestFixture
 {
-public:
+   public:
     StreamdeckContextComparisonTestFixture()
-        : // Create StreamdeckContexts with different comparison selections to test.
+        :  // Create StreamdeckContexts with different comparison selections to test.
           context_with_equals("ctx_equals",
                               {{"dcs_id_compare_monitor", "123"},
                                {"dcs_id_compare_condition", "EQUAL_TO"},
@@ -383,7 +383,7 @@ TEST_F(StreamdeckContextComparisonTestFixture, dcs_id_float_compare_to_float_wit
 {
     json settings;
     settings["dcs_id_compare_monitor"] = "123";
-    settings["dcs_id_comparison_value"] = "1.0 "; //< Trailing space
+    settings["dcs_id_comparison_value"] = "1.0 ";  //< Trailing space
     context_with_greater_than.updateContextSettings(settings);
     const std::string mock_dcs_message = "header*123=2.0";
     mock_dcs.send(mock_dcs_message);
@@ -423,8 +423,7 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_after_delay)
     // Test -- force send will send current state regardless of state change.
     int delay_count = 3;
     fixture_context.forceSendStateAfterDelay(delay_count);
-    while (delay_count > 0)
-    {
+    while (delay_count > 0) {
         fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
         EXPECT_EQ(esd_connection_manager.context_, "");
         delay_count--;
@@ -450,9 +449,9 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_negative_delay)
 
 class StreamdeckContextKeyPressTestFixture : public StreamdeckContextTestFixture
 {
-public:
+   public:
     StreamdeckContextKeyPressTestFixture()
-        : // Create default json payload.
+        :  // Create default json payload.
           payload({{"state", 0},
                    {"settings",
                     {{"button_id", std::to_string(button_id)},
@@ -616,8 +615,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple)
 {
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 5; ++i)
-    {
+    for (int i = 0; i < 5; ++i) {
         fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
@@ -630,8 +628,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_to_max)
 {
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 15; ++i)
-    {
+    for (int i = 0; i < 15; ++i) {
         fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
@@ -645,8 +642,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_cycle_max_
     payload["settings"]["increment_cycle_allowed_check"] = true;
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 11; ++i)
-    {
+    for (int i = 0; i < 11; ++i) {
         fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
@@ -660,8 +656,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple_n
     payload["settings"]["increment_value"] = "-0.1";
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 5; ++i)
-    {
+    for (int i = 0; i < 5; ++i) {
         fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
@@ -675,8 +670,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_t
     payload["settings"]["increment_value"] = "-0.1";
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 15; ++i)
-    {
+    for (int i = 0; i < 15; ++i) {
         fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
@@ -691,8 +685,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
     payload["settings"]["increment_cycle_allowed_check"] = true;
     const std::string action = "com.ctytler.dcs.increment.two-state";
     std::stringstream ss_received;
-    for (int i = 0; i < 1; ++i)
-    {
+    for (int i = 0; i < 1; ++i) {
         fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
