@@ -11,7 +11,8 @@
 #include <string>
 #include <vector>
 
-json get_installed_modules(const std::string &dcs_install_path, const std::string &module_subdir) {
+json get_installed_modules(const std::string &dcs_install_path, const std::string &module_subdir)
+{
     json installed_modules_and_result;
     installed_modules_and_result["installed_modules"] = json::array();
     installed_modules_and_result["result"] = "";
@@ -32,7 +33,8 @@ json get_installed_modules(const std::string &dcs_install_path, const std::strin
 
 json get_clickabledata(const std::string &dcs_install_path,
                        const std::string &module_name,
-                       const std::string &lua_script) {
+                       const std::string &lua_script)
+{
     json clickabledata_and_result;
     clickabledata_and_result["clickabledata_items"] = json::array();
     clickabledata_and_result["result"] = "";

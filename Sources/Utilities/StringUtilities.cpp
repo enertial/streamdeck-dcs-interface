@@ -5,7 +5,8 @@
 #include "StringUtilities.h"
 #include <stdlib.h>
 
-bool is_integer(const std::string &str) {
+bool is_integer(const std::string &str)
+{
     if (!str.empty()) {
         // Add special handling for stripping of trailing spaces
         const std::string str_trailing_spaces_stripped = str.substr(0, str.find_last_not_of(" ") + 1);
@@ -19,7 +20,8 @@ bool is_integer(const std::string &str) {
     return false;
 }
 
-bool is_number(const std::string &str) {
+bool is_number(const std::string &str)
+{
     if (!str.empty()) {
         // Add special handling for stripping of trailing spaces
         const std::string str_trailing_spaces_stripped = str.substr(0, str.find_last_not_of(" ") + 1);
@@ -36,7 +38,8 @@ bool is_number(const std::string &str) {
 bool pop_key_and_value(std::stringstream &ss,
                        const char token_delim,
                        const char key_value_delim,
-                       std::pair<std::string, std::string> &key_and_value) {
+                       std::pair<std::string, std::string> &key_and_value)
+{
     // Iterate through tokens received from single message.
     std::string token;
     if (std::getline(ss, token, token_delim)) {

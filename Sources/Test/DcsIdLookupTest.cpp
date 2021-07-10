@@ -5,9 +5,10 @@
 #include "../Common/EPLJSONUtils.h"
 #include "../DcsInterface/DcsIdLookup.cpp"
 
-namespace test {
-
-TEST(DcsIdLookupTest, get_installed_modules_bad_path) {
+namespace test
+{
+TEST(DcsIdLookupTest, get_installed_modules_bad_path)
+{
     const std::string dcs_install_path = "non-existant-path";
     const std::string module_subdir = "/Test/";
     json found_files_and_result = get_installed_modules(dcs_install_path, module_subdir);
@@ -15,7 +16,8 @@ TEST(DcsIdLookupTest, get_installed_modules_bad_path) {
     EXPECT_EQ(0, found_files_and_result["installed_modules"].size());
 }
 
-TEST(DcsIdLookupTest, nonexistant_lua_file) {
+TEST(DcsIdLookupTest, nonexistant_lua_file)
+{
     // Test that a bad path will return an empty json container.
     const std::string lua_script = "non-existant-file.lua";
     json returned_values = get_clickabledata("path", "module", lua_script);

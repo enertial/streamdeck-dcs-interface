@@ -9,7 +9,8 @@
  * summation and comparison while maintaining precision.
  *
  */
-class Decimal {
+class Decimal
+{
   public:
     Decimal();
     Decimal(std::string number);
@@ -28,11 +29,13 @@ class Decimal {
      */
     friend Decimal operator+(const Decimal &lhs, const Decimal &rhs);
     friend Decimal operator-(const Decimal &lhs, const Decimal &rhs);
-    inline Decimal &operator+=(const Decimal &rhs) {
+    inline Decimal &operator+=(const Decimal &rhs)
+    {
         *this = *this + rhs;
         return *this;
     }
-    inline Decimal &operator-=(const Decimal &rhs) {
+    inline Decimal &operator-=(const Decimal &rhs)
+    {
         *this = *this - rhs;
         return *this;
     }

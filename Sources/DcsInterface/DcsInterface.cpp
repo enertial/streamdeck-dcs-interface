@@ -2,8 +2,8 @@
 
 #include "pch.h"
 
-#include "DcsInterface.h"
 #include "../Utilities/StringUtilities.h"
+#include "DcsInterface.h"
 
 DcsInterface::DcsInterface(const DcsConnectionSettings &settings)
     : dcs_socket_(settings.ip_address, settings.rx_port, settings.tx_port), connection_settings_(settings)
@@ -25,12 +25,10 @@ void DcsInterface::update_dcs_state()
     std::stringstream recv_msg = dcs_socket_.receive();
 
     std::string token;
-    if (std::getline(recv_msg, token, header_delimiter))
-    {
+    if (std::getline(recv_msg, token, header_delimiter)) {
         // Iterate through tokens received from single message.
         std::pair<std::string, std::string> key_and_value;
-        while (pop_key_and_value(recv_msg, ':', '=', key_and_value))
-        {
+        while (pop_key_and_value(recv_msg, ':', '=', key_and_value)) {
             // Strip any trailing newline chars from value.
             auto value_end_loc = key_and_value.second.find_last_not_of('\n');
             std::string value = key_and_value.second.substr(0, value_end_loc + 1);
@@ -41,16 +39,24 @@ void DcsInterface::update_dcs_state()
 
 std::string DcsInterface::get_current_dcs_module() { return current_game_module_; }
 
-std::string DcsInterface::get_value_of_dcs_id(const int dcs_id)
+std::optional<std::string> DcsInterface::get_value_of_dcs_id(const int dcs_id)
 {
-    if (current_game_state_.count(dcs_id) > 0)
-    {
-        return current_game_state_[dcs_id];
+    if (current_game_state_.count(dcs_id) > 0) {
+        if (!current_game_state_[dcs_id].empty()) {
+            return current_game_state_[dcs_id];
+        }
     }
-    else
-    {
-        return "";
+    return std::nullopt;
+}
+
+std::optional<Decimal> DcsInterface::get_decimal_of_dcs_id(const int dcs_id)
+{
+    if (current_game_state_.count(dcs_id) > 0) {
+        if (is_number(current_game_state_[dcs_id])) {
+            return current_game_state_[dcs_id];
+        }
     }
+    return std::nullopt;
 }
 
 void DcsInterface::send_dcs_command(const int button_id, const std::string &device_id, const std::string &value)
@@ -67,19 +73,13 @@ std::map<int, std::string> DcsInterface::debug_get_current_game_state() { return
 
 void DcsInterface::handle_received_token(const std::string &key, const std::string &value)
 {
-    if (is_integer(key))
-    {
-        current_game_state_[std::stoi(key)] = value;
-    }
-    else if (key == "File")
-    {
+    if (is_integer(key)) {
+        current_game_state_.insert_or_assign(std::stoi(key), value);
+    } else if (key == "File") {
         current_game_module_ = value;
-    }
-    else if (key == "Ikarus" || key == "DAC" || key == "DCS")
-    {
+    } else if (key == "Ikarus" || key == "DAC" || key == "DCS") {
         // Stop is received when user has quit mission -- game state should be cleared.
-        if (value == "stop")
-        {
+        if (value == "stop") {
             clear_game_state();
             current_game_module_ = "";
         }
