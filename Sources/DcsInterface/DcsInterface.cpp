@@ -2,8 +2,8 @@
 
 #include "pch.h"
 
-#include "DcsInterface.h"
 #include "../Utilities/StringUtilities.h"
+#include "DcsInterface.h"
 
 DcsInterface::DcsInterface(const DcsConnectionSettings &settings)
     : dcs_socket_(settings.ip_address, settings.rx_port, settings.tx_port), connection_settings_(settings)
@@ -81,7 +81,7 @@ void DcsInterface::handle_received_token(const std::string &key, const std::stri
 {
     if (is_integer(key))
     {
-        current_game_state_[std::stoi(key)] = value;
+        current_game_state_.insert_or_assign(std::stoi(key), value);
     }
     else if (key == "File")
     {
