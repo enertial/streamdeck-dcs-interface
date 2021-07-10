@@ -166,7 +166,7 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
     if (dcs_interface_ != nullptr)
     {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_DOWN, inAction, inPayload);
+        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KeyEvent::PRESSED, inAction, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -192,7 +192,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
         {
             mVisibleContexts[inContext].forceSendState(mConnectionManager);
         }
-        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KEY_UP, inAction, inPayload);
+        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KeyEvent::RELEASED, inAction, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }

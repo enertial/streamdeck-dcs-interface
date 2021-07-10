@@ -488,7 +488,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_button_id)
 {
     payload["settings"]["button_id"] = "abc";
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -498,7 +498,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_device_id)
 {
     payload["settings"]["device_id"] = "32.4";
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -507,7 +507,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_invalid_device_id)
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary)
 {
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + press_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -516,7 +516,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary)
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_momentary)
 {
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::RELEASED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + release_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -526,7 +526,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_momentary_release_send
 {
     payload["settings"]["disable_release_check"] = true;
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::RELEASED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -536,7 +536,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary_empty_valu
 {
     payload["settings"]["press_value"] = "";
     const std::string action = "com.ctytler.dcs.static.button.one-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -545,7 +545,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_momentary_empty_valu
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_in_first_state)
 {
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::RELEASED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command =
         "C" + device_id + "," + std::to_string(button_id) + "," + send_when_first_state_value;
@@ -556,7 +556,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_in_second_state
 {
     payload["state"] = 1;
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::RELEASED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command =
         "C" + device_id + "," + std::to_string(button_id) + "," + send_when_second_state_value;
@@ -566,7 +566,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_in_second_state
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_switch)
 {
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";
@@ -577,7 +577,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_empty_value)
 {
     payload["settings"]["send_when_first_state_value"] = "";
     const std::string action = "com.ctytler.dcs.switch.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::RELEASED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -586,7 +586,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_switch_empty_value)
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment)
 {
     const std::string action = "com.ctytler.dcs.increment.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + increment_value;
@@ -604,7 +604,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_after_exte
     fixture_context.updateContextState(&dcs_interface, &esd_connection_manager);
 
     const std::string action = "com.ctytler.dcs.increment.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     const Decimal expected_increment_value = Decimal(external_increment_start) + Decimal(increment_value);
     std::string expected_command =
@@ -618,7 +618,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple)
     std::stringstream ss_received;
     for (int i = 0; i < 5; ++i)
     {
-        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -632,7 +632,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_to_max)
     std::stringstream ss_received;
     for (int i = 0; i < 15; ++i)
     {
-        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -647,7 +647,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_cycle_max_
     std::stringstream ss_received;
     for (int i = 0; i < 11; ++i)
     {
-        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -662,7 +662,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_multiple_n
     std::stringstream ss_received;
     for (int i = 0; i < 5; ++i)
     {
-        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -677,7 +677,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_t
     std::stringstream ss_received;
     for (int i = 0; i < 15; ++i)
     {
-        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -693,7 +693,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
     std::stringstream ss_received;
     for (int i = 0; i < 1; ++i)
     {
-        fixture_context.handleButtonEvent(&dcs_interface, KEY_DOWN, action, payload);
+        fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::PRESSED, action, payload);
         ss_received = mock_dcs.receive();
     }
     // Expect no command sent (empty string is due to mock socket functionality).
@@ -704,7 +704,7 @@ TEST_F(StreamdeckContextKeyPressTestFixture, handle_keydown_increment_negative_c
 TEST_F(StreamdeckContextKeyPressTestFixture, handle_keyup_increment)
 {
     const std::string action = "com.ctytler.dcs.increment.two-state";
-    fixture_context.handleButtonEvent(&dcs_interface, KEY_UP, action, payload);
+    fixture_context.handleButtonEvent(&dcs_interface, KeyEvent::RELEASED, action, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";

@@ -13,7 +13,7 @@
 #include <optional>
 #include <string>
 
-using KeyEvent = enum { KEY_DOWN, KEY_UP };
+enum class KeyEvent { PRESSED, RELEASED };
 
 class StreamdeckContext {
   public:
@@ -66,8 +66,8 @@ class StreamdeckContext {
                            const json &inPayload);
 
   private:
-    using CompareConditionType = enum { GREATER_THAN, EQUAL_TO, LESS_THAN };
-    using ContextState = enum { FIRST = 0, SECOND };
+    enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };
+    enum class ContextState { FIRST = 0, SECOND };
 
     /**
      * @brief Determines what the context state should be according to current game value and comparison monitor
@@ -114,7 +114,7 @@ class StreamdeckContext {
                                                     // after counting down the stored delay value.
 
     // Context state.
-    ContextState current_state_ = FIRST;       // Stored state of the context.
+    ContextState current_state_ = ContextState::FIRST;       // Stored state of the context.
     std::string current_title_ = "";           // Stored title of the context.
     Decimal current_increment_value_;          // Stored value for increment button types.
     bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
@@ -123,7 +123,7 @@ class StreamdeckContext {
     // Stored settings extracted from user-filled fields.
     int dcs_id_increment_monitor_ = 0; // DCS ID to monitor for updating current increment value from game state.
     int dcs_id_compare_monitor_ = 0;   // DCS ID to monitor for context state setting according to value comparison.
-    CompareConditionType dcs_id_compare_condition_ = GREATER_THAN; // Comparison to use for DCS ID compare monitor.
+    Comparison dcs_id_compare_condition_ = Comparison::GREATER_THAN; // Comparison to use for DCS ID compare monitor.
     Decimal dcs_id_comparison_value_;                              // Value to compare DCS ID compare monitor value to.
     int dcs_id_string_monitor_ = 0;                                // DCS ID to monitor for context title.
     int string_monitor_vertical_spacing_ = 0; // Vertical spacing (number of '\n') to include before or after title.

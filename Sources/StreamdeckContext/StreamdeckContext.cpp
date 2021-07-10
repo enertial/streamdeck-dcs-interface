@@ -15,7 +15,7 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
 
 void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConnectionManager *mConnectionManager) {
     // Initialize to default values.
-    ContextState updated_state = FIRST;
+    ContextState updated_state = ContextState::FIRST;
     std::string updated_title = "";
 
     if (increment_monitor_is_set_) {
@@ -95,12 +95,12 @@ void StreamdeckContext::updateContextSettings(const json &settings) {
         dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
         dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);
         if (dcs_id_compare_condition_raw == "EQUAL_TO") {
-            dcs_id_compare_condition_ = EQUAL_TO;
+            dcs_id_compare_condition_ = Comparison::EQUAL_TO;
         } else if (dcs_id_compare_condition_raw == "LESS_THAN") {
-            dcs_id_compare_condition_ = LESS_THAN;
+            dcs_id_compare_condition_ = Comparison::LESS_THAN;
         } else // Default in Property Inspector html is GREATER_THAN.
         {
-            dcs_id_compare_condition_ = GREATER_THAN;
+            dcs_id_compare_condition_ = Comparison::GREATER_THAN;
         }
     }
 
@@ -134,7 +134,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface *dcs_interface,
         bool send_command = false;
         std::string value = "";
         if (action.find("switch") != std::string::npos) {
-            const ContextState state = EPLJSONUtils::GetIntByName(inPayload, "state") == 0 ? FIRST : SECOND;
+            const ContextState state = EPLJSONUtils::GetIntByName(inPayload, "state") == 0 ? ContextState::FIRST : ContextState::SECOND;
             send_command = determineSendValueForSwitch(event, state, inPayload["settings"], value);
         } else if (action.find("increment") != std::string::npos) {
             send_command = determineSendValueForIncrement(event, inPayload["settings"], value);
@@ -151,18 +151,18 @@ void StreamdeckContext::handleButtonEvent(DcsInterface *dcs_interface,
 StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonitor(const Decimal &current_game_value) {
     bool set_context_state_to_second = false;
     switch (dcs_id_compare_condition_) {
-    case EQUAL_TO:
+    case Comparison::EQUAL_TO:
         set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
         break;
-    case LESS_THAN:
+    case Comparison::LESS_THAN:
         set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
         break;
-    case GREATER_THAN:
+    case Comparison::GREATER_THAN:
         set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
         break;
     }
 
-    return set_context_state_to_second ? SECOND : FIRST;
+    return set_context_state_to_second ? ContextState::SECOND : ContextState::FIRST;
 }
 
 std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value) {
@@ -186,7 +186,7 @@ std::string StreamdeckContext::determineTitleForStringMonitor(const std::string 
 }
 
 bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value) {
-    if (event == KEY_DOWN) {
+    if (event == KeyEvent::PRESSED) {
         value = EPLJSONUtils::GetStringByName(settings, "press_value");
     } else {
         if (!EPLJSONUtils::GetBoolByName(settings, "disable_release_check")) {
@@ -201,8 +201,8 @@ bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
                                                     const ContextState state,
                                                     const json &settings,
                                                     std::string &value) {
-    if (event == KEY_UP) {
-        if (state == FIRST) {
+    if (event == KeyEvent::RELEASED) {
+        if (state == ContextState::FIRST) {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
         } else {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_second_state_value");
@@ -217,7 +217,7 @@ bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
 }
 
 bool StreamdeckContext::determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value) {
-    if (event == KEY_DOWN) {
+    if (event == KeyEvent::PRESSED) {
         const std::string increment_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
         const std::string increment_min_str = EPLJSONUtils::GetStringByName(settings, "increment_min");
         const std::string increment_max_str = EPLJSONUtils::GetStringByName(settings, "increment_max");
