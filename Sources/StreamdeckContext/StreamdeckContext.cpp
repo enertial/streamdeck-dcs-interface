@@ -15,16 +15,10 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
 
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
-    if (increment_monitor_is_set_) {
-        const std::optional<Decimal> maybe_current_game_value =
-            dcs_interface.get_decimal_of_dcs_id(dcs_id_increment_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            current_increment_value_ = maybe_current_game_value.value();
-        }
-    }
 
     const auto updated_state = comparison_monitor_.determineContextState(dcs_interface);
     const auto updated_title = title_monitor_.determineTitle(dcs_interface);
+    increment_monitor_.update(dcs_interface);
 
     if (updated_state != current_state_) {
         current_state_ = updated_state;
@@ -55,21 +49,9 @@ void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
 
 void StreamdeckContext::updateContextSettings(const json &settings)
 {
-
     comparison_monitor_.update_settings(settings);
     title_monitor_.update_settings(settings);
-
-    // Read in settings.
-    const std::string dcs_id_increment_monitor_raw =
-        EPLJSONUtils::GetStringByName(settings, "dcs_id_increment_monitor");
-
-    // Process status of settings.
-    increment_monitor_is_set_ = is_integer(dcs_id_increment_monitor_raw);
-
-    // Update internal settings of class instance.
-    if (increment_monitor_is_set_) {
-        dcs_id_increment_monitor_ = std::stoi(dcs_id_increment_monitor_raw);
-    }
+    increment_monitor_.update_settings(settings);
 }
 
 void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
@@ -79,10 +61,6 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
 {
     const std::string button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
-
-    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
-    cycle_increments_is_allowed_ =
-        EPLJSONUtils::GetBoolByName(inPayload["settings"], "increment_cycle_allowed_check", false);
 
     if (is_integer(button_id) && is_integer(device_id)) {
         bool send_command = false;
@@ -102,6 +80,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
     }
 }
 
+// TODO: Change determineSend... functions to return an optional rather than a mutable value argument.
 bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value)
 {
     if (event == KeyEvent::PRESSED) {
@@ -138,22 +117,17 @@ bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
 bool StreamdeckContext::determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value)
 {
     if (event == KeyEvent::PRESSED) {
-        const std::string increment_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
+        const std::string increment_cmd_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
         const std::string increment_min_str = EPLJSONUtils::GetStringByName(settings, "increment_min");
         const std::string increment_max_str = EPLJSONUtils::GetStringByName(settings, "increment_max");
         const bool cycling_is_allowed = EPLJSONUtils::GetBoolByName(settings, "increment_cycle_allowed_check");
-        if (is_number(increment_value_str) && is_number(increment_min_str) && is_number(increment_max_str)) {
-            Decimal increment_min(increment_min_str);
-            Decimal increment_max(increment_max_str);
 
-            current_increment_value_ += Decimal(increment_value_str);
-
-            if (current_increment_value_ < increment_min) {
-                current_increment_value_ = cycle_increments_is_allowed_ ? increment_max : increment_min;
-            } else if (current_increment_value_ > increment_max) {
-                current_increment_value_ = cycle_increments_is_allowed_ ? increment_min : increment_max;
-            }
-            value = current_increment_value_.str();
+        if (is_number(increment_cmd_value_str) && is_number(increment_min_str) && is_number(increment_max_str)) {
+            const auto current_value = increment_monitor_.get_increment_after_command(Decimal(increment_cmd_value_str),
+                                                                                      Decimal(increment_min_str),
+                                                                                      Decimal(increment_max_str),
+                                                                                      cycling_is_allowed);
+            value = current_value.str();
             return true;
         }
     }

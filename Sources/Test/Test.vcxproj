@@ -36,6 +36,7 @@
     <ClCompile Include="ComparisonMonitorTest.cpp" />
     <ClCompile Include="DcsIdLookupTest.cpp" />
     <ClCompile Include="DcsInterfaceTest.cpp" />
+    <ClCompile Include="IncrementMonitorTest.cpp" />
     <ClCompile Include="TitleMonitorTest.cpp" />
     <ClCompile Include="UdpSocketTest.cpp" />
     <ClCompile Include="DecimalTest.cpp" />
