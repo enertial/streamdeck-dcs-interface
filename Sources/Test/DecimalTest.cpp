@@ -30,6 +30,11 @@ TEST(StringUtilitiesTest, Decimal_convert_string_with_leading_trailing_zeros)
     EXPECT_EQ("0.00403", decimal.str());
 }
 
+TEST(StringUtilitiesTest, Decimal_convert_non_numeric_string_exception)
+{
+    EXPECT_THROW(Decimal("Alpha_Only_String"), std::invalid_argument);
+}
+
 TEST(StringUtilitiesTest, Decimal_convert_integer)
 {
     Decimal decimal("576");

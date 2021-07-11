@@ -8,6 +8,8 @@
  * @brief Provides a type for decimal values which can be converted to/from string representation and supports
  * summation and comparison while maintaining precision.
  *
+ * @throws Exception if string cannot be converted to a decimal representation.
+ *
  */
 class Decimal
 {
@@ -56,6 +58,8 @@ class Decimal
      * @brief Converts a string to a Decimal represtentation (significant_digits and exponent).
      *
      * @param number String representing a numeric value.
+     *
+     * @throws invalid_argument exception (received from std::stoi) if unable to convert to numeric value.
      */
     void string_to_decimal(std::string number);
 
