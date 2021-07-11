@@ -15,9 +15,6 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
 
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
-    // Initialize to default values.
-    std::string updated_title = "";
-
     if (increment_monitor_is_set_) {
         const std::optional<Decimal> maybe_current_game_value =
             dcs_interface.get_decimal_of_dcs_id(dcs_id_increment_monitor_);
@@ -27,14 +24,7 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
     }
 
     const auto updated_state = comparison_monitor_.determineContextState(dcs_interface);
-
-    if (string_monitor_is_set_) {
-        const std::optional<std::string> maybe_current_game_value =
-            dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            updated_title = determineTitleForStringMonitor(maybe_current_game_value.value());
-        }
-    }
+    const auto updated_title = title_monitor_.determineTitle(dcs_interface);
 
     if (updated_state != current_state_) {
         current_state_ = updated_state;
@@ -67,39 +57,18 @@ void StreamdeckContext::updateContextSettings(const json &settings)
 {
 
     comparison_monitor_.update_settings(settings);
+    title_monitor_.update_settings(settings);
 
     // Read in settings.
     const std::string dcs_id_increment_monitor_raw =
         EPLJSONUtils::GetStringByName(settings, "dcs_id_increment_monitor");
-    const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
-    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
-    const std::string string_monitor_vertical_spacing_raw =
-        EPLJSONUtils::GetStringByName(settings, "string_monitor_vertical_spacing");
-    string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
-    std::stringstream string_monitor_mapping_raw;
-    string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
 
     // Process status of settings.
     increment_monitor_is_set_ = is_integer(dcs_id_increment_monitor_raw);
-    string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
 
     // Update internal settings of class instance.
     if (increment_monitor_is_set_) {
         dcs_id_increment_monitor_ = std::stoi(dcs_id_increment_monitor_raw);
-    }
-
-    if (string_monitor_is_set_) {
-        dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
-        if (is_integer(string_monitor_vertical_spacing_raw)) {
-            string_monitor_vertical_spacing_ = std::stoi(string_monitor_vertical_spacing_raw);
-        }
-        if (!string_monitor_passthrough_) {
-            string_monitor_mapping_.clear();
-            std::pair<std::string, std::string> key_and_value;
-            while (pop_key_and_value(string_monitor_mapping_raw, ',', '=', key_and_value)) {
-                string_monitor_mapping_[key_and_value.first] = key_and_value.second;
-            }
-        }
     }
 }
 
@@ -131,27 +100,6 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
             dcs_interface.send_dcs_command(std::stoi(button_id), device_id, value);
         }
     }
-}
-
-std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value)
-{
-    std::string title;
-    if (string_monitor_passthrough_) {
-        title = current_game_string_value;
-    } else {
-        title = string_monitor_mapping_[current_game_string_value];
-    }
-    // Apply vertical spacing.
-    if (string_monitor_vertical_spacing_ < 0) {
-        for (int i = 0; i > string_monitor_vertical_spacing_; --i) {
-            title = "\n" + title;
-        }
-    } else {
-        for (int i = 0; i < string_monitor_vertical_spacing_; ++i) {
-            title = title + "\n";
-        }
-    }
-    return title;
 }
 
 bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value)

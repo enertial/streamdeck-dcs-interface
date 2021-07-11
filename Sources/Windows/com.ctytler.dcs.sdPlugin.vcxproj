@@ -190,6 +190,7 @@
     <ClInclude Include="..\DcsInterface\DcsInterface.h" />
     <ClInclude Include="..\DcsInterface\DcsInterfaceParameters.h" />
     <ClInclude Include="..\StreamdeckContext\Monitors\ComparisonMonitor.h" />
+    <ClInclude Include="..\StreamdeckContext\Monitors\TitleMonitor.h" />
     <ClInclude Include="..\StreamdeckContext\StreamdeckContext.h" />
     <ClInclude Include="..\Utilities\Decimal.h" />
     <ClInclude Include="..\Utilities\StringUtilities.h" />
@@ -225,6 +226,7 @@
     <ClCompile Include="..\DcsInterface\DcsIdLookup.cpp" />
     <ClCompile Include="..\DcsInterface\DcsInterface.cpp" />
     <ClCompile Include="..\StreamdeckContext\Monitors\ComparisonMonitor.cpp" />
+    <ClCompile Include="..\StreamdeckContext\Monitors\TitleMonitor.cpp" />
     <ClCompile Include="..\StreamdeckContext\StreamdeckContext.cpp" />
     <ClCompile Include="..\Utilities\Decimal.cpp" />
     <ClCompile Include="..\Utilities\StringUtilities.cpp" />
