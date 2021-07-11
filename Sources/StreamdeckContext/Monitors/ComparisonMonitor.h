@@ -26,7 +26,7 @@ class ComparisonMonitor
      * @param dcs_interface Interface to request current game state from.
      * @return The Streamdeck context should be set to if all settings are filled.
      */
-    std::optional<int> determineContextState(DcsInterface &dcs_interface);
+    int determineContextState(DcsInterface &dcs_interface);
 
   private:
     enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };

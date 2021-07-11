@@ -36,8 +36,8 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
         }
     }
 
-    if (updated_state.has_value() && (updated_state.value() != current_state_)) {
-        current_state_ = updated_state.value();
+    if (updated_state != current_state_) {
+        current_state_ = updated_state;
         mConnectionManager->SetState(current_state_, context_);
     }
     if (updated_title != current_title_) {

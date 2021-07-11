@@ -32,7 +32,7 @@ void ComparisonMonitor::update_settings(const json &settings)
     }
 }
 
-std::optional<int> ComparisonMonitor::determineContextState(DcsInterface &dcs_interface)
+int ComparisonMonitor::determineContextState(DcsInterface &dcs_interface)
 {
     if (settings_are_filled_) {
         const auto maybe_current_game_value = dcs_interface.get_decimal_of_dcs_id(dcs_id_compare_monitor_);
@@ -40,7 +40,7 @@ std::optional<int> ComparisonMonitor::determineContextState(DcsInterface &dcs_in
             return comparison_is_satisfied(maybe_current_game_value.value()) ? 1 : 0;
         }
     }
-    return std::nullopt;
+    return 0;
 }
 
 bool ComparisonMonitor::comparison_is_satisfied(Decimal current_game_value)
