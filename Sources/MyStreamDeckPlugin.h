@@ -76,5 +76,5 @@ class MyStreamDeckPlugin : public ESDBasePlugin
     std::unordered_map<std::string, StreamdeckContext> mVisibleContexts = {};
 
     CallBackTimer *mTimer;
-    DcsInterface *dcs_interface_ = nullptr;
+    std::optional<DcsInterface> dcs_interface_ = std::nullopt;
 };

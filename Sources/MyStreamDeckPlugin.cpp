@@ -72,10 +72,6 @@ MyStreamDeckPlugin::~MyStreamDeckPlugin()
         delete mTimer;
         mTimer = nullptr;
     }
-    if (dcs_interface_ != nullptr) {
-        delete dcs_interface_;
-        dcs_interface_ = nullptr;
-    }
 }
 
 DcsConnectionSettings MyStreamDeckPlugin::get_connection_settings(const json &global_settings)
@@ -106,16 +102,15 @@ void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload)
     DcsConnectionSettings connection_settings = get_connection_settings(settings);
 
     // If settings have changed, close DcsInterface so it can be re-opened with new connection.
-    if (dcs_interface_ != nullptr && !dcs_interface_->connection_settings_match(connection_settings)) {
-        delete dcs_interface_;
-        dcs_interface_ = nullptr;
+    if (dcs_interface_ && !dcs_interface_.value().connection_settings_match(connection_settings)) {
+        dcs_interface_ = std::nullopt;
     }
 
     // Create first instance of DCS Interface only done under DidReceiveGlobalSettings to allow for any stored settings
     // to be used before binding socket to default port values.
-    if (dcs_interface_ == nullptr) {
+    if (!dcs_interface_.has_value()) {
         try {
-            dcs_interface_ = new DcsInterface(connection_settings);
+            dcs_interface_.emplace(connection_settings);
         } catch (const std::exception &e) {
             mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
         }
@@ -128,14 +123,14 @@ void MyStreamDeckPlugin::UpdateFromGameState()
     // Warning: UpdateFromGameState() is running in the timer thread
     //
 
-    if (dcs_interface_ != nullptr) {
+    if (dcs_interface_) {
         // Update the DCS game state in memory, then update each Streamdeck button context.
-        dcs_interface_->update_dcs_state();
+        dcs_interface_.value().update_dcs_state();
 
         if (mConnectionManager != nullptr) {
             mVisibleContextsMutex.lock();
             for (auto &elem : mVisibleContexts) {
-                elem.second.updateContextState(dcs_interface_, mConnectionManager);
+                elem.second.updateContextState(*dcs_interface_, mConnectionManager);
             }
             mVisibleContextsMutex.unlock();
         }
@@ -147,9 +142,9 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
                                           const json &inPayload,
                                           const std::string &inDeviceID)
 {
-    if (dcs_interface_ != nullptr) {
+    if (dcs_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KeyEvent::PRESSED, inAction, inPayload);
+        mVisibleContexts[inContext].handleButtonEvent(*dcs_interface_, KeyEvent::PRESSED, inAction, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -160,7 +155,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
                                         const std::string &inDeviceID)
 {
 
-    if (dcs_interface_ != nullptr) {
+    if (dcs_interface_) {
         mVisibleContextsMutex.lock();
         // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
         // context's state will keep the button state in sync with the plugin.
@@ -171,7 +166,7 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
         } else {
             mVisibleContexts[inContext].forceSendState(mConnectionManager);
         }
-        mVisibleContexts[inContext].handleButtonEvent(dcs_interface_, KeyEvent::RELEASED, inAction, inPayload);
+        mVisibleContexts[inContext].handleButtonEvent(*dcs_interface_, KeyEvent::RELEASED, inAction, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -186,7 +181,7 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
     mVisibleContexts[inContext] = StreamdeckContext(inContext, settings);
-    if (dcs_interface_ != nullptr) {
+    if (dcs_interface_) {
         mVisibleContexts[inContext].forceSendState(mConnectionManager);
     }
     mVisibleContextsMutex.unlock();
@@ -233,14 +228,14 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
     }
 
     if (event == "RequestDcsStateUpdate") {
-        if (dcs_interface_ == nullptr) {
+        if (!dcs_interface_) {
             mConnectionManager->SendToPropertyInspector(inAction,
                                                         inContext,
                                                         json({{"event", "DebugDcsGameState"},
                                                               {"current_game_state", ""},
                                                               {"error", "DcsInterface not connected"}}));
         } else {
-            const std::map<int, std::string> dcs_id_values = dcs_interface_->debug_get_current_game_state();
+            const std::map<int, std::string> dcs_id_values = dcs_interface_.value().debug_get_current_game_state();
             json current_game_state;
             for (const auto &[key, value] : dcs_id_values) {
                 current_game_state[std::to_string(key)] = value;

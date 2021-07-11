@@ -14,7 +14,7 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
     updateContextSettings(settings);
 }
 
-void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConnectionManager *mConnectionManager)
+void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
     // Initialize to default values.
     ContextState updated_state = ContextState::FIRST;
@@ -22,7 +22,7 @@ void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConne
 
     if (increment_monitor_is_set_) {
         const std::optional<Decimal> maybe_current_game_value =
-            dcs_interface->get_decimal_of_dcs_id(dcs_id_increment_monitor_);
+            dcs_interface.get_decimal_of_dcs_id(dcs_id_increment_monitor_);
         if (maybe_current_game_value.has_value()) {
             current_increment_value_ = maybe_current_game_value.value();
         }
@@ -30,14 +30,14 @@ void StreamdeckContext::updateContextState(DcsInterface *dcs_interface, ESDConne
 
     if (compare_monitor_is_set_) {
         const std::optional<Decimal> maybe_current_game_value =
-            dcs_interface->get_decimal_of_dcs_id(dcs_id_compare_monitor_);
+            dcs_interface.get_decimal_of_dcs_id(dcs_id_compare_monitor_);
         if (maybe_current_game_value.has_value()) {
             updated_state = determineStateForCompareMonitor(maybe_current_game_value.value());
         }
     }
     if (string_monitor_is_set_) {
         const std::optional<std::string> maybe_current_game_value =
-            dcs_interface->get_value_of_dcs_id(dcs_id_string_monitor_);
+            dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
         if (maybe_current_game_value.has_value()) {
             updated_title = determineTitleForStringMonitor(maybe_current_game_value.value());
         }
@@ -127,7 +127,7 @@ void StreamdeckContext::updateContextSettings(const json &settings)
     }
 }
 
-void StreamdeckContext::handleButtonEvent(DcsInterface *dcs_interface,
+void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
                                           const KeyEvent event,
                                           const std::string &action,
                                           const json &inPayload)
@@ -153,7 +153,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface *dcs_interface,
         }
 
         if (send_command) {
-            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, value);
+            dcs_interface.send_dcs_command(std::stoi(button_id), device_id, value);
         }
     }
 }
