@@ -270,7 +270,7 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
     if (event == "RequestIdLookup") {
         const std::string dcs_install_path = EPLJSONUtils::GetStringByName(inPayload, "dcs_install_path");
         const std::string module = EPLJSONUtils::GetStringByName(inPayload, "module");
-        json clickabledata_and_result = get_clickabledata(dcs_install_path, module, "extract_clickabledata.lua");
+        json clickabledata_and_result = get_clickabledata(dcs_install_path, module, "bin/extract_clickabledata.lua");
         const std::string lua_result = EPLJSONUtils::GetStringByName(clickabledata_and_result, "result");
         if (lua_result != "success") {
             mConnectionManager->LogMessage(module + " Clickabledata Result: " + lua_result);
