@@ -13,11 +13,15 @@ class UdpSocket
      * @brief Construct a new Dcs Socket object bound to the rx port and initializes the destination address using the
      * tx port if provided, or determines tx_port address dynamically if not.
      *
-     * @param tx_ip_address UDP transmit IP address.
+     * @param ip_address UDP receive/transmit IP address.
      * @param rx_port UDP receive port.
      * @param tx_port UDP transmit port, defaults to dynamic (use recvfrom address) if not provided.
+     * @param multicast_addr Address to join multicast group on, not set if no address provided.
      */
-    UdpSocket(const std::string &ip_address, const std::string &rx_port, const std::string &tx_port = "dynamic");
+    UdpSocket(const std::string &ip_address,
+              const std::string &rx_port,
+              const std::string &tx_port = "dynamic",
+              const std::string &multicast_addr = "");
 
     /**
      * @brief Destroy the Dcs Socket object
