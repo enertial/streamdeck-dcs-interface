@@ -25,7 +25,8 @@ TEST(UdpSocketTest, invalid_multicast_ip_addr)
 
 TEST(UdpSocketTest, multicast_port_builds)
 {
-    UdpSocket second_receiver_socket("0.0.0.0", "5010", "7778", "239.255.50.10");
+    // Test that no errors occur when connecting to multicast group.
+    UdpSocket multicast_subscriber_socket("0.0.0.0", "5010", "7778", "239.255.50.10");
 }
 
 class UdpSocketTestFixture : public ::testing::Test
@@ -40,7 +41,6 @@ class UdpSocketTestFixture : public ::testing::Test
     UdpSocket receiver_socket;
     static inline std::string common_port = "1789";
     static inline std::string ip_address = "127.0.0.1";
-    // static inline std::string ip_address = "239.255.50.10";
 };
 
 TEST_F(UdpSocketTestFixture, send_and_receive)

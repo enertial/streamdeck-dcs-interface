@@ -80,7 +80,7 @@ UdpSocket::UdpSocket(const std::string &ip_address,
         ip_mreq mreq;
         const std::wstring multicast_addr_L = std::wstring(multicast_addr.begin(), multicast_addr.end());
         InetPton(AF_INET, multicast_addr_L.c_str(), &mreq.imr_multiaddr.s_addr);
-        mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+        mreq.imr_interface.s_addr = htonl(std::stoi(ip_address));
         result = setsockopt(socket_id_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mreq, sizeof(mreq));
         if (result != 0) {
             const std::string error_msg = "Failure in setting Multicast membership in socket options -- WSA Error: " +
