@@ -9,7 +9,6 @@ TitleMonitor::TitleMonitor(const json &settings) { update_settings(settings); }
 
 void TitleMonitor::update_settings(const json &settings)
 {
-
     const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
     // Set boolean from checkbox using default false value if it doesn't exist in "settings".
     const std::string string_monitor_vertical_spacing_raw =

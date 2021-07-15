@@ -76,7 +76,7 @@ class StreamdeckContextTestFixture : public ::testing::Test
     static inline std::string fixture_context_id = "abc123";
 };
 
-TEST_F(StreamdeckContextTestFixture, update_context_state_dcs_id_compare)
+TEST_F(StreamdeckContextTestFixture, UseComparisonMonitor)
 {
     // Create StreamdeckContext initialized with settings to test.
     const std::string context_id = "def456";
@@ -89,7 +89,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_dcs_id_compare)
     EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 
-TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_passthrough)
+TEST_F(StreamdeckContextTestFixture, UseTitleMonitor)
 {
     // Create StreamdeckContext initialized with settings to test.
     const std::string context_id = "def456";
@@ -100,67 +100,7 @@ TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_passthr
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
 }
 
-TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_vertical_spacing_positive)
-{
-    // Create StreamdeckContext initialized with settings to test.
-    const std::string context_id = "def456";
-    const json settings = {{"dcs_id_string_monitor", "2026"},
-                           {"string_monitor_vertical_spacing", "2"},
-                           {"string_monitor_passthrough_check", true}};
-    StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, context_id);
-    EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR\n\n");
-}
-
-TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_vertical_spacing_negative)
-{
-    // Create StreamdeckContext initialized with settings to test.
-    const std::string context_id = "def456";
-    const json settings = {{"dcs_id_string_monitor", "2026"},
-                           {"string_monitor_vertical_spacing", "-4"},
-                           {"string_monitor_passthrough_check", true}};
-    StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, context_id);
-    EXPECT_EQ(esd_connection_manager.title_, "\n\n\n\nTEXT_STR");
-}
-
-TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping)
-{
-    // Create StreamdeckContext initialized with settings to test.
-    const std::string context_id = "def456";
-    const json settings = {{"dcs_id_string_monitor", "2027"},
-                           {"string_monitor_passthrough_check", false},
-                           {"string_monitor_mapping", "0.0=A,0.1=B,0.2=C"}};
-    StreamdeckContext fixture_context(context_id, settings);
-    fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, context_id);
-    EXPECT_EQ(esd_connection_manager.title_, "B");
-}
-
-TEST_F(StreamdeckContextTestFixture, update_context_state_string_monitor_mapping_unknown_key)
-{
-    // Create StreamdeckContext initialized with settings to test.
-    const std::string context_id = "def456";
-    const json settings = {{"dcs_id_string_monitor", "2027"},
-                           {"string_monitor_passthrough_check", false},
-                           {"string_monitor_mapping", "0.0=A,0.1=B,0.2=C"}};
-    StreamdeckContext test_context(context_id, settings);
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, context_id);
-    EXPECT_EQ(esd_connection_manager.title_, "B");
-
-    // Test -- Check that an empty title string is sent when an unmapped key is received from game.
-    std::string new_mock_dcs_message = "header*2027=0.6";
-    mock_dcs.send(new_mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    test_context.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, context_id);
-    EXPECT_EQ(esd_connection_manager.title_, "");
-}
-
-TEST_F(StreamdeckContextTestFixture, update_context_settings)
+TEST_F(StreamdeckContextTestFixture, UpdateContextSettings)
 {
     // Test 1 -- With no settings defined, streamdeck context should not send update.
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
@@ -188,30 +128,6 @@ TEST_F(StreamdeckContextTestFixture, update_context_settings)
     EXPECT_EQ(esd_connection_manager.context_, fixture_context_id);
     EXPECT_EQ(esd_connection_manager.state_, 0);
     EXPECT_EQ(esd_connection_manager.title_, "");
-}
-
-TEST_F(StreamdeckContextTestFixture, ComparisonMonitorSetsState)
-{
-    constexpr int comparison_value = 10;
-    StreamdeckContext context_with_equals{"ctx_equals",
-                                          {{"dcs_id_compare_monitor", "123"},
-                                           {"dcs_id_compare_condition", "EQUAL_TO"},
-                                           {"dcs_id_comparison_value", std::to_string(comparison_value)}}};
-
-    esd_connection_manager.clear_buffer();
-    context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
-
-    // Test -- Compare value equal to comparison_value.
-    const std::string mock_dcs_message = "header*123=" + std::to_string(comparison_value);
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-
-    esd_connection_manager.clear_buffer();
-    context_with_equals.updateContextState(dcs_interface, &esd_connection_manager);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
-    EXPECT_EQ(esd_connection_manager.state_, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, force_send_state_update)
