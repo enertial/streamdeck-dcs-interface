@@ -7,207 +7,182 @@
 namespace test
 {
 
-/* COMMENTED OUT - ENABLE BEFORE LANDING
-
-class ComparisonTestFixture : public ::testing::Test
+class ComparisonMonitorTestFixture : public ::testing::Test
 {
   public:
-    ComparisonTestFixture()
+    ComparisonMonitorTestFixture()
         : // Create StreamdeckContexts with different comparison selections to test.
-          monitor_with_equals({{"dcs_id_compare_monitor", "123"},
+          context_with_equals({{"dcs_id_compare_monitor", "123"},
                                {"dcs_id_compare_condition", "EQUAL_TO"},
                                {"dcs_id_comparison_value", std::to_string(comparison_value)}}),
-          monitor_with_less_than({{"dcs_id_compare_monitor", "123"},
+          context_with_less_than({{"dcs_id_compare_monitor", "123"},
                                   {"dcs_id_compare_condition", "LESS_THAN"},
                                   {"dcs_id_comparison_value", std::to_string(comparison_value)}}),
-          monitor_with_greater_than({{"dcs_id_compare_monitor", "123"},
+          context_with_greater_than({{"dcs_id_compare_monitor", "123"},
                                      {"dcs_id_compare_condition", "GREATER_THAN"},
-                                     {"dcs_id_comparison_value", std::to_string(comparison_value)}})
+                                     {"dcs_id_comparison_value", std::to_string(comparison_value)}}),
+          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
+          dcs_interface(connection_settings)
     {
+        // Consume intial reset command sent to to mock_dcs.
+        (void)mock_dcs.receive();
     }
 
-    const float comparison_value = 1.56F;
-    ComparisonMonitor monitor_with_equals;
-    ComparisonMonitor monitor_with_less_than;
-    ComparisonMonitor monitor_with_greater_than;
+    void set_current_dcs_id_value(const std::string value)
+    {
+        mock_dcs.send("header*123=" + value);
+        dcs_interface.update_dcs_state();
+    }
+
+    const double comparison_value = 1.56;
+    ComparisonMonitor context_with_equals;
+    ComparisonMonitor context_with_less_than;
+    ComparisonMonitor context_with_greater_than;
+    DcsConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
+    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface; // DCS Interface to test.
 };
 
-
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_zero)
+TEST_F(ComparisonMonitorTestFixture, CompareToZero)
 {
-    // Test -- Compare 0 to non-zero comparison_value.
-    const std::string mock_dcs_message = "header*123=0";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
+    // Zero compared to positive reference settings value.
+    set_current_dcs_id_value("0");
+    ASSERT_GT(comparison_value, 0);
 
-    ComparisonMonitor::ContextState state;
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_equals.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_less_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
-    EXPECT_EQ(esd_connection_manager.state_, 1);
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(1, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_lesser_value)
+TEST_F(ComparisonMonitorTestFixture, CompareToNegativeValue)
 {
-    // Test -- Compare value less than comparison_value.
-    const std::string mock_dcs_message = "header*123=" + std::to_string(comparison_value / 2.0F);
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
+    // Received value is less than reference settings value.
+    set_current_dcs_id_value(std::to_string(-1 * comparison_value));
+    ASSERT_GT(comparison_value, 0);
 
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_equals.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_less_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_less_than");
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(1, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_equal_value)
+TEST_F(ComparisonMonitorTestFixture, CompareToLesserPositiveValue)
 {
-    // Test -- Compare value equal to comparison_value.
-    const std::string mock_dcs_message = "header*123=" + std::to_string(comparison_value);
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
+    // Received value is less than reference settings value.
+    set_current_dcs_id_value(std::to_string(comparison_value / 2.0));
 
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_equals.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_equals");
-    EXPECT_EQ(esd_connection_manager.state_, 1);
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_less_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(1, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_greater_value)
+TEST_F(ComparisonMonitorTestFixture, CompareToEqualValue)
 {
-    // Test -- Compare value greater than comparison_value.
-    const std::string mock_dcs_message = "header*123=" + std::to_string(comparison_value * 2.0F);
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
+    // Received value is equal to to reference settings value.
+    set_current_dcs_id_value(std::to_string(comparison_value));
 
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_equals.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
-    EXPECT_EQ(esd_connection_manager.state_, 0);
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_less_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "");
-    esd_connection_manager.clear_buffer();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.context_, "ctx_greater_than");
-    EXPECT_EQ(esd_connection_manager.state_, 1);
+    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+}
+
+TEST_F(ComparisonMonitorTestFixture, CompareToGreaterValue)
+{
+    // Received value is less than reference settings value.
+    set_current_dcs_id_value(std::to_string(comparison_value * 2.0));
+
+    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_greater_than.determineContextState(dcs_interface));
+}
+
+TEST_F(ComparisonMonitorTestFixture, UpdateSettings)
+{
+    // Zero compared to positive reference settings value.
+    const std::string modified_reference = "99";
+    set_current_dcs_id_value(modified_reference);
+
+    // Verify initial settings show equal comparison not satisfied.
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+
+    // Modify settings
+    const json modified_settings = {{"dcs_id_compare_monitor", "123"},
+                                    {"dcs_id_compare_condition", "EQUAL_TO"},
+                                    {"dcs_id_comparison_value", modified_reference}};
+    context_with_equals.update_settings(modified_settings);
+
+    // Verify modified settings show equal comparison IS satisfied.
+    EXPECT_EQ(1, context_with_equals.determineContextState(dcs_interface));
 }
 
 // Test comparison to invalid values.
 
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_integer)
+TEST_F(ComparisonMonitorTestFixture, CompareFloatToInt)
 {
-    // Send game state value as an integer -- should still resolve to float comparison.
-    const std::string mock_dcs_message = "header*123=20";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 1);
+    // Received int value is appropriately compared to a floating point reference.
+    set_current_dcs_id_value("20");
+    ASSERT_GT(20, comparison_value);
+
+    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_greater_than.determineContextState(dcs_interface));
 }
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_alphanumeric)
+
+TEST_F(ComparisonMonitorTestFixture, CompareToAlphaNumeric)
 {
     // Send game state value with letters -- should treat as string and not try comparison.
-    const std::string mock_dcs_message = "header*123=20a";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    set_current_dcs_id_value("20a");
+    ASSERT_GT(20, comparison_value);
+
+    // Expect default state (0) returned.
+    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_empty)
+
+TEST_F(ComparisonMonitorTestFixture, CompareToEmptyString)
 {
-    // Send game state as empty -- should treat as string and not try comparison.
-    const std::string mock_dcs_message = "header*123=";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    // Send game state value with letters -- should treat as string and not try comparison.
+    set_current_dcs_id_value("");
+
+    // Expect default state (0) returned.
+    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_string_of_spaces)
+
+TEST_F(ComparisonMonitorTestFixture, CompareToNumberWithSpacesPadding)
 {
-    // Send game state value as string of spaces -- should treat as (non-numeric) string and not try comparison.
-    const std::string mock_dcs_message = "header*123=    ";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    // Send game state value with letters -- should treat as string and not try comparison.
+    set_current_dcs_id_value("  " + std::to_string(comparison_value) + "  ");
+
+    // Expect default state (0) returned.
+    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_dcs_id_float)
-{
-    // Send DCS ID as a float -- should not read update.
-    const std::string mock_dcs_message = "header*123.0=2.0";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
-}
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_with_settings_id_as_float)
+
+TEST_F(ComparisonMonitorTestFixture, CompareWithInvalidDcsID)
 {
     // Send valid game state, but make settings dcs_id monitor value invalid as a float.
-    json settings;
-    settings["dcs_id_compare_monitor"] = "123.0";
-    state = monitor_with_greater_than.updateContextSettings(settings);
-    const std::string mock_dcs_message = "header*123=2.0";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    ComparisonMonitor context_with_flot_id{json{{"dcs_id_compare_monitor", "123.0"},
+                                                {"dcs_id_compare_condition", "EQUAL_TO"},
+                                                {"dcs_id_comparison_value", std::to_string(comparison_value)}}};
+
+    set_current_dcs_id_value(std::to_string(comparison_value));
+    // Expect default state (0) returned.
+    EXPECT_EQ(0, context_with_flot_id.determineContextState(dcs_interface));
 }
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_with_invalid_settings_comparison_value)
+
+TEST_F(ComparisonMonitorTestFixture, InvalidComparisonValueSetting)
 {
-    // Send valid game state, but make settings comparison value invalid as a float.
-    json settings;
-    settings["dcs_id_compare_monitor"] = "123";
-    settings["dcs_id_comparison_value"] = "1.0abc";
-    state = monitor_with_greater_than.updateContextSettings(settings);
-    const std::string mock_dcs_message = "header*123=2.0";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 0);
+    // Send valid game state, but make settings dcs_id monitor value invalid as a float.
+    const ComparisonMonitor context_with_flot_id{json{{"dcs_id_compare_monitor", "123"},
+                                                      {"dcs_id_compare_condition", "EQUAL_TO"},
+                                                      {"dcs_id_comparison_value", "1.0abc"}}};
+
+    set_current_dcs_id_value(std::to_string(comparison_value));
+    // Expect default state (0) returned.
+    EXPECT_EQ(0, context_with_flot_id.determineContextState(dcs_interface));
 }
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_float_with_leading_spaces)
-{
-    // Use leading spaces, zeros, and integers -- should be compared as floats without problem.
-    json settings;
-    settings["dcs_id_compare_monitor"] = "  00123";
-    settings["dcs_id_comparison_value"] = "  0001.00";
-    state = monitor_with_greater_than.updateContextSettings(settings);
-    const std::string mock_dcs_message = "header*123=   002";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 1);
-}
-TEST_F(ComparisonTestFixture, dcs_id_float_compare_to_float_with_trailing_space)
-{
-    json settings;
-    settings["dcs_id_compare_monitor"] = "123";
-    settings["dcs_id_comparison_value"] = "1.0 "; //< Trailing space
-    state = monitor_with_greater_than.updateContextSettings(settings);
-    const std::string mock_dcs_message = "header*123=2.0";
-    mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
-    state = monitor_with_greater_than.determineContextState(&dcs_interface);
-    EXPECT_EQ(esd_connection_manager.state_, 1);
-}
-*/
 
 } // namespace test

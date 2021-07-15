@@ -26,7 +26,7 @@ class ComparisonMonitor
      * @param dcs_interface Interface to request current game state from.
      * @return The Streamdeck context should be set to if all settings are filled.
      */
-    int determineContextState(DcsInterface &dcs_interface);
+    int determineContextState(DcsInterface &dcs_interface) const;
 
   private:
     enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };
@@ -36,7 +36,7 @@ class ComparisonMonitor
      *
      * @param current_game_value
      */
-    bool comparison_is_satisfied(Decimal current_game_value);
+    bool comparison_is_satisfied(Decimal current_game_value) const;
 
     // Status of user-filled fields.
     bool settings_are_filled_ = false; // True if all DCS ID comparison monitor settings have been set.
