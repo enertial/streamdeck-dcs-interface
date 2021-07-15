@@ -37,12 +37,16 @@ Decimal IncrementMonitor::get_increment_after_command(const Decimal &delta_cmd,
                                                       const Decimal &increment_max,
                                                       const bool cycling_is_allowed)
 {
-    current_increment_value_ += delta_cmd;
+    if (increment_monitor_is_set_) {
+        current_increment_value_ += delta_cmd;
 
-    if (current_increment_value_ < increment_min) {
-        current_increment_value_ = cycling_is_allowed ? increment_max : increment_min;
-    } else if (current_increment_value_ > increment_max) {
-        current_increment_value_ = cycling_is_allowed ? increment_min : increment_max;
+        if (current_increment_value_ < increment_min) {
+            current_increment_value_ = cycling_is_allowed ? increment_max : increment_min;
+        } else if (current_increment_value_ > increment_max) {
+            current_increment_value_ = cycling_is_allowed ? increment_min : increment_max;
+        }
+        return current_increment_value_;
+    } else {
+        return Decimal("0");
     }
-    return current_increment_value_;
 }
