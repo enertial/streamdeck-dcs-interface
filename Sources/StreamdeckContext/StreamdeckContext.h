@@ -3,9 +3,9 @@
 #pragma once
 
 #include "../DcsInterface/DcsInterface.h"
-#include "../Utilities/Decimal.h"
 #include "../Utilities/StringUtilities.h"
 #include "Monitors/ComparisonMonitor.h"
+#include "Monitors/IncrementMonitor.h"
 #include "Monitors/TitleMonitor.h"
 
 #ifndef UNIT_TEST
@@ -87,21 +87,14 @@ class StreamdeckContext
     // Monitors.
     ComparisonMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
     TitleMonitor title_monitor_{};           // Monitors DCS ID to determine the title text of Streamdeck context.
-
-    // Status of user-filled fields.
-    bool increment_monitor_is_set_ = false; // True if a DCS ID increment monitor setting has been set.
+    IncrementMonitor increment_monitor_{};   // Monitors DCS ID to determine the state of an incremental switch.
 
     // Optional settings.
     std::optional<int> delay_for_force_send_state_; // When populated, requests a force send of state to Streamdeck
                                                     // after counting down the stored delay value.
 
     // Context state.
-    int current_state_ = 0;                    // Stored state of the context.
-    std::string current_title_ = "";           // Stored title of the context.
-    Decimal current_increment_value_;          // Stored value for increment button types.
-    bool cycle_increments_is_allowed_ = false; // Flag set by user settings for increment button types.
-    bool disable_release_value_ = false;       // Flag set by user settings for momentary button types.
-
-    // Stored settings extracted from user-filled fields.
-    int dcs_id_increment_monitor_ = 0; // DCS ID to monitor for updating current increment value from game state.
+    int current_state_ = 0;              // Stored state of the context.
+    std::string current_title_ = "";     // Stored title of the context.
+    bool disable_release_value_ = false; // Flag set by user settings for momentary button types.
 };
