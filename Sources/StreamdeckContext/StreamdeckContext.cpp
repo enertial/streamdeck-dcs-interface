@@ -6,46 +6,23 @@
 
 #include "../Common/EPLJSONUtils.h"
 
-StreamdeckContext::StreamdeckContext(const std::string &context) { context_ = context; }
+StreamdeckContext::StreamdeckContext(const std::string &context) : context_{context} {};
 
-StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings)
+StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings) : context_{context}
 {
-    context_ = context;
     updateContextSettings(settings);
 }
 
 void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
-    // Initialize to default values.
-    ContextState updated_state = ContextState::FIRST;
-    std::string updated_title = "";
 
-    if (increment_monitor_is_set_) {
-        const std::optional<Decimal> maybe_current_game_value =
-            dcs_interface.get_decimal_of_dcs_id(dcs_id_increment_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            current_increment_value_ = maybe_current_game_value.value();
-        }
-    }
-
-    if (compare_monitor_is_set_) {
-        const std::optional<Decimal> maybe_current_game_value =
-            dcs_interface.get_decimal_of_dcs_id(dcs_id_compare_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            updated_state = determineStateForCompareMonitor(maybe_current_game_value.value());
-        }
-    }
-    if (string_monitor_is_set_) {
-        const std::optional<std::string> maybe_current_game_value =
-            dcs_interface.get_value_of_dcs_id(dcs_id_string_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            updated_title = determineTitleForStringMonitor(maybe_current_game_value.value());
-        }
-    }
+    const auto updated_state = comparison_monitor_.determineContextState(dcs_interface);
+    const auto updated_title = title_monitor_.determineTitle(dcs_interface);
+    increment_monitor_.update(dcs_interface);
 
     if (updated_state != current_state_) {
         current_state_ = updated_state;
-        mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+        mConnectionManager->SetState(current_state_, context_);
     }
     if (updated_title != current_title_) {
         current_title_ = updated_title;
@@ -54,7 +31,7 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
 
     if (delay_for_force_send_state_) {
         if (delay_for_force_send_state_.value()-- <= 0) {
-            mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+            mConnectionManager->SetState(current_state_, context_);
             delay_for_force_send_state_.reset();
         }
     }
@@ -62,7 +39,7 @@ void StreamdeckContext::updateContextState(DcsInterface &dcs_interface, ESDConne
 
 void StreamdeckContext::forceSendState(ESDConnectionManager *mConnectionManager)
 {
-    mConnectionManager->SetState(static_cast<int>(current_state_), context_);
+    mConnectionManager->SetState(current_state_, context_);
 }
 
 void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
@@ -72,59 +49,9 @@ void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
 
 void StreamdeckContext::updateContextSettings(const json &settings)
 {
-    // Read in settings.
-    const std::string dcs_id_increment_monitor_raw =
-        EPLJSONUtils::GetStringByName(settings, "dcs_id_increment_monitor");
-    const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
-    const std::string dcs_id_compare_condition_raw =
-        EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
-    const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
-    const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
-    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
-    const std::string string_monitor_vertical_spacing_raw =
-        EPLJSONUtils::GetStringByName(settings, "string_monitor_vertical_spacing");
-    string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
-    std::stringstream string_monitor_mapping_raw;
-    string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
-
-    // Process status of settings.
-    increment_monitor_is_set_ = is_integer(dcs_id_increment_monitor_raw);
-    const bool compare_monitor_is_populated = is_integer(dcs_id_compare_monitor_raw);
-    const bool comparison_value_is_populated = is_number(dcs_id_comparison_value_raw);
-    compare_monitor_is_set_ = compare_monitor_is_populated && comparison_value_is_populated;
-    string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
-
-    // Update internal settings of class instance.
-    if (increment_monitor_is_set_) {
-        dcs_id_increment_monitor_ = std::stoi(dcs_id_increment_monitor_raw);
-    }
-
-    if (compare_monitor_is_set_) {
-        dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
-        dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);
-        if (dcs_id_compare_condition_raw == "EQUAL_TO") {
-            dcs_id_compare_condition_ = Comparison::EQUAL_TO;
-        } else if (dcs_id_compare_condition_raw == "LESS_THAN") {
-            dcs_id_compare_condition_ = Comparison::LESS_THAN;
-        } else // Default in Property Inspector html is GREATER_THAN.
-        {
-            dcs_id_compare_condition_ = Comparison::GREATER_THAN;
-        }
-    }
-
-    if (string_monitor_is_set_) {
-        dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
-        if (is_integer(string_monitor_vertical_spacing_raw)) {
-            string_monitor_vertical_spacing_ = std::stoi(string_monitor_vertical_spacing_raw);
-        }
-        if (!string_monitor_passthrough_) {
-            string_monitor_mapping_.clear();
-            std::pair<std::string, std::string> key_and_value;
-            while (pop_key_and_value(string_monitor_mapping_raw, ',', '=', key_and_value)) {
-                string_monitor_mapping_[key_and_value.first] = key_and_value.second;
-            }
-        }
-    }
+    comparison_monitor_.update_settings(settings);
+    title_monitor_.update_settings(settings);
+    increment_monitor_.update_settings(settings);
 }
 
 void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
@@ -135,16 +62,11 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
     const std::string button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
 
-    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
-    cycle_increments_is_allowed_ =
-        EPLJSONUtils::GetBoolByName(inPayload["settings"], "increment_cycle_allowed_check", false);
-
     if (is_integer(button_id) && is_integer(device_id)) {
         bool send_command = false;
         std::string value = "";
         if (action.find("switch") != std::string::npos) {
-            const ContextState state =
-                EPLJSONUtils::GetIntByName(inPayload, "state") == 0 ? ContextState::FIRST : ContextState::SECOND;
+            const int state = EPLJSONUtils::GetIntByName(inPayload, "state");
             send_command = determineSendValueForSwitch(event, state, inPayload["settings"], value);
         } else if (action.find("increment") != std::string::npos) {
             send_command = determineSendValueForIncrement(event, inPayload["settings"], value);
@@ -158,45 +80,7 @@ void StreamdeckContext::handleButtonEvent(DcsInterface &dcs_interface,
     }
 }
 
-StreamdeckContext::ContextState StreamdeckContext::determineStateForCompareMonitor(const Decimal &current_game_value)
-{
-    bool set_context_state_to_second = false;
-    switch (dcs_id_compare_condition_) {
-    case Comparison::EQUAL_TO:
-        set_context_state_to_second = (current_game_value == dcs_id_comparison_value_);
-        break;
-    case Comparison::LESS_THAN:
-        set_context_state_to_second = (current_game_value < dcs_id_comparison_value_);
-        break;
-    case Comparison::GREATER_THAN:
-        set_context_state_to_second = (current_game_value > dcs_id_comparison_value_);
-        break;
-    }
-
-    return set_context_state_to_second ? ContextState::SECOND : ContextState::FIRST;
-}
-
-std::string StreamdeckContext::determineTitleForStringMonitor(const std::string &current_game_string_value)
-{
-    std::string title;
-    if (string_monitor_passthrough_) {
-        title = current_game_string_value;
-    } else {
-        title = string_monitor_mapping_[current_game_string_value];
-    }
-    // Apply vertical spacing.
-    if (string_monitor_vertical_spacing_ < 0) {
-        for (int i = 0; i > string_monitor_vertical_spacing_; --i) {
-            title = "\n" + title;
-        }
-    } else {
-        for (int i = 0; i < string_monitor_vertical_spacing_; ++i) {
-            title = title + "\n";
-        }
-    }
-    return title;
-}
-
+// TODO: Change determineSend... functions to return an optional rather than a mutable value argument.
 bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value)
 {
     if (event == KeyEvent::PRESSED) {
@@ -211,12 +95,12 @@ bool StreamdeckContext::determineSendValueForMomentary(const KeyEvent event, con
 }
 
 bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
-                                                    const ContextState state,
+                                                    const int state,
                                                     const json &settings,
                                                     std::string &value)
 {
     if (event == KeyEvent::RELEASED) {
-        if (state == ContextState::FIRST) {
+        if (state == 0) {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
         } else {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_second_state_value");
@@ -233,22 +117,17 @@ bool StreamdeckContext::determineSendValueForSwitch(const KeyEvent event,
 bool StreamdeckContext::determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value)
 {
     if (event == KeyEvent::PRESSED) {
-        const std::string increment_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
+        const std::string increment_cmd_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
         const std::string increment_min_str = EPLJSONUtils::GetStringByName(settings, "increment_min");
         const std::string increment_max_str = EPLJSONUtils::GetStringByName(settings, "increment_max");
         const bool cycling_is_allowed = EPLJSONUtils::GetBoolByName(settings, "increment_cycle_allowed_check");
-        if (is_number(increment_value_str) && is_number(increment_min_str) && is_number(increment_max_str)) {
-            Decimal increment_min(increment_min_str);
-            Decimal increment_max(increment_max_str);
 
-            current_increment_value_ += Decimal(increment_value_str);
-
-            if (current_increment_value_ < increment_min) {
-                current_increment_value_ = cycle_increments_is_allowed_ ? increment_max : increment_min;
-            } else if (current_increment_value_ > increment_max) {
-                current_increment_value_ = cycle_increments_is_allowed_ ? increment_min : increment_max;
-            }
-            value = current_increment_value_.str();
+        if (is_number(increment_cmd_value_str) && is_number(increment_min_str) && is_number(increment_max_str)) {
+            const auto current_value = increment_monitor_.get_increment_after_command(Decimal(increment_cmd_value_str),
+                                                                                      Decimal(increment_min_str),
+                                                                                      Decimal(increment_max_str),
+                                                                                      cycling_is_allowed);
+            value = current_value.str();
             return true;
         }
     }
