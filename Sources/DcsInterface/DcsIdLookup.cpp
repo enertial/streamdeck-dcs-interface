@@ -56,14 +56,16 @@ json get_clickabledata(const std::string &dcs_install_path,
     const int lua_stack_size = lua_gettop(lua_state);
     const int file_status = luaL_loadfile(lua_state, lua_script.c_str());
     if (file_status != 0) {
+        clickabledata_and_result["result"] =
+            "Lua file load error (" + std::to_string(file_status) + "): " + lua_tostring(lua_state, -1);
         lua_close(lua_state);
-        clickabledata_and_result["result"] = "Lua file load error: " + std::to_string(file_status);
         return clickabledata_and_result;
     }
     const int script_status = lua_pcall(lua_state, 0, LUA_MULTRET, 0);
     if (script_status != 0) {
+        clickabledata_and_result["result"] =
+            "Lua script runtime error (" + std::to_string(script_status) + "): " + lua_tostring(lua_state, -1);
         lua_close(lua_state);
-        clickabledata_and_result["result"] = "Lua script runtime error: " + std::to_string(script_status);
         return clickabledata_and_result;
     }
 

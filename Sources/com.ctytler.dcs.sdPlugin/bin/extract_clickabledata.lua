@@ -147,8 +147,12 @@ function load_module(module_name)
 
 	script_to_run = loadfile(LockOn_Options.script_path.."clickabledata.lua")
 	if script_to_run == nil then
+		failed_script_path = LockOn_Options.script_path
 		LockOn_Options.script_path = LockOn_Options.script_path..[[Scripts\]]
 		script_to_run = loadfile(LockOn_Options.script_path.."clickabledata.lua")
+		if script_to_run == nil then
+			error("Could not find clickabledata.lua from "..failed_script_path.." or "..LockOn_Options.script_path.." (or file found but contains syntax errors)", 2)
+		end
 	end
 
 	script_to_run()
