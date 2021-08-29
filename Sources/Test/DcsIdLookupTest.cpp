@@ -21,7 +21,8 @@ TEST(DcsIdLookupTest, nonexistant_lua_file)
     // Test that a bad path will return an empty json container.
     const std::string lua_script = "non-existant-file.lua";
     json returned_values = get_clickabledata("path", "module", lua_script);
-    EXPECT_EQ("Lua file load error: 6", EPLJSONUtils::GetStringByName(returned_values, "result"));
+    EXPECT_EQ("Lua file load error (6): cannot open non-existant-file.lua: No such file or directory",
+              EPLJSONUtils::GetStringByName(returned_values, "result"));
     EXPECT_EQ(0, returned_values["clickabledata_items"].size());
 }
 
