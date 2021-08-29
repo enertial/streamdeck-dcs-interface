@@ -11,7 +11,10 @@
 // Set default timeout for socket.
 DWORD socket_timeout_ms = 100;
 
-UdpSocket::UdpSocket(const std::string &ip_address, const std::string &rx_port, const std::string &tx_port)
+UdpSocket::UdpSocket(const std::string &ip_address,
+                     const std::string &rx_port,
+                     const std::string &tx_port,
+                     const std::string &multicast_addr)
 {
     // Detect any missing input settings.
     if (rx_port.empty() || tx_port.empty() || ip_address.empty()) {
@@ -38,8 +41,8 @@ UdpSocket::UdpSocket(const std::string &ip_address, const std::string &rx_port, 
 
     // Define local receive port.
     addrinfo *local_port;
-    const auto getaddr_result = getaddrinfo(ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
-    if (getaddr_result != 0) {
+    auto result = getaddrinfo(ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
+    if (result != 0) {
         const std::string error_msg = "Could not get valid address info from requested IP: " + ip_address +
                                       " Rx_Port: " + rx_port + " Tx_Port: " + tx_port +
                                       " -- WSA Error: " + std::to_string(WSAGetLastError());
@@ -47,18 +50,44 @@ UdpSocket::UdpSocket(const std::string &ip_address, const std::string &rx_port, 
         throw std::runtime_error(error_msg);
     }
 
-    // Bind local socket to receive port.
     socket_id_ = socket(local_port->ai_family, local_port->ai_socktype, local_port->ai_protocol);
-    setsockopt(socket_id_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&socket_timeout_ms, sizeof(socket_timeout_ms));
-    const auto bind_result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
-    freeaddrinfo(local_port);
 
-    if (bind_result == SOCKET_ERROR) {
+    // Socket options: allow reuse of address, and set timeout.
+    const u_int yes = 1;
+    result = setsockopt(socket_id_, SOL_SOCKET, SO_REUSEADDR, (const char *)&yes, sizeof(yes));
+    result =
+        result ||
+        setsockopt(socket_id_, SOL_SOCKET, SO_RCVTIMEO, (const char *)&socket_timeout_ms, sizeof(socket_timeout_ms));
+    if (result != 0) {
+        const std::string error_msg =
+            "Failure in setting socket options -- WSA Error: " + std::to_string(WSAGetLastError());
+        WSACleanup();
+        throw std::runtime_error(error_msg);
+    }
+
+    // Bind local socket to receive port.
+    result = bind(socket_id_, local_port->ai_addr, static_cast<int>(local_port->ai_addrlen));
+    freeaddrinfo(local_port);
+    if (result != 0) {
         const std::string error_msg =
             "Could not bind UDP address to socket -- WSA Error: " + std::to_string(WSAGetLastError());
         closesocket(socket_id_);
         WSACleanup();
         throw std::runtime_error(error_msg);
+    }
+
+    if (!multicast_addr.empty()) {
+        ip_mreq mreq;
+        const std::wstring multicast_addr_L = std::wstring(multicast_addr.begin(), multicast_addr.end());
+        InetPton(AF_INET, multicast_addr_L.c_str(), &mreq.imr_multiaddr.s_addr);
+        mreq.imr_interface.s_addr = htonl(std::stoi(ip_address));
+        result = setsockopt(socket_id_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mreq, sizeof(mreq));
+        if (result != 0) {
+            const std::string error_msg = "Failure in setting Multicast membership in socket options -- WSA Error: " +
+                                          std::to_string(WSAGetLastError());
+            WSACleanup();
+            throw std::runtime_error(error_msg);
+        }
     }
 
     if (tx_port != "dynamic") {

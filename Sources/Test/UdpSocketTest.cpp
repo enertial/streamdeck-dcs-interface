@@ -18,6 +18,17 @@ TEST(UdpSocketTest, invalid_connection_ip_addr_settings)
     EXPECT_THROW(UdpSocket dcs_socket("127001", "1908", "1909"), std::runtime_error);
 }
 
+TEST(UdpSocketTest, invalid_multicast_ip_addr)
+{
+    EXPECT_THROW(UdpSocket second_receiver_socket("0.0.0.0", "5015", "7778", "23813222"), std::runtime_error);
+}
+
+TEST(UdpSocketTest, multicast_port_builds)
+{
+    // Test that no errors occur when connecting to multicast group.
+    UdpSocket multicast_subscriber_socket("0.0.0.0", "5010", "7778", "239.255.50.10");
+}
+
 class UdpSocketTestFixture : public ::testing::Test
 {
   public:
@@ -38,12 +49,6 @@ TEST_F(UdpSocketTestFixture, send_and_receive)
     sender_socket.send(test_message);
     std::stringstream ss_received = receiver_socket.receive();
     EXPECT_EQ(ss_received.str(), test_message);
-}
-
-TEST_F(UdpSocketTestFixture, unavailable_port_bind)
-{
-    // Expect exception thrown if try to bind a new socket to same rx_port.
-    EXPECT_THROW(UdpSocket duplicate_socket(ip_address, common_port, "1801"), std::runtime_error);
 }
 
 TEST_F(UdpSocketTestFixture, receive_timeout)
