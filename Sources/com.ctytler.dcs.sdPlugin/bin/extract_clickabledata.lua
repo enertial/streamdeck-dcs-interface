@@ -25,7 +25,7 @@ end
 -- All should use the configured "LockOn_Options.script_path" variable.
 call_dofile = dofile
 function inspect_and_dofile(path)
-	local is_absolute_path = (string.match(path, "DCS") and string.match(path, "World"))
+	local is_absolute_path = (string.match(path, dcs_install_path))
 	if is_absolute_path then
 		call_dofile(path)
 	else
