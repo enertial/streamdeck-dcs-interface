@@ -40,6 +40,9 @@ function addDefaultGlobalSettings(settings) {
     if (!settings.hasOwnProperty("last_selected_module")) {
         settings["last_selected_module"] = "";
     }
+    if (!settings.hasOwnProperty("last_search_query")) {
+        settings["last_search_query"] = "";
+    }
     return settings;
 }
 
