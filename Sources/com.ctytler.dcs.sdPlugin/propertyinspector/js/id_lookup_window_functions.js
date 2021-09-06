@@ -28,6 +28,7 @@ function UpdateGlobalSettings() {
         window.opener.global_settings["last_selected_module"] = selected_module;
     }
     sendmessage("UpdateGlobalSettings", window.opener.global_settings);
+    console.log("Updated global settings: ", window.opener.global_settings);
 }
 
 
@@ -61,9 +62,12 @@ function gotInstalledModules(installed_modules_list) {
         select_elem.append(option);
     }
 
-    // Select the last selected module for convenience.
+    // Select the last selected module and search last query for convenience.
     setSelectedModule(window.opener.global_settings.last_selected_module);
-    callbackRequestIdLookup();
+    document.getElementById("clickabledata_table_search").value = window.opener.global_settings.last_search_query;
+    console.log("Restoring module to:", window.opener.global_settings.last_selected_module,
+                "; search to: ", window.opener.global_settings.last_search_query);
+    callbackRequestIdLookup(clear_search=false);
 }
 
 /**
@@ -96,8 +100,9 @@ function modifyInstalledModulesList(installed_modules_list) {
 /**
  * Requests list of DCS ID attributes from the plugin for the currently selected module.
  */
-function callbackRequestIdLookup() {
+function callbackRequestIdLookup(clear_search=false) {
     clearTableContents()
+    if (clear_search) clearSearchQuery();
     var select_elem = document.getElementById("select_module");
     if (select_elem.options.length > 0) {
         var module = select_elem.options[select_elem.selectedIndex].value;
@@ -140,7 +145,6 @@ function setSelectedModule(module) {
  * Clears all rows of table.
  */
 function clearTableContents() {
-    document.getElementById("clickabledata_table_search").value = "";
     document.getElementById("import_selection_div").hidden = true;
     document.getElementById("type_hints_text").hidden = true;
     var tbody = document.getElementById("clickabledata_table").getElementsByTagName("tbody")[0];
@@ -148,6 +152,14 @@ function clearTableContents() {
         tbody.deleteRow(0);
     }
     selected_row = "";
+}
+
+/**
+ * Clears search query.
+ */
+function clearSearchQuery() {
+    document.getElementById("clickabledata_table_search").value = "";
+    window.opener.global_settings["last_search_query"] = "";
 }
 
 /**
@@ -178,6 +190,9 @@ function gotClickabledata(clickabledata_elements) {
         document_table_body.parentNode.replaceChild(new_table_body, document_table_body);
 
         document.getElementById("type_hints_text").hidden = false;
+
+        // Trigger a table search with any stored query.
+        searchTable();
     }
 }
 
@@ -185,7 +200,7 @@ function gotClickabledata(clickabledata_elements) {
  * Call back function that shows/hides table rows if they do/don't contain the search query.
  */
 function searchTable() {
-    var query = document.getElementById("clickabledata_table_search").value.toUpperCase();
+    var query = document.getElementById("clickabledata_table_search").value;
     var table = document.getElementById("clickabledata_table");
     var body = table.getElementsByTagName("tbody")[0];
     var tr = body.getElementsByTagName("tr");
@@ -195,13 +210,16 @@ function searchTable() {
         for (j = 0; j < td.length; j++) {
             row_text += td[j].textContent;
         }
-        if (row_text.toUpperCase().indexOf(query) >= 0) {
+        if (row_text.toUpperCase().indexOf(query.toUpperCase()) >= 0) {
             tr[i].style.display = "";
         }
         else {
             tr[i].style.display = "none";
         }
     }
+    // Store last search query for convenience in re-opening window.
+    window.opener.global_settings["last_search_query"] = query;
+    UpdateGlobalSettings();
 }
 
 /**
