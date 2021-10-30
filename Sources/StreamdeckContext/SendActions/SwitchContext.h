@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "StreamdeckContext.h"
+#include "../StreamdeckContext.h"
 
 #include <optional>
 #include <string>

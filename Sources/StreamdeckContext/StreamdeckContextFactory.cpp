@@ -4,9 +4,9 @@
 
 #include "StreamdeckContextFactory.h"
 
-#include "IncrementContext.h"
-#include "MomentaryContext.h"
-#include "SwitchContext.h"
+#include "SendActions/IncrementContext.h"
+#include "SendActions/MomentaryContext.h"
+#include "SendActions/SwitchContext.h"
 
 StreamdeckContextFactory::StreamdeckContextFactory()
 {

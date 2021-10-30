@@ -4,9 +4,9 @@
 
 #include "../DcsInterface/DcsInterface.h"
 #include "../Utilities/StringUtilities.h"
-#include "Monitors/ComparisonMonitor.h"
-#include "Monitors/IncrementMonitor.h"
-#include "Monitors/TitleMonitor.h"
+#include "ExportMonitors/ComparisonMonitor.h"
+#include "ExportMonitors/IncrementMonitor.h"
+#include "ExportMonitors/TitleMonitor.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"

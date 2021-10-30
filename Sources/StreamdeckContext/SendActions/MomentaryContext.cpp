@@ -4,7 +4,7 @@
 
 #include "MomentaryContext.h"
 
-#include "../Common/EPLJSONUtils.h"
+#include "../../Common/EPLJSONUtils.h"
 
 void MomentaryContext::handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload)
 {
