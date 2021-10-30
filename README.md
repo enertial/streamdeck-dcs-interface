@@ -8,6 +8,7 @@
 - [Installation](#installation)
     - [Downloads](#downloads)
     - [Version Update](#version-update)
+      - [Identify installed version number:](#identify-installed-version-number)
     - [Initial Configuration](#initial-configuration)
     - [Video Walkthrough](#video-walkthrough)
 - [Source code](#source-code)
@@ -45,7 +46,7 @@ More detailed instructions can be found in: [Settings Help Documentation](Source
 
 ### Downloads
 
-- For the DCS plugin to work you will first need [DCS-ExportScripts](https://github.com/s-d-a/DCS-ExportScripts) installed, detailed instructions are on their [Wiki](https://github.com/s-d-a/DCS-ExportScripts/wiki). This is the backend that is relied on for communication with the DCS game.
+- For the DCS plugin to work you will first need [DCS-ExportScripts](https://github.com/asherao/DCS-ExportScripts) installed, detailed instructions are on their [Wiki](https://github.com/s-d-a/DCS-ExportScripts/wiki). This is the backend that is relied on for communication with the DCS game.
 
 - To install the DCS Interface Streamdeck plugin, you will need to download and run the installer `com.ctytler.dcs.streamDeckPlugin` from [Releases](https://github.com/charlestytler/streamdeck-dcs-interface/releases).
 
@@ -53,7 +54,7 @@ More detailed instructions can be found in: [Settings Help Documentation](Source
 
 ### Version Update
 
-If you have a prior version already installed on your StreamDeck, you will have to uninstall it first before installing the latest version. To do this click the "More Actions..." button at the bottom-right of the StreamDeck GUI and click "Uninstall" next to the DCS Interface plugin.
+If you have a prior version already installed on your StreamDeck, you will have to uninstall it first before installing the latest version. To do this right-click on one of the DCS Interface button types in the right-side panel and click "Uninstall".
 
 #### Identify installed version number:
 To see the version of the plugin installed on the StreamDeck, click the "More Actions..." button, each installed plugin will have the author and version number printed below its title.
@@ -70,7 +71,7 @@ ExportScript.Config.IkarusPort      = 1725         -- Port Ikarus (1625)
 ExportScript.Config.IkarusSeparator = ":"
 ```
 
-The export script is also capable of supporting both, instructions can be found in the [Settings Help Documentation - Enabling Both DCS Interface & Ikarus](Sources/com.ctytler.dcs.sdPlugin/helpDocs/helpContents.md#enabling-both-dcs-interface--ikarus).
+If you are interested in using the export script to support both Streamdeck and Ikarus, instructions can be found in the [Settings Help Documentation - Enabling Both DCS Interface & Ikarus](Sources/com.ctytler.dcs.sdPlugin/helpDocs/helpContents.md#enabling-both-dcs-interface--ikarus).
 
 ### Video Walkthrough
 
