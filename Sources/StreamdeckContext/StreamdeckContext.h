@@ -16,6 +16,7 @@
 #include <string>
 
 enum class KeyEvent { PRESSED, RELEASED };
+enum class ContextState { FIRST, SECOND };
 
 class StreamdeckContext
 {
@@ -64,13 +65,13 @@ class StreamdeckContext
      */
     virtual void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload) = 0;
 
-  private:
-    std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
-
     // Monitors.
     ComparisonMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
     TitleMonitor title_monitor_{};           // Monitors DCS ID to determine the title text of Streamdeck context.
     IncrementMonitor increment_monitor_{};   // Monitors DCS ID to determine the state of an incremental switch.
+
+  private:
+    std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 
     // Optional settings.
     std::optional<int> delay_for_force_send_state_; // When populated, requests a force send of state to Streamdeck

@@ -6,15 +6,7 @@
 
 #include "../Common/EPLJSONUtils.h"
 
-MomentaryContext::MomentaryContext(const std::string &context) { context_ = context; }
-
-MomentaryContext::MomentaryContext(const std::string &context, const json &settings)
-{
-    context_ = context;
-    updateContextSettings(settings);
-}
-
-void MomentaryContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyEvent event, const json &inPayload)
+void MomentaryContext::handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload)
 {
     const std::string button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
@@ -23,7 +15,7 @@ void MomentaryContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyE
         const auto send_command = determineSendValue(event, inPayload["settings"]);
 
         if (send_command) {
-            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, send_command.value());
+            dcs_interface.send_dcs_command(std::stoi(button_id), device_id, send_command.value());
         }
     }
 }
@@ -38,5 +30,9 @@ std::optional<std::string> MomentaryContext::determineSendValue(const KeyEvent e
             value = EPLJSONUtils::GetStringByName(settings, "release_value");
         }
     }
-    return value.empty() ? std::nullopt : value;
+
+    if (!value.empty()) {
+        return value;
+    }
+    return std::nullopt;
 }

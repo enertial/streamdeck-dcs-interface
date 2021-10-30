@@ -10,6 +10,8 @@
 class IncrementContext : public StreamdeckContext
 {
   public:
+    using StreamdeckContext::StreamdeckContext;
+
     /**
      * @brief Sends DCS commands according to button type and settings received during Key Down/Up event.
      *
@@ -17,7 +19,7 @@ class IncrementContext : public StreamdeckContext
      * @param event Type of button event - PRESSED or RELEASED.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void IncrementContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyEvent event, const json &inPayload);
+    void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload);
 
   private:
     /**
@@ -27,5 +29,5 @@ class IncrementContext : public StreamdeckContext
      * @param settings Settings for context.
      * @return (Optional) Value to be sent to Button ID if it exists.
      */
-    std::optional<std::string> determineSendValue(const KeyEvent event, const json &settings) const;
+    std::optional<std::string> determineSendValue(const KeyEvent event, const json &settings);
 };

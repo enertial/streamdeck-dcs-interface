@@ -12,7 +12,7 @@
 
 #include "Common/ESDBasePlugin.h"
 #include "DcsInterface/DcsInterface.h"
-#include "StreamdeckContext/StreamdeckContext.h"
+#include "StreamdeckContext/StreamdeckContextFactory.h"
 #include <mutex>
 #include <unordered_map>
 
@@ -73,8 +73,9 @@ class MyStreamDeckPlugin : public ESDBasePlugin
     DcsConnectionSettings get_connection_settings(const json &global_settings);
 
     std::mutex mVisibleContextsMutex;
-    std::unordered_map<std::string, StreamdeckContext> mVisibleContexts = {};
+    std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> mVisibleContexts = {};
 
     CallBackTimer *mTimer;
     std::optional<DcsInterface> dcs_interface_ = std::nullopt;
+    StreamdeckContextFactory streamdeck_context_factory;
 };

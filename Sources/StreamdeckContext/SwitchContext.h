@@ -10,6 +10,8 @@
 class SwitchContext : public StreamdeckContext
 {
   public:
+    using StreamdeckContext::StreamdeckContext;
+
     /**
      * @brief Sends DCS commands according to button type and settings received during Key Down/Up event.
      *
@@ -17,7 +19,7 @@ class SwitchContext : public StreamdeckContext
      * @param event Type of button event - PRESSED or RELEASED.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void SwitchContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyEvent event, const json &inPayload);
+    void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload);
 
   private:
     /**

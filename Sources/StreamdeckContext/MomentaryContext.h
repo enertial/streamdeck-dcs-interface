@@ -10,6 +10,8 @@
 class MomentaryContext : public StreamdeckContext
 {
   public:
+    using StreamdeckContext::StreamdeckContext;
+
     /**
      * @brief Sends DCS commands according to button type and settings received during Key Down/Up event.
      *
@@ -18,7 +20,7 @@ class MomentaryContext : public StreamdeckContext
      * @param action Type of button action - used to determine momentary, swtich, or increment button type.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void MomentaryContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyEvent event, const json &inPayload);
+    void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload);
 
   private:
     /**
