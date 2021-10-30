@@ -57,7 +57,7 @@ More detailed instructions can be found in: [Settings Help Documentation](Source
 If you have a prior version already installed on your StreamDeck, you will have to uninstall it first before installing the latest version. To do this right-click on one of the DCS Interface button types in the right-side panel and click "Uninstall".
 
 #### Identify installed version number:
-To see the version of the plugin installed on the StreamDeck, click the "More Actions..." button, each installed plugin will have the author and version number printed below its title.
+To see the version of the plugin installed on the StreamDeck, right-click on one of the DCS Interface button types in the right-side panel.
 
 ### Initial Configuration
 
