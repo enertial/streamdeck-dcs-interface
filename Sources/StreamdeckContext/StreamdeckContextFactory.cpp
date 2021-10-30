@@ -3,6 +3,7 @@
 #include "pch.h"
 
 #include "StreamdeckContextFactory.h"
+#include <iostream>
 
 #include "SendActions/IncrementContext.h"
 #include "SendActions/MomentaryContext.h"
@@ -11,7 +12,6 @@
 StreamdeckContextFactory::StreamdeckContextFactory()
 {
     // Register UUID string values to corresponding Button Action types.
-    std::unordered_map<std::string, ButtonAction> button_action_from_uuid_;
     button_action_from_uuid_["com.ctytler.dcs.lamp.button.two-state"] = ButtonAction::MOMENTARY;
     button_action_from_uuid_["com.ctytler.dcs.static.button.one-state"] = ButtonAction::MOMENTARY;
     button_action_from_uuid_["com.ctytler.dcs.static.text.one-state"] = ButtonAction::MOMENTARY;

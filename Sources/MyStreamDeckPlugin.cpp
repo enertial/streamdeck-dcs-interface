@@ -180,7 +180,6 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     mVisibleContextsMutex.lock();
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-    // mVisibleContexts[inContext] = StreamdeckContextFactory(inAction, inContext, settings);
     mVisibleContexts[inContext] = streamdeck_context_factory.create(inAction, inContext, settings);
     if (dcs_interface_) {
         mVisibleContexts[inContext]->forceSendState(mConnectionManager);

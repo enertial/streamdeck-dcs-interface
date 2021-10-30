@@ -22,7 +22,6 @@ class StreamdeckContextFactory
     create(const std::string &action_uuid, const std::string &context, const json &settings);
 
   private:
-    enum class ButtonAction { MOMENTARY, INCREMENT, SWITCH };
-
+    enum class ButtonAction { UNDEFINED, MOMENTARY, INCREMENT, SWITCH };
     std::unordered_map<std::string, ButtonAction> button_action_from_uuid_;
 };
