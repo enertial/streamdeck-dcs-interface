@@ -24,18 +24,15 @@ void IncrementContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyE
         EPLJSONUtils::GetBoolByName(inPayload["settings"], "increment_cycle_allowed_check", false);
 
     if (is_integer(button_id) && is_integer(device_id)) {
-        bool send_command = false;
-        std::string value = "";
-
-        send_command = determineSendValue(event, inPayload["settings"], value);
+        const auto send_command = determineSendValue(event, inPayload["settings"]);
 
         if (send_command) {
-            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, value);
+            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, send_command.value());
         }
     }
 }
 
-bool IncrementContext::determineSendValue(const KeyEvent event, const json &settings, std::string &value)
+std::optional<std::string> IncrementContext::determineSendValue(const KeyEvent event, const json &settings) const
 {
     if (event == KeyEvent::PRESSED) {
         const std::string increment_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
@@ -53,10 +50,9 @@ bool IncrementContext::determineSendValue(const KeyEvent event, const json &sett
             } else if (current_increment_value_ > increment_max) {
                 current_increment_value_ = cycle_increments_is_allowed_ ? increment_min : increment_max;
             }
-            value = current_increment_value_.str();
-            return true;
+            return current_increment_value_.str();
         }
     }
     // Increment type only needs to send command on key down.
-    return false;
+    return std::nullopt;
 }

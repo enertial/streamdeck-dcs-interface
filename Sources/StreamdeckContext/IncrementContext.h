@@ -25,8 +25,7 @@ class IncrementContext : public StreamdeckContext
      *
      * @param event Either a KeyDown or KeyUp event.
      * @param settings Settings for context.
-     * @param value Value to be sent to Button ID.
-     * @return True if value should be sent to DCS.
+     * @return (Optional) Value to be sent to Button ID if it exists.
      */
-    bool determineSendValue(const KeyEvent event, const json &settings, std::string &value);
+    std::optional<std::string> determineSendValue(const KeyEvent event, const json &settings) const;
 };

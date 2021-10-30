@@ -20,23 +20,19 @@ void SwitchContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyEven
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
 
     if (is_integer(button_id) && is_integer(device_id)) {
-        bool send_command = false;
-        std::string value = "";
-
         const ContextState state = EPLJSONUtils::GetIntByName(inPayload, "state") == 0 ? FIRST : SECOND;
-        send_command = determineSendValue(event, state, inPayload["settings"], value);
+        const auto send_command = determineSendValue(event, state, inPayload["settings"]);
 
         if (send_command) {
-            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, value);
+            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, send_command.value());
         }
     }
 }
 
-bool SwitchContext::determineSendValue(const KeyEvent event,
-                                       const ContextState state,
-                                       const json &settings,
-                                       std::string &value)
+std::optional<std::string>
+SwitchContext::determineSendValue(const KeyEvent event, const ContextState state, const json &settings) const
 {
+    std::string value;
     if (event == KeyEvent::RELEASED) {
         if (state == FIRST) {
             value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
@@ -45,9 +41,9 @@ bool SwitchContext::determineSendValue(const KeyEvent event,
         }
 
         if (!value.empty()) {
-            return true;
+            return value;
         }
     }
     // Switch type only needs to send command on key down.
-    return false;
+    return std::nullopt;
 }

@@ -62,7 +62,7 @@ class StreamdeckContext
      * @param event Type of button event - KeyDown or KeyUp
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload);
+    virtual void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload) = 0;
 
   private:
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.

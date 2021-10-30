@@ -20,19 +20,17 @@ void MomentaryContext::handleButtonEvent(DcsInterface *dcs_interface, const KeyE
     const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
 
     if (is_integer(button_id) && is_integer(device_id)) {
-        bool send_command = false;
-        std::string value = "";
-
-        send_command = determineSendValue(event, inPayload["settings"], value);
+        const auto send_command = determineSendValue(event, inPayload["settings"]);
 
         if (send_command) {
-            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, value);
+            dcs_interface->send_dcs_command(std::stoi(button_id), device_id, send_command.value());
         }
     }
 }
 
-bool MomentaryContext::determineSendValue(const KeyEvent event, const json &settings, std::string &value)
+std::optional<std::string> MomentaryContext::determineSendValue(const KeyEvent event, const json &settings) const
 {
+    std::string value;
     if (event == KeyEvent::PRESSED) {
         value = EPLJSONUtils::GetStringByName(settings, "press_value");
     } else {
@@ -40,6 +38,5 @@ bool MomentaryContext::determineSendValue(const KeyEvent event, const json &sett
             value = EPLJSONUtils::GetStringByName(settings, "release_value");
         }
     }
-    const bool is_valid = value.empty() ? false : true;
-    return is_valid;
+    return value.empty() ? std::nullopt : value;
 }
