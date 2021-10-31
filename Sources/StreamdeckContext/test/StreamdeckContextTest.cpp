@@ -14,13 +14,14 @@
 TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
 {
     // Test -- With an unpopulated game state in dcs_interface, try to update context state.
-    MomentaryContext test_context("def456");
+    StreamdeckContext test_context("def456");
     DcsConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
     DcsInterface dcs_interface(connection_settings);
     MockESDConnectionManager esd_connection_manager{};
     test_context.updateContextState(dcs_interface, &esd_connection_manager);
     // Expect no state or title change as default context state and title values have not changed.
     EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
 }
 
 class StreamdeckContextTestFixture : public ::testing::Test
@@ -45,7 +46,7 @@ class StreamdeckContextTestFixture : public ::testing::Test
     DcsInterface dcs_interface;                        // DCS Interface to test.
     MockESDConnectionManager esd_connection_manager{}; // Streamdeck connection manager, using mock class definition.
 
-    MomentaryContext fixture_context;
+    StreamdeckContext fixture_context;
 
     // Create StreamdeckContext to test without any defined settings.
     static inline std::string fixture_context_id = "abc123";
@@ -58,7 +59,7 @@ TEST_F(StreamdeckContextTestFixture, UseComparisonMonitor)
     const json settings = {{"dcs_id_compare_monitor", "765"},
                            {"dcs_id_compare_condition", "EQUAL_TO"},
                            {"dcs_id_comparison_value", "2.0"}};
-    MomentaryContext test_context(context_id, settings);
+    StreamdeckContext test_context(context_id, settings);
     test_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.state_, 1);
@@ -69,7 +70,7 @@ TEST_F(StreamdeckContextTestFixture, UseTitleMonitor)
     // Create StreamdeckContext initialized with settings to test.
     const std::string context_id = "def456";
     const json settings = {{"dcs_id_string_monitor", "2026"}, {"string_monitor_passthrough_check", true}};
-    MomentaryContext test_context(context_id, settings);
+    StreamdeckContext test_context(context_id, settings);
     test_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, context_id);
     EXPECT_EQ(esd_connection_manager.title_, "TEXT_STR");
@@ -80,6 +81,7 @@ TEST_F(StreamdeckContextTestFixture, UpdateContextSettings)
     // Test 1 -- With no settings defined, streamdeck context should not send update.
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
 
     // Test 2 -- With populated settings, streamdeck context should try to update context state.
     json settings = {{"dcs_id_compare_monitor", "765"},
@@ -110,11 +112,13 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update)
     // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
 
     // Test -- force send will send current state regardless of state change.
     fixture_context.forceSendState(&esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "abc123");
     EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, force_send_state_update_with_zero_delay)
@@ -122,6 +126,7 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_with_zero_delay)
     // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
 
     // Test -- force send will send current state regardless of state change.
     int delay_count = 0;
@@ -129,6 +134,7 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_with_zero_delay)
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "abc123");
     EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, force_send_state_update_after_delay)
@@ -139,11 +145,13 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_after_delay)
     while (delay_count > 0) {
         fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
         EXPECT_EQ(esd_connection_manager.context_, "");
+        EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
         delay_count--;
     }
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "abc123");
     EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, force_send_state_update_negative_delay)
@@ -151,6 +159,7 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_negative_delay)
     // Test 1 -- With updateContextState and no detected state changes, no state is sent to connection manager.
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "");
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
 
     // Test -- force send will occur as delay is already less than zero.
     int delay_count = -3;
@@ -158,6 +167,7 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_negative_delay)
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
     EXPECT_EQ(esd_connection_manager.context_, "abc123");
     EXPECT_EQ(esd_connection_manager.state_, 0);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
 }
 
 TEST_F(StreamdeckContextTestFixture, derived_class_instances_within_container)
@@ -170,7 +180,7 @@ TEST_F(StreamdeckContextTestFixture, derived_class_instances_within_container)
 
     std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> ctx_map;
     ctx_map["ctx_a"] =
-        std::unique_ptr<StreamdeckContext>(new MomentaryContext("ctx_a", {{"dcs_id_string_monitor", "1"}}));
+        std::unique_ptr<StreamdeckContext>(new StreamdeckContext("ctx_a", {{"dcs_id_string_monitor", "1"}}));
     ctx_map["ctx_b"] =
         std::unique_ptr<StreamdeckContext>(new IncrementContext("ctx_b", {{"dcs_id_string_monitor", "2"}}));
     ctx_map["ctx_c"] = std::unique_ptr<StreamdeckContext>(new SwitchContext("ctx_c", {{"dcs_id_string_monitor", "3"}}));

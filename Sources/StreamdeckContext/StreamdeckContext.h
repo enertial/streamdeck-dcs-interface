@@ -54,13 +54,19 @@ class StreamdeckContext
     void updateContextSettings(const json &settings);
 
     /**
-     * @brief Sends DCS commands according to button type and settings received during Key Down/Up event.
+     * @brief Sends DCS commands according to button type and settings received during Key Pressed and Released events.
      *
      * @param dcs_interface Interface to DCS containing current game state.
-     * @param event Type of button event - KeyDown or KeyUp
+     * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload) = 0;
+    virtual void handleButtonPressedEvent(DcsInterface &dcs_interface,
+                                          ESDConnectionManager *mConnectionManager,
+                                          const json &inPayload){};
+
+    virtual void handleButtonReleasedEvent(DcsInterface &dcs_interface,
+                                           ESDConnectionManager *mConnectionManager,
+                                           const json &inPayload){};
 
     // Monitors.
     ComparisonMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.

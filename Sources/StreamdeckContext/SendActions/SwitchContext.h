@@ -13,23 +13,19 @@ class SwitchContext : public StreamdeckContext
     using StreamdeckContext::StreamdeckContext;
 
     /**
-     * @brief Sends DCS commands according to button type and settings received during Key Down/Up event.
+     * @brief Sends DCS commands according to button type and settings received during Key Pressed and Released events.
      *
      * @param dcs_interface Interface to DCS containing current game state.
-     * @param event Type of button event - PRESSED or RELEASED.
+     * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload);
+    void handleButtonPressedEvent(DcsInterface &dcs_interface,
+                                  ESDConnectionManager *mConnectionManager,
+                                  const json &inPayload);
 
-  private:
-    /**
-     * @brief Determines the send value for the type of button for KeyDown and KeyUp events.
-     *
-     * @param event Either a KeyDown or KeyUp event.
-     * @param state Current state of the context.
-     * @param settings Settings for context.
-     * @return (Optional) Value to be sent to Button ID if it exists.
-     */
-    std::optional<std::string>
-    determineSendValue(const KeyEvent event, const ContextState state, const json &settings) const;
+    void handleButtonReleasedEvent(DcsInterface &dcs_interface,
+                                   ESDConnectionManager *mConnectionManager,
+                                   const json &inPayload);
+
+    const int num_frames_delay_forced_state_update_ = 3; // Kept public for unit testing.
 };

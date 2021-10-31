@@ -72,14 +72,21 @@ class MockESDConnectionManager : public ESDConnectionManager
     {
         context_ = inContext;
         state_ = inState;
+        num_calls_to_SetState++;
     }
 
-    void SetImage(const std::string &inBase64ImageString, const std::string &inContext, ESDSDKTarget inTarget) {}
+    void SetImage(const std::string &inBase64ImageString, const std::string &inContext, ESDSDKTarget inTarget)
+    {
+        context_ = inContext;
+        base64_image_string_ = inBase64ImageString;
+        num_calls_to_SetImage++;
+    }
 
     void SetTitle(const std::string &inTitle, const std::string &inContext, ESDSDKTarget inTarget)
     {
         context_ = inContext;
         title_ = inTitle;
+        num_calls_to_SetTitle++;
     }
 
     // Only in mock class:
@@ -93,5 +100,10 @@ class MockESDConnectionManager : public ESDConnectionManager
     MockPlugin plugin_;
     std::string context_ = "";
     int state_ = 0;
+    std::string base64_image_string_ = "";
     std::string title_ = "";
+
+    int num_calls_to_SetState = 0;
+    int num_calls_to_SetImage = 0;
+    int num_calls_to_SetTitle = 0;
 };
