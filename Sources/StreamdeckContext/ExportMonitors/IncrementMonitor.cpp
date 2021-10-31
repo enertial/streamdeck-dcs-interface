@@ -1,9 +1,8 @@
 // Copyright 2021 Charles Tytler
 
-#include "pch.h"
-
-#include "../../Utilities/StringUtilities.h"
 #include "IncrementMonitor.h"
+
+#include "Utilities/StringUtilities.h"
 
 IncrementMonitor::IncrementMonitor(const json &settings) { update_settings(settings); }
 

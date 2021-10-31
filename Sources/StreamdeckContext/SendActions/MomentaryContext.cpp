@@ -1,10 +1,8 @@
 // Copyright 2021 Charles Tytler
 
-#include "pch.h"
-
 #include "MomentaryContext.h"
 
-#include "../../Common/EPLJSONUtils.h"
+#include "ElgatoSD/EPLJSONUtils.h"
 
 void MomentaryContext::handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload)
 {

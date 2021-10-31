@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "../Utilities/Decimal.h"
-#include "../Utilities/UdpSocket.h"
+#include "Utilities/Decimal.h"
+#include "Utilities/UdpSocket.h"
 
 #include <map>
 #include <optional>

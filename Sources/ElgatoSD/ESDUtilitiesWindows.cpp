@@ -10,6 +10,8 @@
 **/
 //==============================================================================
 
+#include "pch.h"
+
 #include "ESDUtilities.h"
 
 void ESDUtilities::DoSleep(int inMilliseconds) { Sleep(inMilliseconds); }

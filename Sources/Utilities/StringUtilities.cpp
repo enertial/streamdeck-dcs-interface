@@ -1,8 +1,7 @@
 // Copyright 2020 Charles Tytler
 
-#include "pch.h"
-
 #include "StringUtilities.h"
+
 #include <stdlib.h>
 
 bool is_integer(const std::string &str)

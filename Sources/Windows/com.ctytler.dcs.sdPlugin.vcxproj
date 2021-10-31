@@ -186,20 +186,6 @@
     <ClInclude Include="..\Common\ESDLocalizer.h" />
     <ClInclude Include="..\Common\ESDSDKDefines.h" />
     <ClInclude Include="..\Common\ESDUtilities.h" />
-    <ClInclude Include="..\DcsInterface\DcsIdLookup.h" />
-    <ClInclude Include="..\DcsInterface\DcsInterface.h" />
-    <ClInclude Include="..\DcsInterface\DcsInterfaceParameters.h" />
-    <ClInclude Include="..\StreamdeckContext\SendActions\IncrementContext.h" />
-    <ClInclude Include="..\StreamdeckContext\SendActions\MomentaryContext.h" />
-    <ClInclude Include="..\StreamdeckContext\ExportMonitors\ComparisonMonitor.h" />
-    <ClInclude Include="..\StreamdeckContext\ExportMonitors\IncrementMonitor.h" />
-    <ClInclude Include="..\StreamdeckContext\ExportMonitors\TitleMonitor.h" />
-    <ClInclude Include="..\StreamdeckContext\StreamdeckContext.h" />
-    <ClInclude Include="..\StreamdeckContext\StreamdeckContextFactory.h" />
-    <ClInclude Include="..\StreamdeckContext\SendActions\SwitchContext.h" />
-    <ClInclude Include="..\Utilities\Decimal.h" />
-    <ClInclude Include="..\Utilities\StringUtilities.h" />
-    <ClInclude Include="..\Utilities\UdpSocket.h" />
     <ClInclude Include="..\MyStreamDeckPlugin.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -228,19 +214,6 @@
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
-    <ClCompile Include="..\DcsInterface\DcsIdLookup.cpp" />
-    <ClCompile Include="..\DcsInterface\DcsInterface.cpp" />
-    <ClCompile Include="..\StreamdeckContext\SendActions\IncrementContext.cpp" />
-    <ClCompile Include="..\StreamdeckContext\SendActions\MomentaryContext.cpp" />
-    <ClCompile Include="..\StreamdeckContext\ExportMonitors\ComparisonMonitor.cpp" />
-    <ClCompile Include="..\StreamdeckContext\ExportMonitors\IncrementMonitor.cpp" />
-    <ClCompile Include="..\StreamdeckContext\ExportMonitors\TitleMonitor.cpp" />
-    <ClCompile Include="..\StreamdeckContext\StreamdeckContext.cpp" />
-    <ClCompile Include="..\StreamdeckContext\StreamdeckContextFactory.cpp" />
-    <ClCompile Include="..\StreamdeckContext\SendActions\SwitchContext.cpp" />
-    <ClCompile Include="..\Utilities\Decimal.cpp" />
-    <ClCompile Include="..\Utilities\StringUtilities.cpp" />
-    <ClCompile Include="..\Utilities\UdpSocket.cpp" />
     <ClCompile Include="..\MyStreamDeckPlugin.cpp">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">/FI"pch.h" %(AdditionalOptions)</AdditionalOptions>

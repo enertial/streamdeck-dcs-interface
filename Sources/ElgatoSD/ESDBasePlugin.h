@@ -12,6 +12,9 @@
 
 #pragma once
 
+#include "Vendor/json/src/json.hpp"
+using json = nlohmann::json;
+
 class ESDConnectionManager;
 
 class ESDBasePlugin

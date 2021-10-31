@@ -10,9 +10,10 @@
 **/
 //==============================================================================
 
-#include "Common/ESDBasePlugin.h"
 #include "DcsInterface/DcsInterface.h"
+#include "ElgatoSD/ESDBasePlugin.h"
 #include "StreamdeckContext/StreamdeckContextFactory.h"
+
 #include <mutex>
 #include <unordered_map>
 

@@ -10,10 +10,12 @@
 **/
 //==============================================================================
 
-#include "../MyStreamDeckPlugin.h"
-#include "EPLJSONUtils.h"
-#include "ESDConnectionManager.h"
-#include "ESDLocalizer.h"
+#include "ElgatoSD/pch.h"
+
+#include "ElgatoSD/EPLJSONUtils.h"
+#include "ElgatoSD/ESDConnectionManager.h"
+#include "ElgatoSD/ESDLocalizer.h"
+#include "StreamdeckInterface/StreamdeckInterface.h"
 
 int main(int argc, const char *const argv[])
 {

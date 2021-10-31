@@ -10,8 +10,10 @@
 **/
 //==============================================================================
 
-#include "ESDConnectionManager.h"
+#include "pch.h"
+
 #include "EPLJSONUtils.h"
+#include "ESDConnectionManager.h"
 
 void ESDConnectionManager::OnOpen(WebsocketClient *inClient, websocketpp::connection_hdl inConnectionHandler)
 {

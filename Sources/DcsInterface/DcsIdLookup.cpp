@@ -1,10 +1,8 @@
 // Copyright 2020 Charles Tytler
 
-#include "pch.h"
-
 #include "DcsIdLookup.h"
 
-#include "../Vendor/lua-5.1.5/etc/lua.hpp"
+#include "Vendor/lua-5.1.5/etc/lua.hpp"
 
 #include <filesystem>
 #include <iostream>

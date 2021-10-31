@@ -10,8 +10,10 @@
 **/
 //==============================================================================
 
-#include "ESDLocalizer.h"
+#include "pch.h"
+
 #include "EPLJSONUtils.h"
+#include "ESDLocalizer.h"
 #include "ESDUtilities.h"
 #include <fstream>
 

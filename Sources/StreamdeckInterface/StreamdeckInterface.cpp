@@ -10,13 +10,17 @@
 **/
 //==============================================================================
 
-#include "MyStreamDeckPlugin.h"
+#include "StreamdeckInterface.h"
+
 #include <atomic>
 
-#include "Common/EPLJSONUtils.h"
-#include "Common/ESDConnectionManager.h"
 #include "DcsInterface/DcsIdLookup.h"
 #include "DcsInterface/DcsInterfaceParameters.h"
+#include "ElgatoSD/EPLJSONUtils.h"
+#include "ElgatoSD/ESDConnectionManager.h"
+
+#include "Vendor/json/src/json.hpp"
+using json = nlohmann::json;
 
 class CallBackTimer
 {
