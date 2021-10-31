@@ -130,7 +130,7 @@ void MyStreamDeckPlugin::UpdateFromGameState()
         if (mConnectionManager != nullptr) {
             mVisibleContextsMutex.lock();
             for (auto &elem : mVisibleContexts) {
-                elem.second.updateContextState(*dcs_interface_, mConnectionManager);
+                elem.second->updateContextState(*dcs_interface_, mConnectionManager);
             }
             mVisibleContextsMutex.unlock();
         }
@@ -144,7 +144,7 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
 {
     if (dcs_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext].handleButtonEvent(*dcs_interface_, KeyEvent::PRESSED, inAction, inPayload);
+        mVisibleContexts[inContext]->handleButtonEvent(*dcs_interface_, KeyEvent::PRESSED, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -162,11 +162,11 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
         if (inAction.find("switch") != std::string::npos) {
             // For switches use a delay to avoid jittering and a race condition of Streamdeck and Plugin trying to
             // change state.
-            mVisibleContexts[inContext].forceSendStateAfterDelay(3);
+            mVisibleContexts[inContext]->forceSendStateAfterDelay(3);
         } else {
-            mVisibleContexts[inContext].forceSendState(mConnectionManager);
+            mVisibleContexts[inContext]->forceSendState(mConnectionManager);
         }
-        mVisibleContexts[inContext].handleButtonEvent(*dcs_interface_, KeyEvent::RELEASED, inAction, inPayload);
+        mVisibleContexts[inContext]->handleButtonEvent(*dcs_interface_, KeyEvent::RELEASED, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -180,9 +180,9 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     mVisibleContextsMutex.lock();
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-    mVisibleContexts[inContext] = StreamdeckContext(inContext, settings);
+    mVisibleContexts[inContext] = streamdeck_context_factory.create(inAction, inContext, settings);
     if (dcs_interface_) {
-        mVisibleContexts[inContext].forceSendState(mConnectionManager);
+        mVisibleContexts[inContext]->forceSendState(mConnectionManager);
     }
     mVisibleContextsMutex.unlock();
 }
@@ -222,7 +222,7 @@ void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
         // Update settings for the specified context -- triggered by Property Inspector detecting a change.
         mVisibleContextsMutex.lock();
         if (mVisibleContexts.count(inContext) > 0) {
-            mVisibleContexts[inContext].updateContextSettings(inPayload["settings"]);
+            mVisibleContexts[inContext]->updateContextSettings(inPayload["settings"]);
         }
         mVisibleContextsMutex.unlock();
     }

@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../StreamdeckContext/Monitors/IncrementMonitor.cpp"
+#include "../StreamdeckContext/ExportMonitors/IncrementMonitor.cpp"
 
 namespace test
 {

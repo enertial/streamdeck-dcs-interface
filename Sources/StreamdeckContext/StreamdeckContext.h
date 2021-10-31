@@ -4,9 +4,9 @@
 
 #include "../DcsInterface/DcsInterface.h"
 #include "../Utilities/StringUtilities.h"
-#include "Monitors/ComparisonMonitor.h"
-#include "Monitors/IncrementMonitor.h"
-#include "Monitors/TitleMonitor.h"
+#include "ExportMonitors/ComparisonMonitor.h"
+#include "ExportMonitors/IncrementMonitor.h"
+#include "ExportMonitors/TitleMonitor.h"
 
 #ifndef UNIT_TEST
 #include "../Common/ESDConnectionManager.h"
@@ -16,6 +16,7 @@
 #include <string>
 
 enum class KeyEvent { PRESSED, RELEASED };
+enum class ContextState { FIRST, SECOND };
 
 class StreamdeckContext
 {
@@ -60,34 +61,17 @@ class StreamdeckContext
      *
      * @param dcs_interface Interface to DCS containing current game state.
      * @param event Type of button event - KeyDown or KeyUp
-     * @param action Type of button action - used to determine momentary, swtich, or increment button type.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void handleButtonEvent(DcsInterface &dcs_interface,
-                           const KeyEvent event,
-                           const std::string &action,
-                           const json &inPayload);
-
-  private:
-    /**
-     * @brief Determines the send value for the type of button for KeyDown and KeyUp events.
-     *
-     * @param event Either a KeyDown or KeyUp event.
-     * @param state Current state of the context.
-     * @param settings Settings for context.
-     * @param value Value to be sent to Button ID.
-     * @return True if value should be sent to DCS.
-     */
-    bool determineSendValueForMomentary(const KeyEvent event, const json &settings, std::string &value);
-    bool determineSendValueForSwitch(const KeyEvent event, const int state, const json &settings, std::string &value);
-    bool determineSendValueForIncrement(const KeyEvent event, const json &settings, std::string &value);
-
-    std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
+    virtual void handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload) = 0;
 
     // Monitors.
     ComparisonMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
     TitleMonitor title_monitor_{};           // Monitors DCS ID to determine the title text of Streamdeck context.
     IncrementMonitor increment_monitor_{};   // Monitors DCS ID to determine the state of an incremental switch.
+
+  private:
+    std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
 
     // Optional settings.
     std::optional<int> delay_for_force_send_state_; // When populated, requests a force send of state to Streamdeck
