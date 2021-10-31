@@ -13,44 +13,32 @@ class ESDConnectionManager
 namespace test
 {
 
-class StreamdeckContextTestFixture : public ::testing::Test
-{
-  public:
-    StreamdeckContextTestFixture()
-        : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
-          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          dcs_interface(connection_settings), fixture_context(fixture_context_id)
-    {
-        // Consume intial reset command sent to to mock_dcs.
-        (void)mock_dcs.receive();
-    }
-
-    DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface; // DCS Interface to test.
-    MomentaryContext fixture_context;
-
-    // Create StreamdeckContext to test without any defined settings.
-    static inline std::string fixture_context_id = "abc123";
-};
-
-class MomentaryContextKeyPressTestFixture : public StreamdeckContextTestFixture
+class MomentaryContextKeyPressTestFixture : public ::testing::Test
 {
   public:
     MomentaryContextKeyPressTestFixture()
-        : // Create default json payload.
+        : // Mock DCS socket uses the reverse rx and tx ports of dcs_interface so it can communicate with it.
+          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
+          dcs_interface(connection_settings), fixture_context(fixture_context_id),
+          // Create default json payload.
           payload({{"state", 0},
                    {"settings",
-                    {{"button_id", std::to_string(button_id)},
+                    {{"button_id", button_id},
                      {"device_id", device_id},
                      {"press_value", press_value},
                      {"release_value", release_value},
                      {"disable_release_check", false}}}})
     {
-        fixture_context.updateContextSettings(payload["settings"]);
+        // Consume intial reset command sent to to mock_dcs.
+        (void)mock_dcs.receive();
     }
+    DcsConnectionSettings connection_settings = {"1928", "1929", "127.0.0.1"};
+    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface; // DCS Interface to test.
+    std::string fixture_context_id = "abc123";
+    MomentaryContext fixture_context;
 
-    int button_id = 2;
+    std::string button_id = "2";
     std::string device_id = "23";
     std::string press_value = "4";
     std::string release_value = "5";
@@ -77,9 +65,10 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_invalid_device_id)
 
 TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary)
 {
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    MomentaryContext fc("abc", {});
+    fc.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
     const std::stringstream ss_received = mock_dcs.receive();
-    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + press_value;
+    std::string expected_command = "C" + device_id + "," + button_id + "," + press_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -87,7 +76,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary)
 {
     fixture_context.handleButtonEvent(dcs_interface, KeyEvent::RELEASED, payload);
     const std::stringstream ss_received = mock_dcs.receive();
-    std::string expected_command = "C" + device_id + "," + std::to_string(button_id) + "," + release_value;
+    std::string expected_command = "C" + device_id + "," + button_id + "," + release_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 

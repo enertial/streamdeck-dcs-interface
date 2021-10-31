@@ -3,7 +3,6 @@
 #include "pch.h"
 
 #include "StreamdeckContextFactory.h"
-#include <iostream>
 
 #include "SendActions/IncrementContext.h"
 #include "SendActions/MomentaryContext.h"
