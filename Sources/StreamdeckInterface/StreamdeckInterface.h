@@ -1,6 +1,6 @@
 //==============================================================================
 /**
-@file       MyStreamDeckPlugin.h
+@file       StreamdeckInterface.h
 
 @brief      Based off of Elgato's CPU plugin example
 
@@ -19,11 +19,11 @@
 
 class CallBackTimer;
 
-class MyStreamDeckPlugin : public ESDBasePlugin
+class StreamdeckInterface : public ESDBasePlugin
 {
   public:
-    MyStreamDeckPlugin();
-    virtual ~MyStreamDeckPlugin();
+    StreamdeckInterface();
+    virtual ~StreamdeckInterface();
 
     void KeyDownForAction(const std::string &inAction,
                           const std::string &inContext,

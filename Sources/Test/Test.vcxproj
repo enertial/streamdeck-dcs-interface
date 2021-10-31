@@ -32,35 +32,43 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>$(SolutionDir)..\;../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>$(SolutionDir)..\;../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <IncludePath>$(SolutionDir)..\;../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <IncludePath>$(SolutionDir)..\;../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+  </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="ComparisonMonitorTest.cpp" />
-    <ClCompile Include="DcsIdLookupTest.cpp" />
-    <ClCompile Include="DcsInterfaceTest.cpp" />
-    <ClCompile Include="IncrementContextTest.cpp" />
-    <ClCompile Include="IncrementMonitorTest.cpp" />
-    <ClCompile Include="MomentaryContextTest.cpp" />
-    <ClCompile Include="StreamdeckContextFactoryTest.cpp" />
-    <ClCompile Include="SwitchContextTest.cpp" />
-    <ClCompile Include="TitleMonitorTest.cpp" />
-    <ClCompile Include="UdpSocketTest.cpp" />
-    <ClCompile Include="DecimalTest.cpp" />
-    <ClCompile Include="StringUtilitiesTest.cpp" />
-    <ClCompile Include="StreamdeckContextTest.cpp" />
+    <ClCompile Include="..\**\*Test.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\DcsInterface\DcsInterface.vcxproj">
+      <Project>{2782d849-65f7-4b89-a856-964fd918269a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\ElgatoSD\ElgatoSD.vcxproj">
+      <Project>{f60ca831-72e9-4992-bcfe-12b3387f646b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\StreamdeckContext\StreamdeckContext.vcxproj">
+      <Project>{36a2b3d3-c3fa-424c-9bb6-37d19ebe5a3e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\Utilities\Utilities.vcxproj">
+      <Project>{329f64ac-6346-46d2-a671-9b5dd626b485}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Vendor\lua-5.1.5\Lua.vcxproj">
       <Project>{59eec206-84e0-4842-b89e-2025fd78e589}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Windows\com.ctytler.dcs.sdPlugin.vcxproj">
-      <Project>{f76362ac-339a-4f56-8c7b-d73a560670c4}</Project>
-      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="MockESDConnectionManager.h" />
   </ItemGroup>
   <ItemDefinitionGroup />
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
@@ -76,6 +84,7 @@
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -92,6 +101,7 @@
       <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -107,6 +117,7 @@
       <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -124,6 +135,7 @@
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalOptions>/Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

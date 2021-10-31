@@ -9,7 +9,7 @@
 #include "Utilities/StringUtilities.h"
 
 #ifndef UNIT_TEST
-#include "../ElgatoSD/ESDConnectionManager.h"
+#include "ElgatoSD/ESDConnectionManager.h"
 #endif
 
 #include <optional>

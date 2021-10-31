@@ -1,6 +1,6 @@
 //==============================================================================
 /**
-@file       MyStreamDeckPlugin.cpp
+@file       StreamdeckInterface.cpp
 
 @brief      Based off of Elgato's CPU plugin example
 
@@ -62,13 +62,13 @@ class CallBackTimer
     std::thread _thd;
 };
 
-MyStreamDeckPlugin::MyStreamDeckPlugin()
+StreamdeckInterface::StreamdeckInterface()
 {
     mTimer = new CallBackTimer();
     mTimer->start(10, [this]() { this->UpdateFromGameState(); });
 }
 
-MyStreamDeckPlugin::~MyStreamDeckPlugin()
+StreamdeckInterface::~StreamdeckInterface()
 {
     if (mTimer != nullptr) {
         mTimer->stop();
@@ -78,7 +78,7 @@ MyStreamDeckPlugin::~MyStreamDeckPlugin()
     }
 }
 
-DcsConnectionSettings MyStreamDeckPlugin::get_connection_settings(const json &global_settings)
+DcsConnectionSettings StreamdeckInterface::get_connection_settings(const json &global_settings)
 {
     const std::string ip_address_request = EPLJSONUtils::GetStringByName(global_settings, "ip_address");
     const std::string listener_port_request = EPLJSONUtils::GetStringByName(global_settings, "listener_port");
@@ -99,7 +99,7 @@ DcsConnectionSettings MyStreamDeckPlugin::get_connection_settings(const json &gl
     return connection_settings;
 }
 
-void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload)
+void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
 {
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
@@ -121,7 +121,7 @@ void MyStreamDeckPlugin::DidReceiveGlobalSettings(const json &inPayload)
     }
 }
 
-void MyStreamDeckPlugin::UpdateFromGameState()
+void StreamdeckInterface::UpdateFromGameState()
 {
     //
     // Warning: UpdateFromGameState() is running in the timer thread
@@ -141,10 +141,10 @@ void MyStreamDeckPlugin::UpdateFromGameState()
     }
 }
 
-void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
-                                          const std::string &inContext,
-                                          const json &inPayload,
-                                          const std::string &inDeviceID)
+void StreamdeckInterface::KeyDownForAction(const std::string &inAction,
+                                           const std::string &inContext,
+                                           const json &inPayload,
+                                           const std::string &inDeviceID)
 {
     if (dcs_interface_) {
         mVisibleContextsMutex.lock();
@@ -153,10 +153,10 @@ void MyStreamDeckPlugin::KeyDownForAction(const std::string &inAction,
     }
 }
 
-void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
-                                        const std::string &inContext,
-                                        const json &inPayload,
-                                        const std::string &inDeviceID)
+void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
+                                         const std::string &inContext,
+                                         const json &inPayload,
+                                         const std::string &inDeviceID)
 {
 
     if (dcs_interface_) {
@@ -175,10 +175,10 @@ void MyStreamDeckPlugin::KeyUpForAction(const std::string &inAction,
     }
 }
 
-void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
-                                             const std::string &inContext,
-                                             const json &inPayload,
-                                             const std::string &inDeviceID)
+void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
+                                              const std::string &inContext,
+                                              const json &inPayload,
+                                              const std::string &inDeviceID)
 {
     // Remember the context.
     mVisibleContextsMutex.lock();
@@ -191,10 +191,10 @@ void MyStreamDeckPlugin::WillAppearForAction(const std::string &inAction,
     mVisibleContextsMutex.unlock();
 }
 
-void MyStreamDeckPlugin::WillDisappearForAction(const std::string &inAction,
-                                                const std::string &inContext,
-                                                const json &inPayload,
-                                                const std::string &inDeviceID)
+void StreamdeckInterface::WillDisappearForAction(const std::string &inAction,
+                                                 const std::string &inContext,
+                                                 const json &inPayload,
+                                                 const std::string &inDeviceID)
 {
     // Remove the context.
     mVisibleContextsMutex.lock();
@@ -202,7 +202,7 @@ void MyStreamDeckPlugin::WillDisappearForAction(const std::string &inAction,
     mVisibleContextsMutex.unlock();
 }
 
-void MyStreamDeckPlugin::DeviceDidConnect(const std::string &inDeviceID, const json &inDeviceInfo)
+void StreamdeckInterface::DeviceDidConnect(const std::string &inDeviceID, const json &inDeviceInfo)
 {
     // Request global settings from Streamdeck.
     if (mConnectionManager != nullptr) {
@@ -210,15 +210,15 @@ void MyStreamDeckPlugin::DeviceDidConnect(const std::string &inDeviceID, const j
     }
 }
 
-void MyStreamDeckPlugin::DeviceDidDisconnect(const std::string &inDeviceID)
+void StreamdeckInterface::DeviceDidDisconnect(const std::string &inDeviceID)
 {
     // Nothing to do.
 }
 
-void MyStreamDeckPlugin::SendToPlugin(const std::string &inAction,
-                                      const std::string &inContext,
-                                      const json &inPayload,
-                                      const std::string &inDeviceID)
+void StreamdeckInterface::SendToPlugin(const std::string &inAction,
+                                       const std::string &inContext,
+                                       const json &inPayload,
+                                       const std::string &inDeviceID)
 {
     const std::string event = EPLJSONUtils::GetStringByName(inPayload, "event");
 

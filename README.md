@@ -82,12 +82,25 @@ A walkthrough of installation and configuration can be found at the below link, 
 
 The Sources folder contains the source code of the plugin. The primary components are as follows:
 
-- `Sources/DcsInterface/MyStreamDeckPlugin.{cpp,h}` - StreamDeck C++ API (based on the Elgato streamdeck-cpu example)
-- `Sources/DcsInterface/StreamdeckContext.{cpp,h}` - Class which stores each visible Streamdeck button's settings
-- `Sources/DcsInterface/DcsInterface.{cpp,h}` - Interface between plugin and DCS
-- `Sources/Test/*.cpp` - Contains unit tests for above classes and helps demonstrate their function
-- `Sources/com.ctytler.dcs.sdPlugin/proprtyinspector` - Contains html and javascript for handling user settings
-- `Sources/com.ctytler.dcs.sdPlugin/manifest.json` - Configuration for the Stream Deck plugin
+```
+Sources
+├── DcsInterface              Classes for interacting with DCS
+├── ElgatoSD                  Elgato Streamdeck SDK source and utilities
+├── StreamdeckContext         Classes for maintaining state of individual Streamdeck buttons
+│   ├── ExportMonitors        Classes that monitor DCS export state for individual buttons
+│   ├── SendActions           Classes that define button press and release actions
+├── StreamdeckInterface       Executable that interfaces C++ code with Streamdeck plugin
+├── Test                      Unit test infrastructure and target
+├── Utilities                 Generic utilities for UDP socket and string manipulation
+├── Vendor                    Third party source code
+├── Windows                   Visual Studio solution settings
+└── com.ctytler.dcs.sdPlugin  Plugin package containing javascript and compiled C++ executable
+    ├── manifest.json         Definition of Streamdeck plugin metadata
+    ├── bin                   Location for compiled C++ and lua scripts called by plugin
+    ├── helpDocs              Help documentation within plugin
+    ├── images                Default icon images
+    └── propertyinspector     Javascript and html used by plugin (Button settings and windows)
+```
 
 # Build from source instructions
 
@@ -95,5 +108,4 @@ A build script is included which will build both the C++ executable which handle
 
 You must call this file from the [Developer Command Prompt for VS](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs) in order for the Visual C++ target build step to work.
 
-You may also need to install the Boost C++ library as it is used by the base Streamdeck SDK.
-Current version was built with Visual Studio Community 2019 and Boost 1.55.0.
+Current version was built with Visual Studio Community 2019.

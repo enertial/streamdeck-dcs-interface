@@ -2,12 +2,9 @@
 
 #include "gtest/gtest.h"
 
-#define UNIT_TEST
-// Mocked definition.
-class ESDConnectionManager
-{
-};
-#include "../StreamdeckContext/SendActions/IncrementContext.cpp"
+#include "StreamdeckContext/SendActions/IncrementContext.h"
+
+#include "Test/MockESDConnectionManager.h"
 
 namespace test
 {
@@ -35,9 +32,9 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
         fixture_context.updateContextSettings(payload["settings"]);
     }
     DcsConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
-    UdpSocket mock_dcs;                          // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                  // DCS Interface to test.
-    ESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
+    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface;                      // DCS Interface to test.
+    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     IncrementContext fixture_context;
 

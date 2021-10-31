@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../Utilities/StringUtilities.cpp"
+#include "Utilities/StringUtilities.h"
 
 namespace test
 {

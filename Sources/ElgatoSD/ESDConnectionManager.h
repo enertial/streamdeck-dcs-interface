@@ -16,7 +16,6 @@
 #include "ESDSDKDefines.h"
 
 #define ASIO_STANDALONE
-
 #include <Vendor/websocketpp/websocketpp/client.hpp>
 #include <Vendor/websocketpp/websocketpp/common/memory.hpp>
 #include <Vendor/websocketpp/websocketpp/common/thread.hpp>
@@ -38,12 +37,12 @@ class ESDConnectionManager
     void Run();
 
     // API to communicate with the Stream Deck application
-    void SetTitle(const std::string &inTitle, const std::string &inContext, ESDSDKTarget inTarget);
-    void SetImage(const std::string &inBase64ImageString, const std::string &inContext, ESDSDKTarget inTarget);
+    virtual void SetTitle(const std::string &inTitle, const std::string &inContext, ESDSDKTarget inTarget);
+    virtual void SetImage(const std::string &inBase64ImageString, const std::string &inContext, ESDSDKTarget inTarget);
     void ShowAlertForContext(const std::string &inContext);
     void ShowOKForContext(const std::string &inContext);
     void SetSettings(const json &inSettings, const std::string &inContext);
-    void SetState(int inState, const std::string &inContext);
+    virtual void SetState(int inState, const std::string &inContext);
     void GetGlobalSettings();
     void SetGlobalSettings(const json &inSettings);
     void SendToPropertyInspector(const std::string &inAction, const std::string &inContext, const json &inPayload);

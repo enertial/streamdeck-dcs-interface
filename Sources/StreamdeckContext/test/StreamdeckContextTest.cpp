@@ -1,44 +1,15 @@
 // Copyright 2020 Charles Tytler
 
-#include "../Windows/pch.h"
 #include "gtest/gtest.h"
 #include <unordered_map>
 
-// Create mock version of ESDConnectionManager for testing.
-#define UNIT_TEST
-const int kESDSDKTarget_HardwareAndSoftware = 0;
+#include "Test/MockESDConnectionManager.h"
 
-class ESDConnectionManager
-{
-  public:
-    void SetState(int state, std::string context)
-    {
-        context_ = context;
-        state_ = state;
-    }
-    void SetTitle(std::string title, std::string context, int flag)
-    {
-        context_ = context;
-        title_ = title;
-    }
+#include "StreamdeckContext/StreamdeckContext.h"
 
-    // Only in mock class:
-    void clear_buffer()
-    {
-        context_ = "";
-        state_ = 0;
-        title_ = "";
-    }
-
-    std::string context_ = "";
-    int state_ = 0;
-    std::string title_ = "";
-};
-
-#include "../StreamdeckContext/SendActions/IncrementContext.h"
-#include "../StreamdeckContext/SendActions/MomentaryContext.h"
-#include "../StreamdeckContext/SendActions/SwitchContext.h"
-#include "../StreamdeckContext/StreamdeckContext.cpp"
+#include "StreamdeckContext/SendActions/IncrementContext.h"
+#include "StreamdeckContext/SendActions/MomentaryContext.h"
+#include "StreamdeckContext/SendActions/SwitchContext.h"
 
 TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
 {
@@ -46,7 +17,7 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
     MomentaryContext test_context("def456");
     DcsConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
     DcsInterface dcs_interface(connection_settings);
-    ESDConnectionManager esd_connection_manager;
+    MockESDConnectionManager esd_connection_manager{};
     test_context.updateContextState(dcs_interface, &esd_connection_manager);
     // Expect no state or title change as default context state and title values have not changed.
     EXPECT_EQ(esd_connection_manager.context_, "");
@@ -70,9 +41,9 @@ class StreamdeckContextTestFixture : public ::testing::Test
     }
 
     DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                          // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                  // DCS Interface to test.
-    ESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
+    UdpSocket mock_dcs;                                // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface;                        // DCS Interface to test.
+    MockESDConnectionManager esd_connection_manager{}; // Streamdeck connection manager, using mock class definition.
 
     MomentaryContext fixture_context;
 
@@ -191,7 +162,7 @@ TEST_F(StreamdeckContextTestFixture, force_send_state_update_negative_delay)
 
 TEST_F(StreamdeckContextTestFixture, derived_class_instances_within_container)
 {
-    // This is more of a test of the MyStreamDeckPlugin.cpp use of this class than of the class itself.
+    // This is more of a test of the StreamdeckInterface.cpp use of this class than of the class itself.
 
     std::string mock_dcs_message = "header*1=a:2=b:3=c";
     mock_dcs.send(mock_dcs_message);

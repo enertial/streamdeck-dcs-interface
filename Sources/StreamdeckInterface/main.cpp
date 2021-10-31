@@ -65,7 +65,7 @@ int main(int argc, const char *const argv[])
     }
 
     // Create the plugin
-    MyStreamDeckPlugin *plugin = new MyStreamDeckPlugin();
+    StreamdeckInterface *plugin = new StreamdeckInterface();
 
     // Initialize localization helper
     std::string language = "en";

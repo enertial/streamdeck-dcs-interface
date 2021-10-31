@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../Utilities/UdpSocket.cpp"
+#include "Utilities/UdpSocket.h"
 
 namespace test
 {

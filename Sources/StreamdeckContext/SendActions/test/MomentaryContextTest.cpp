@@ -2,13 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#define UNIT_TEST
-// Mocked definition.
-class ESDConnectionManager
-{
-};
-
-#include "../StreamdeckContext/SendActions/MomentaryContext.cpp"
+#include "StreamdeckContext/SendActions/MomentaryContext.h"
 
 namespace test
 {

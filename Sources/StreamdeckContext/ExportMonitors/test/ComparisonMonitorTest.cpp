@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "../StreamdeckContext/ExportMonitors/ComparisonMonitor.cpp"
+#include "StreamdeckContext/ExportMonitors/ComparisonMonitor.h"
 
 namespace test
 {

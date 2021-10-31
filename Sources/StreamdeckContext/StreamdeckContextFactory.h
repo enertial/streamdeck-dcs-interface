@@ -2,7 +2,8 @@
 
 #pragma once
 
-#include "StreamdeckContext.h"
+#include "StreamdeckContext/StreamdeckContext.h"
+
 #include <memory>
 #include <unordered_map>
 
