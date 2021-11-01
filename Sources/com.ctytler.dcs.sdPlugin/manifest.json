@@ -126,8 +126,11 @@
   ],
   "SDKVersion": 2,
   "Author": "Charlie Tytler",
-  "CodePathWin": "bin/dcs_interface.exe",
-  "DefaultWindowSize": [950, 850],
+  "CodePathWin": "bin/streamdeck_dcs_interface.exe",
+  "DefaultWindowSize": [
+    950,
+    850
+  ],
   "Description": "Allows buttons which communicate with Digital Combat Simulator (DCS)",
   "Name": "DCS Interface",
   "Icon": "images/plugin_icon",

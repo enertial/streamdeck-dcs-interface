@@ -104,7 +104,7 @@ Sources
 
 # Build from source instructions
 
-A build script is included which will build both the C++ executable which handles the communcation with DCS as well as the package for the Stream Deck plugin: `build_plugin.bat`
+A build script is included which will build both the C++ executable which handles the communcation with DCS as well as the package for the Stream Deck plugin: `Tools/build_plugin.bat`
 
 You must call this file from the [Developer Command Prompt for VS](https://docs.microsoft.com/en-us/dotnet/framework/tools/developer-command-prompt-for-vs) in order for the Visual C++ target build step to work.
 

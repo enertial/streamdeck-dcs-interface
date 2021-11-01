@@ -67,111 +67,110 @@
  * efficiently on either one than if ARCH_IS_BIG_ENDIAN is defined.
  */
 
-#include <cstring>
 #include <stddef.h>
 #include <string>
+#include <cstring>
 
-namespace websocketpp
-{
+namespace websocketpp {
 /// Provides MD5 hashing functionality
-namespace md5
-{
+namespace md5 {
 
 typedef unsigned char md5_byte_t; /* 8-bit byte */
-typedef unsigned int md5_word_t;  /* 32-bit word */
+typedef unsigned int md5_word_t; /* 32-bit word */
 
 /* Define the state of the MD5 Algorithm. */
 typedef struct md5_state_s {
-    md5_word_t count[2]; /* message length in bits, lsw first */
-    md5_word_t abcd[4];  /* digest buffer */
-    md5_byte_t buf[64];  /* accumulate block */
+    md5_word_t count[2];    /* message length in bits, lsw first */
+    md5_word_t abcd[4];     /* digest buffer */
+    md5_byte_t buf[64];     /* accumulate block */
 } md5_state_t;
 
 /* Initialize the algorithm. */
 inline void md5_init(md5_state_t *pms);
 
 /* Append a string to the message. */
-inline void md5_append(md5_state_t *pms, md5_byte_t const *data, size_t nbytes);
+inline void md5_append(md5_state_t *pms, md5_byte_t const * data, size_t nbytes);
 
 /* Finish the message and return the digest. */
 inline void md5_finish(md5_state_t *pms, md5_byte_t digest[16]);
 
-#undef ZSW_MD5_BYTE_ORDER /* 1 = big-endian, -1 = little-endian, 0 = unknown */
+#undef ZSW_MD5_BYTE_ORDER   /* 1 = big-endian, -1 = little-endian, 0 = unknown */
 #ifdef ARCH_IS_BIG_ENDIAN
-#define ZSW_MD5_BYTE_ORDER (ARCH_IS_BIG_ENDIAN ? 1 : -1)
+#  define ZSW_MD5_BYTE_ORDER (ARCH_IS_BIG_ENDIAN ? 1 : -1)
 #else
-#define ZSW_MD5_BYTE_ORDER 0
+#  define ZSW_MD5_BYTE_ORDER 0
 #endif
 
 #define ZSW_MD5_T_MASK ((md5_word_t)~0)
 #define ZSW_MD5_T1 /* 0xd76aa478 */ (ZSW_MD5_T_MASK ^ 0x28955b87)
 #define ZSW_MD5_T2 /* 0xe8c7b756 */ (ZSW_MD5_T_MASK ^ 0x173848a9)
-#define ZSW_MD5_T3 0x242070db
+#define ZSW_MD5_T3    0x242070db
 #define ZSW_MD5_T4 /* 0xc1bdceee */ (ZSW_MD5_T_MASK ^ 0x3e423111)
 #define ZSW_MD5_T5 /* 0xf57c0faf */ (ZSW_MD5_T_MASK ^ 0x0a83f050)
-#define ZSW_MD5_T6 0x4787c62a
+#define ZSW_MD5_T6    0x4787c62a
 #define ZSW_MD5_T7 /* 0xa8304613 */ (ZSW_MD5_T_MASK ^ 0x57cfb9ec)
 #define ZSW_MD5_T8 /* 0xfd469501 */ (ZSW_MD5_T_MASK ^ 0x02b96afe)
-#define ZSW_MD5_T9 0x698098d8
+#define ZSW_MD5_T9    0x698098d8
 #define ZSW_MD5_T10 /* 0x8b44f7af */ (ZSW_MD5_T_MASK ^ 0x74bb0850)
 #define ZSW_MD5_T11 /* 0xffff5bb1 */ (ZSW_MD5_T_MASK ^ 0x0000a44e)
 #define ZSW_MD5_T12 /* 0x895cd7be */ (ZSW_MD5_T_MASK ^ 0x76a32841)
-#define ZSW_MD5_T13 0x6b901122
+#define ZSW_MD5_T13    0x6b901122
 #define ZSW_MD5_T14 /* 0xfd987193 */ (ZSW_MD5_T_MASK ^ 0x02678e6c)
 #define ZSW_MD5_T15 /* 0xa679438e */ (ZSW_MD5_T_MASK ^ 0x5986bc71)
-#define ZSW_MD5_T16 0x49b40821
+#define ZSW_MD5_T16    0x49b40821
 #define ZSW_MD5_T17 /* 0xf61e2562 */ (ZSW_MD5_T_MASK ^ 0x09e1da9d)
 #define ZSW_MD5_T18 /* 0xc040b340 */ (ZSW_MD5_T_MASK ^ 0x3fbf4cbf)
-#define ZSW_MD5_T19 0x265e5a51
+#define ZSW_MD5_T19    0x265e5a51
 #define ZSW_MD5_T20 /* 0xe9b6c7aa */ (ZSW_MD5_T_MASK ^ 0x16493855)
 #define ZSW_MD5_T21 /* 0xd62f105d */ (ZSW_MD5_T_MASK ^ 0x29d0efa2)
-#define ZSW_MD5_T22 0x02441453
+#define ZSW_MD5_T22    0x02441453
 #define ZSW_MD5_T23 /* 0xd8a1e681 */ (ZSW_MD5_T_MASK ^ 0x275e197e)
 #define ZSW_MD5_T24 /* 0xe7d3fbc8 */ (ZSW_MD5_T_MASK ^ 0x182c0437)
-#define ZSW_MD5_T25 0x21e1cde6
+#define ZSW_MD5_T25    0x21e1cde6
 #define ZSW_MD5_T26 /* 0xc33707d6 */ (ZSW_MD5_T_MASK ^ 0x3cc8f829)
 #define ZSW_MD5_T27 /* 0xf4d50d87 */ (ZSW_MD5_T_MASK ^ 0x0b2af278)
-#define ZSW_MD5_T28 0x455a14ed
+#define ZSW_MD5_T28    0x455a14ed
 #define ZSW_MD5_T29 /* 0xa9e3e905 */ (ZSW_MD5_T_MASK ^ 0x561c16fa)
 #define ZSW_MD5_T30 /* 0xfcefa3f8 */ (ZSW_MD5_T_MASK ^ 0x03105c07)
-#define ZSW_MD5_T31 0x676f02d9
+#define ZSW_MD5_T31    0x676f02d9
 #define ZSW_MD5_T32 /* 0x8d2a4c8a */ (ZSW_MD5_T_MASK ^ 0x72d5b375)
 #define ZSW_MD5_T33 /* 0xfffa3942 */ (ZSW_MD5_T_MASK ^ 0x0005c6bd)
 #define ZSW_MD5_T34 /* 0x8771f681 */ (ZSW_MD5_T_MASK ^ 0x788e097e)
-#define ZSW_MD5_T35 0x6d9d6122
+#define ZSW_MD5_T35    0x6d9d6122
 #define ZSW_MD5_T36 /* 0xfde5380c */ (ZSW_MD5_T_MASK ^ 0x021ac7f3)
 #define ZSW_MD5_T37 /* 0xa4beea44 */ (ZSW_MD5_T_MASK ^ 0x5b4115bb)
-#define ZSW_MD5_T38 0x4bdecfa9
+#define ZSW_MD5_T38    0x4bdecfa9
 #define ZSW_MD5_T39 /* 0xf6bb4b60 */ (ZSW_MD5_T_MASK ^ 0x0944b49f)
 #define ZSW_MD5_T40 /* 0xbebfbc70 */ (ZSW_MD5_T_MASK ^ 0x4140438f)
-#define ZSW_MD5_T41 0x289b7ec6
+#define ZSW_MD5_T41    0x289b7ec6
 #define ZSW_MD5_T42 /* 0xeaa127fa */ (ZSW_MD5_T_MASK ^ 0x155ed805)
 #define ZSW_MD5_T43 /* 0xd4ef3085 */ (ZSW_MD5_T_MASK ^ 0x2b10cf7a)
-#define ZSW_MD5_T44 0x04881d05
+#define ZSW_MD5_T44    0x04881d05
 #define ZSW_MD5_T45 /* 0xd9d4d039 */ (ZSW_MD5_T_MASK ^ 0x262b2fc6)
 #define ZSW_MD5_T46 /* 0xe6db99e5 */ (ZSW_MD5_T_MASK ^ 0x1924661a)
-#define ZSW_MD5_T47 0x1fa27cf8
+#define ZSW_MD5_T47    0x1fa27cf8
 #define ZSW_MD5_T48 /* 0xc4ac5665 */ (ZSW_MD5_T_MASK ^ 0x3b53a99a)
 #define ZSW_MD5_T49 /* 0xf4292244 */ (ZSW_MD5_T_MASK ^ 0x0bd6ddbb)
-#define ZSW_MD5_T50 0x432aff97
+#define ZSW_MD5_T50    0x432aff97
 #define ZSW_MD5_T51 /* 0xab9423a7 */ (ZSW_MD5_T_MASK ^ 0x546bdc58)
 #define ZSW_MD5_T52 /* 0xfc93a039 */ (ZSW_MD5_T_MASK ^ 0x036c5fc6)
-#define ZSW_MD5_T53 0x655b59c3
+#define ZSW_MD5_T53    0x655b59c3
 #define ZSW_MD5_T54 /* 0x8f0ccc92 */ (ZSW_MD5_T_MASK ^ 0x70f3336d)
 #define ZSW_MD5_T55 /* 0xffeff47d */ (ZSW_MD5_T_MASK ^ 0x00100b82)
 #define ZSW_MD5_T56 /* 0x85845dd1 */ (ZSW_MD5_T_MASK ^ 0x7a7ba22e)
-#define ZSW_MD5_T57 0x6fa87e4f
+#define ZSW_MD5_T57    0x6fa87e4f
 #define ZSW_MD5_T58 /* 0xfe2ce6e0 */ (ZSW_MD5_T_MASK ^ 0x01d3191f)
 #define ZSW_MD5_T59 /* 0xa3014314 */ (ZSW_MD5_T_MASK ^ 0x5cfebceb)
-#define ZSW_MD5_T60 0x4e0811a1
+#define ZSW_MD5_T60    0x4e0811a1
 #define ZSW_MD5_T61 /* 0xf7537e82 */ (ZSW_MD5_T_MASK ^ 0x08ac817d)
 #define ZSW_MD5_T62 /* 0xbd3af235 */ (ZSW_MD5_T_MASK ^ 0x42c50dca)
-#define ZSW_MD5_T63 0x2ad7d2bb
+#define ZSW_MD5_T63    0x2ad7d2bb
 #define ZSW_MD5_T64 /* 0xeb86d391 */ (ZSW_MD5_T_MASK ^ 0x14792c6e)
 
-static void md5_process(md5_state_t *pms, md5_byte_t const *data /*[64]*/)
-{
-    md5_word_t a = pms->abcd[0], b = pms->abcd[1], c = pms->abcd[2], d = pms->abcd[3];
+static void md5_process(md5_state_t *pms, md5_byte_t const * data /*[64]*/) {
+    md5_word_t
+    a = pms->abcd[0], b = pms->abcd[1],
+    c = pms->abcd[2], d = pms->abcd[3];
     md5_word_t t;
 #if ZSW_MD5_BYTE_ORDER > 0
     /* Define storage only for big-endian CPUs. */
@@ -179,25 +178,25 @@ static void md5_process(md5_state_t *pms, md5_byte_t const *data /*[64]*/)
 #else
     /* Define storage for little-endian or both types of CPUs. */
     md5_word_t xbuf[16];
-    md5_word_t const *X;
+    md5_word_t const * X;
 #endif
 
     {
 #if ZSW_MD5_BYTE_ORDER == 0
-        /*
-         * Determine dynamically whether this is a big-endian or
-         * little-endian machine, since we can use a more efficient
-         * algorithm on the latter.
-         */
-        static int const w = 1;
+    /*
+     * Determine dynamically whether this is a big-endian or
+     * little-endian machine, since we can use a more efficient
+     * algorithm on the latter.
+     */
+    static int const w = 1;
 
-        if (*((md5_byte_t const *)&w)) /* dynamic little-endian */
+    if (*((md5_byte_t const *)&w)) /* dynamic little-endian */
 #endif
-#if ZSW_MD5_BYTE_ORDER <= 0 /* little-endian */
-        {
-            /*
-             * On little-endian machines, we can process properly aligned
-             * data without copying it.
+#if ZSW_MD5_BYTE_ORDER <= 0     /* little-endian */
+    {
+        /*
+         * On little-endian machines, we can process properly aligned
+         * data without copying it.
          */
         if (!((data - (md5_byte_t const *)0) & 3)) {
         /* data are properly aligned */

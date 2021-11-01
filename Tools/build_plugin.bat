@@ -6,7 +6,7 @@
 devenv %cd%\Sources\Windows\com.ctytler.dcs.sdPlugin.sln /build "Release|x64"
 
 :: Copy C++ executable to StreamDeck Plugin package:
-copy Sources\Windows\x64\Release\dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
+copy Sources\Windows\x64\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
 
 :: Remove any prior build of the Plugin:
 del Release\com.ctytler.dcs.streamDeckPlugin
