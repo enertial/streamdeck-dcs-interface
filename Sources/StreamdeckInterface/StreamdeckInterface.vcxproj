@@ -162,11 +162,23 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
+  <Target Name="AddWildCardItems"
+      AfterTargets="BuildGenerateSources">
+    <ItemGroup>
+      <ClCompile Include="@(_WildCardClCompile)" />
+    </ItemGroup>
+  </Target>
+  <PropertyGroup>
+    <ComputeCompileInputsTargets>
+      AddWildCardItems
+      $(ComputeCompileInputsTargets)
+    </ComputeCompileInputsTargets>
+  </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="*.cpp" />
+    <_WildCardClCompile Include="*.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="*.h" />
+    <_WildCardClInclude Include="*.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DcsInterface\DcsInterface.vcxproj">

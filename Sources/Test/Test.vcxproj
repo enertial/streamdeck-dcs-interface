@@ -44,8 +44,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SolutionDir)..\;../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
   </PropertyGroup>
+  <Target Name="AddWildCardItems"
+      AfterTargets="BuildGenerateSources">
+    <ItemGroup>
+      <ClCompile Include="@(_WildCardClCompile)" />
+    </ItemGroup>
+  </Target>
+  <PropertyGroup>
+    <ComputeCompileInputsTargets>
+      AddWildCardItems
+      $(ComputeCompileInputsTargets)
+    </ComputeCompileInputsTargets>
+  </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="..\**\*Test.cpp" />
+    <_WildCardClCompile Include="..\**\*Test.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DcsInterface\DcsInterface.vcxproj">
