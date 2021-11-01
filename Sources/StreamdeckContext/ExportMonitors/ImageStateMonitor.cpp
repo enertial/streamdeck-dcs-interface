@@ -1,12 +1,12 @@
 // Copyright 2021 Charles Tytler
 
-#include "ComparisonMonitor.h"
+#include "ImageStateMonitor.h"
 
 #include "Utilities/StringUtilities.h"
 
-ComparisonMonitor::ComparisonMonitor(const json &settings) { update_settings(settings); }
+ImageStateMonitor::ImageStateMonitor(const json &settings) { update_settings(settings); }
 
-void ComparisonMonitor::update_settings(const json &settings)
+void ImageStateMonitor::update_settings(const json &settings)
 {
     const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
     const std::string dcs_id_compare_condition_raw =
@@ -31,7 +31,7 @@ void ComparisonMonitor::update_settings(const json &settings)
     }
 }
 
-int ComparisonMonitor::determineContextState(DcsInterface &dcs_interface) const
+int ImageStateMonitor::determineContextState(DcsInterface &dcs_interface) const
 {
     if (settings_are_filled_) {
         const auto maybe_current_game_value = dcs_interface.get_decimal_of_dcs_id(dcs_id_compare_monitor_);
@@ -42,7 +42,7 @@ int ComparisonMonitor::determineContextState(DcsInterface &dcs_interface) const
     return 0;
 }
 
-bool ComparisonMonitor::comparison_is_satisfied(Decimal current_game_value) const
+bool ImageStateMonitor::comparison_is_satisfied(Decimal current_game_value) const
 {
     bool comparison_result = false;
     switch (dcs_id_compare_condition_) {

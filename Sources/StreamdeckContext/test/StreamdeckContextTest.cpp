@@ -52,7 +52,7 @@ class StreamdeckContextTestFixture : public ::testing::Test
     static inline std::string fixture_context_id = "abc123";
 };
 
-TEST_F(StreamdeckContextTestFixture, UseComparisonMonitor)
+TEST_F(StreamdeckContextTestFixture, UseImageStateMonitor)
 {
     // Create StreamdeckContext initialized with settings to test.
     const std::string context_id = "def456";

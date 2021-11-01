@@ -2,15 +2,15 @@
 
 #include "gtest/gtest.h"
 
-#include "StreamdeckContext/ExportMonitors/ComparisonMonitor.h"
+#include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 
 namespace test
 {
 
-class ComparisonMonitorTestFixture : public ::testing::Test
+class ImageStateMonitorTestFixture : public ::testing::Test
 {
   public:
-    ComparisonMonitorTestFixture()
+    ImageStateMonitorTestFixture()
         : // Create StreamdeckContexts with different comparison selections to test.
           context_with_equals({{"dcs_id_compare_monitor", "123"},
                                {"dcs_id_compare_condition", "EQUAL_TO"},
@@ -35,15 +35,15 @@ class ComparisonMonitorTestFixture : public ::testing::Test
     }
 
     const double comparison_value = 1.56;
-    ComparisonMonitor context_with_equals;
-    ComparisonMonitor context_with_less_than;
-    ComparisonMonitor context_with_greater_than;
+    ImageStateMonitor context_with_equals;
+    ImageStateMonitor context_with_less_than;
+    ImageStateMonitor context_with_greater_than;
     DcsConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
     UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
     DcsInterface dcs_interface; // DCS Interface to test.
 };
 
-TEST_F(ComparisonMonitorTestFixture, CompareToZero)
+TEST_F(ImageStateMonitorTestFixture, CompareToZero)
 {
     // Zero compared to positive reference settings value.
     set_current_dcs_id_value("0");
@@ -54,7 +54,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToZero)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToNegativeValue)
+TEST_F(ImageStateMonitorTestFixture, CompareToNegativeValue)
 {
     // Received value is less than reference settings value.
     set_current_dcs_id_value(std::to_string(-1 * comparison_value));
@@ -65,7 +65,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToNegativeValue)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToLesserPositiveValue)
+TEST_F(ImageStateMonitorTestFixture, CompareToLesserPositiveValue)
 {
     // Received value is less than reference settings value.
     set_current_dcs_id_value(std::to_string(comparison_value / 2.0));
@@ -75,7 +75,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToLesserPositiveValue)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToEqualValue)
+TEST_F(ImageStateMonitorTestFixture, CompareToEqualValue)
 {
     // Received value is equal to to reference settings value.
     set_current_dcs_id_value(std::to_string(comparison_value));
@@ -85,7 +85,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToEqualValue)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToGreaterValue)
+TEST_F(ImageStateMonitorTestFixture, CompareToGreaterValue)
 {
     // Received value is less than reference settings value.
     set_current_dcs_id_value(std::to_string(comparison_value * 2.0));
@@ -95,7 +95,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToGreaterValue)
     EXPECT_EQ(1, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, UpdateSettings)
+TEST_F(ImageStateMonitorTestFixture, UpdateSettings)
 {
     // Zero compared to positive reference settings value.
     const std::string modified_reference = "99";
@@ -116,7 +116,7 @@ TEST_F(ComparisonMonitorTestFixture, UpdateSettings)
 
 // Test comparison to invalid values.
 
-TEST_F(ComparisonMonitorTestFixture, CompareFloatToInt)
+TEST_F(ImageStateMonitorTestFixture, CompareFloatToInt)
 {
     // Received int value is appropriately compared to a floating point reference.
     set_current_dcs_id_value("20");
@@ -127,7 +127,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareFloatToInt)
     EXPECT_EQ(1, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToAlphaNumeric)
+TEST_F(ImageStateMonitorTestFixture, CompareToAlphaNumeric)
 {
     // Send game state value with letters -- should treat as string and not try comparison.
     set_current_dcs_id_value("20a");
@@ -139,7 +139,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToAlphaNumeric)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToEmptyString)
+TEST_F(ImageStateMonitorTestFixture, CompareToEmptyString)
 {
     // Send game state value with letters -- should treat as string and not try comparison.
     set_current_dcs_id_value("");
@@ -150,7 +150,7 @@ TEST_F(ComparisonMonitorTestFixture, CompareToEmptyString)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareToNumberWithSpacesPadding)
+TEST_F(ImageStateMonitorTestFixture, CompareToNumberWithSpacesPadding)
 {
     // Send game state value with letters -- should treat as string and not try comparison.
     set_current_dcs_id_value("  " + std::to_string(comparison_value) + "  ");
@@ -161,10 +161,10 @@ TEST_F(ComparisonMonitorTestFixture, CompareToNumberWithSpacesPadding)
     EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, CompareWithInvalidDcsID)
+TEST_F(ImageStateMonitorTestFixture, CompareWithInvalidDcsID)
 {
     // Send valid game state, but make settings dcs_id monitor value invalid as a float.
-    ComparisonMonitor context_with_flot_id{json{{"dcs_id_compare_monitor", "123.0"},
+    ImageStateMonitor context_with_flot_id{json{{"dcs_id_compare_monitor", "123.0"},
                                                 {"dcs_id_compare_condition", "EQUAL_TO"},
                                                 {"dcs_id_comparison_value", std::to_string(comparison_value)}}};
 
@@ -173,10 +173,10 @@ TEST_F(ComparisonMonitorTestFixture, CompareWithInvalidDcsID)
     EXPECT_EQ(0, context_with_flot_id.determineContextState(dcs_interface));
 }
 
-TEST_F(ComparisonMonitorTestFixture, InvalidComparisonValueSetting)
+TEST_F(ImageStateMonitorTestFixture, InvalidComparisonValueSetting)
 {
     // Send valid game state, but make settings dcs_id monitor value invalid as a float.
-    const ComparisonMonitor context_with_flot_id{json{{"dcs_id_compare_monitor", "123"},
+    const ImageStateMonitor context_with_flot_id{json{{"dcs_id_compare_monitor", "123"},
                                                       {"dcs_id_compare_condition", "EQUAL_TO"},
                                                       {"dcs_id_comparison_value", "1.0abc"}}};
 

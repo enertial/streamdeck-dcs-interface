@@ -4,7 +4,7 @@
 
 #include "DcsInterface/DcsInterface.h"
 #include "ElgatoSD/ESDConnectionManager.h"
-#include "StreamdeckContext/ExportMonitors/ComparisonMonitor.h"
+#include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
 #include "Utilities/StringUtilities.h"
@@ -69,7 +69,7 @@ class StreamdeckContext
                                            const json &inPayload){};
 
     // Monitors.
-    ComparisonMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
+    ImageStateMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
     TitleMonitor title_monitor_{};           // Monitors DCS ID to determine the title text of Streamdeck context.
     IncrementMonitor increment_monitor_{};   // Monitors DCS ID to determine the state of an incremental switch.
 

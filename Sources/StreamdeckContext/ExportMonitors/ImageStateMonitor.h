@@ -7,11 +7,11 @@
 #include "Utilities/Decimal.h"
 
 #include <optional>
-class ComparisonMonitor
+class ImageStateMonitor
 {
   public:
-    ComparisonMonitor() = default;
-    ComparisonMonitor(const json &settings);
+    ImageStateMonitor() = default;
+    ImageStateMonitor(const json &settings);
 
     /**
      * @brief Updates internal monitor conditions based on user settings.
