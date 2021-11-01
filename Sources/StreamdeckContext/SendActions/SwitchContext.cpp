@@ -4,37 +4,36 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void SwitchContext::handleButtonEvent(DcsInterface &dcs_interface, const KeyEvent event, const json &inPayload)
+void SwitchContext::handleButtonPressedEvent(DcsInterface &dcs_interface,
+                                             ESDConnectionManager *mConnectionManager,
+                                             const json &inPayload)
 {
-    const std::string button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
-    const std::string device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
-
-    if (is_integer(button_id) && is_integer(device_id)) {
-        const ContextState state =
-            EPLJSONUtils::GetIntByName(inPayload, "state") == 0 ? ContextState::FIRST : ContextState::SECOND;
-        const auto send_command = determineSendValue(event, state, inPayload["settings"]);
-
-        if (send_command) {
-            dcs_interface.send_dcs_command(std::stoi(button_id), device_id, send_command.value());
-        }
-    }
+    // Nothing sent to DCS on press.
 }
 
-std::optional<std::string>
-SwitchContext::determineSendValue(const KeyEvent event, const ContextState state, const json &settings) const
+void SwitchContext::handleButtonReleasedEvent(DcsInterface &dcs_interface,
+                                              ESDConnectionManager *mConnectionManager,
+                                              const json &inPayload)
 {
-    std::string value;
-    if (event == KeyEvent::RELEASED) {
-        if (state == ContextState::FIRST) {
-            value = EPLJSONUtils::GetStringByName(settings, "send_when_first_state_value");
-        } else {
-            value = EPLJSONUtils::GetStringByName(settings, "send_when_second_state_value");
-        }
+    const auto button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
+    const auto device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
+    const auto send_when_first_state_value =
+        EPLJSONUtils::GetStringByName(inPayload["settings"], "send_when_first_state_value");
+    const auto send_when_second_state_value =
+        EPLJSONUtils::GetStringByName(inPayload["settings"], "send_when_second_state_value");
+    const bool is_first_state = (EPLJSONUtils::GetIntByName(inPayload, "state") == 0);
 
-        if (!value.empty()) {
-            return value;
-        }
+    if (is_integer(button_id) && is_integer(device_id) && !send_when_first_state_value.empty() &&
+        !send_when_second_state_value.empty()) {
+
+        const auto send_value = is_first_state ? send_when_first_state_value : send_when_second_state_value;
+        dcs_interface.send_dcs_command(std::stoi(button_id), device_id, send_value);
     }
-    // Switch type only needs to send command on key down.
-    return std::nullopt;
+
+    // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
+    // context's state will keep the button state in sync with the plugin.
+
+    // For switches use a delay to avoid jittering and a race condition of Streamdeck and Plugin trying to
+    // change state.
+    forceSendStateAfterDelay(num_frames_delay_forced_state_update_);
 }

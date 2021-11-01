@@ -50,7 +50,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
 TEST_F(IncrementContextKeyPressTestFixture, handle_invalid_button_id)
 {
     payload["settings"]["button_id"] = "abc";
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -59,7 +59,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_invalid_button_id)
 TEST_F(IncrementContextKeyPressTestFixture, handle_invalid_device_id)
 {
     payload["settings"]["device_id"] = "32.4";
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -67,7 +67,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_invalid_device_id)
 
 TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment)
 {
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "C" + device_id + "," + button_id + "," + increment_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -83,7 +83,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     dcs_interface.update_dcs_state();
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
 
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     const Decimal expected_increment_value = Decimal(external_increment_start) + Decimal(increment_value);
     std::string expected_command = "C" + device_id + "," + button_id + "," + expected_increment_value.str();
@@ -92,11 +92,19 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
 
 TEST_F(IncrementContextKeyPressTestFixture, handle_keyup_increment)
 {
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::RELEASED, payload);
+    fixture_context.handleButtonReleasedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
+}
+
+TEST_F(IncrementContextKeyPressTestFixture, handle_keyup_force_state_update_called)
+{
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
+    fixture_context.handleButtonReleasedEvent(dcs_interface, &esd_connection_manager, payload);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
 }
 
 } // namespace test

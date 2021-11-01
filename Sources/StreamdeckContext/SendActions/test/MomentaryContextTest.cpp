@@ -4,6 +4,8 @@
 
 #include "StreamdeckContext/SendActions/MomentaryContext.h"
 
+#include "Test/MockESDConnectionManager.h"
+
 namespace test
 {
 
@@ -27,8 +29,9 @@ class MomentaryContextKeyPressTestFixture : public ::testing::Test
         (void)mock_dcs.receive();
     }
     DcsConnectionSettings connection_settings = {"1928", "1929", "127.0.0.1"};
-    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface; // DCS Interface to test.
+    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
+    DcsInterface dcs_interface;                      // DCS Interface to test.
+    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     MomentaryContext fixture_context;
 
@@ -42,7 +45,7 @@ class MomentaryContextKeyPressTestFixture : public ::testing::Test
 TEST_F(MomentaryContextKeyPressTestFixture, handle_invalid_button_id)
 {
     payload["settings"]["button_id"] = "abc";
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -51,7 +54,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_invalid_button_id)
 TEST_F(MomentaryContextKeyPressTestFixture, handle_invalid_device_id)
 {
     payload["settings"]["device_id"] = "32.4";
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -60,7 +63,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_invalid_device_id)
 TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary)
 {
     MomentaryContext fc("abc", {});
-    fc.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fc.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "C" + device_id + "," + button_id + "," + press_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -68,7 +71,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary)
 
 TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary)
 {
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::RELEASED, payload);
+    fixture_context.handleButtonReleasedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "C" + device_id + "," + button_id + "," + release_value;
     EXPECT_EQ(expected_command, ss_received.str());
@@ -77,7 +80,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary)
 TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary_release_send_disabled)
 {
     payload["settings"]["disable_release_check"] = true;
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::RELEASED, payload);
+    fixture_context.handleButtonReleasedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
@@ -86,10 +89,18 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary_release_send_
 TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary_empty_value)
 {
     payload["settings"]["press_value"] = "";
-    fixture_context.handleButtonEvent(dcs_interface, KeyEvent::PRESSED, payload);
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
+}
+
+TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_force_state_update_called)
+{
+    fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
+    fixture_context.handleButtonReleasedEvent(dcs_interface, &esd_connection_manager, payload);
+    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
 }
 
 } // namespace test

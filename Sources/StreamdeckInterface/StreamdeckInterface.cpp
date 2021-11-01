@@ -148,7 +148,7 @@ void StreamdeckInterface::KeyDownForAction(const std::string &inAction,
 {
     if (dcs_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext]->handleButtonEvent(*dcs_interface_, KeyEvent::PRESSED, inPayload);
+        mVisibleContexts[inContext]->handleButtonPressedEvent(*dcs_interface_, mConnectionManager, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -161,16 +161,7 @@ void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
 
     if (dcs_interface_) {
         mVisibleContextsMutex.lock();
-        // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
-        // context's state will keep the button state in sync with the plugin.
-        if (inAction.find("switch") != std::string::npos) {
-            // For switches use a delay to avoid jittering and a race condition of Streamdeck and Plugin trying to
-            // change state.
-            mVisibleContexts[inContext]->forceSendStateAfterDelay(3);
-        } else {
-            mVisibleContexts[inContext]->forceSendState(mConnectionManager);
-        }
-        mVisibleContexts[inContext]->handleButtonEvent(*dcs_interface_, KeyEvent::RELEASED, inPayload);
+        mVisibleContexts[inContext]->handleButtonReleasedEvent(*dcs_interface_, mConnectionManager, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
