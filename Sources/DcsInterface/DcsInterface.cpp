@@ -1,9 +1,8 @@
 // Copyright 2020 Charles Tytler
 
-#include "pch.h"
-
-#include "../Utilities/StringUtilities.h"
 #include "DcsInterface.h"
+
+#include "Utilities/StringUtilities.h"
 
 DcsInterface::DcsInterface(const DcsConnectionSettings &settings)
     : dcs_socket_(settings.ip_address, settings.rx_port, settings.tx_port), connection_settings_(settings)

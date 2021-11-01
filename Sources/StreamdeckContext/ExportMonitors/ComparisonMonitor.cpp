@@ -1,9 +1,8 @@
 // Copyright 2021 Charles Tytler
 
-#include "pch.h"
-
-#include "../../Utilities/StringUtilities.h"
 #include "ComparisonMonitor.h"
+
+#include "Utilities/StringUtilities.h"
 
 ComparisonMonitor::ComparisonMonitor(const json &settings) { update_settings(settings); }
 

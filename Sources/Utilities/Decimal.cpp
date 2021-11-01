@@ -1,7 +1,5 @@
 // Copyright 2020 Charles Tytler
 
-#include "pch.h"
-
 #include "Decimal.h"
 
 #include <algorithm>

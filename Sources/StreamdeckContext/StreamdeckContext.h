@@ -2,15 +2,12 @@
 
 #pragma once
 
-#include "../DcsInterface/DcsInterface.h"
-#include "../Utilities/StringUtilities.h"
-#include "ExportMonitors/ComparisonMonitor.h"
-#include "ExportMonitors/IncrementMonitor.h"
-#include "ExportMonitors/TitleMonitor.h"
-
-#ifndef UNIT_TEST
-#include "../Common/ESDConnectionManager.h"
-#endif
+#include "DcsInterface/DcsInterface.h"
+#include "ElgatoSD/ESDConnectionManager.h"
+#include "StreamdeckContext/ExportMonitors/ComparisonMonitor.h"
+#include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
+#include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
+#include "Utilities/StringUtilities.h"
 
 #include <optional>
 #include <string>

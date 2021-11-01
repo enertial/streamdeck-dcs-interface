@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "../../Common/EPLJSONUtils.h"
-#include "../../DcsInterface/DcsInterface.h"
+#include "DcsInterface/DcsInterface.h"
+#include "ElgatoSD/EPLJSONUtils.h"
 
 #include <string>
 

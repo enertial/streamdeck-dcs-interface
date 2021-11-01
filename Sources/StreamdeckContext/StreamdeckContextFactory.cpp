@@ -1,12 +1,10 @@
 // Copyright 2021 Charles Tytler
 
-#include "pch.h"
-
 #include "StreamdeckContextFactory.h"
 
-#include "SendActions/IncrementContext.h"
-#include "SendActions/MomentaryContext.h"
-#include "SendActions/SwitchContext.h"
+#include "StreamdeckContext/SendActions/IncrementContext.h"
+#include "StreamdeckContext/SendActions/MomentaryContext.h"
+#include "StreamdeckContext/SendActions/SwitchContext.h"
 
 StreamdeckContextFactory::StreamdeckContextFactory()
 {

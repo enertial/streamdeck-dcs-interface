@@ -2,3 +2,4 @@ x64/
 x86/
 .vs
 .vscode
+.vcxproj.*

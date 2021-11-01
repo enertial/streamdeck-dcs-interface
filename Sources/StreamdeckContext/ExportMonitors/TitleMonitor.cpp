@@ -1,9 +1,8 @@
 // Copyright 2021 Charles Tytler
 
-#include "pch.h"
-
-#include "../../Utilities/StringUtilities.h"
 #include "TitleMonitor.h"
+
+#include "Utilities/StringUtilities.h"
 
 TitleMonitor::TitleMonitor(const json &settings) { update_settings(settings); }
 

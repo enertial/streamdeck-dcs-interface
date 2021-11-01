@@ -2,9 +2,9 @@
 
 #pragma once
 
-#include "../../Common/EPLJSONUtils.h"
-#include "../../DcsInterface/DcsInterface.h"
-#include "../../Utilities/Decimal.h"
+#include "DcsInterface/DcsInterface.h"
+#include "ElgatoSD/EPLJSONUtils.h"
+#include "Utilities/Decimal.h"
 
 #include <string>
 
