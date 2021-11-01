@@ -73,26 +73,26 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\</IntDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)..\;$(SolutionDir)../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(IncludePath)</IncludePath>
     <TargetName>streamdeck_dcs_interface</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\</IntDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)..\;$(SolutionDir)../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(IncludePath)</IncludePath>
     <TargetName>streamdeck_dcs_interface</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\</IntDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)..\;$(SolutionDir)../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(IncludePath)</IncludePath>
     <TargetName>streamdeck_dcs_interface</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\</IntDir>
+    <IntDir>$(SolutionDir)$(Platform)\$(Configuration)\obj\$(ProjectName)\</IntDir>
     <IncludePath>$(SolutionDir)..\;$(SolutionDir)../Vendor/asio/include;$(SolutionDir)../Vendor/websocketpp;$(IncludePath)</IncludePath>
     <TargetName>streamdeck_dcs_interface</TargetName>
   </PropertyGroup>
@@ -162,8 +162,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <Target Name="AddWildCardItems"
-      AfterTargets="BuildGenerateSources">
+  <Target Name="AddWildCardItems" AfterTargets="BuildGenerateSources">
     <ItemGroup>
       <ClCompile Include="@(_WildCardClCompile)" />
     </ItemGroup>

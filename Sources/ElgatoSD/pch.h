@@ -5,7 +5,7 @@
 @brief		Precompiled header
 
 @copyright  (c) 2018, Corsair Memory, Inc.
-			This source code is licensed under the MIT-style license found in the LICENSE file.
+                        This source code is licensed under the MIT-style license found in the LICENSE file.
 
 **/
 //==============================================================================
@@ -18,30 +18,29 @@
 //-------------------------------------------------------------------
 
 #include <winsock2.h>
-#include <Windows.h>
-#include <string>
-#include <set>
-#include <thread>
-#include <strsafe.h>
 
+#include <Windows.h>
+#include <set>
+#include <string>
+#include <strsafe.h>
+#include <thread>
 
 //-------------------------------------------------------------------
 // Debug logging
 //-------------------------------------------------------------------
 
 #ifdef _DEBUG
-	#define DEBUG 1
+#define DEBUG 1
 #else
-	#define DEBUG 0
+#define DEBUG 0
 #endif
 
 void __cdecl dbgprintf(const char *format, ...);
 
 #if DEBUG
-#define DebugPrint			dbgprintf
+#define DebugPrint dbgprintf
 #else
-#define DebugPrint(...)		while(0)
+#define DebugPrint(...) while (0)
 #endif
 
-
-#endif //PCH_H
+#endif // PCH_H
