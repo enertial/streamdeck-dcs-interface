@@ -1,7 +1,16 @@
 // Copyright 2021 Charles Tytler
 
+/***
+ *
+ * This file holds Mock classes of Elgato Streamdeck code that can be passed to plugin code for unit testing Streamdeck
+ * context management. The mocked ESDConnectionManager prevents actual websockets to the Streamdeck from being opened in
+ * the unit tests and instead allows output commands to be inspected.
+ *
+ ***/
+
 #pragma once
 
+#include "ElgatoSD/ESDBasePlugin.h"
 #include "ElgatoSD/ESDConnectionManager.h"
 
 class MockPlugin : public ESDBasePlugin
@@ -50,10 +59,6 @@ class MockPlugin : public ESDBasePlugin
     {
     }
 };
-
-// Create mock version of ESDConnectionManager for testing.
-// #define UNIT_TEST
-// const int kESDSDKTarget_HardwareAndSoftware = 0;
 
 class MockESDConnectionManager : public ESDConnectionManager
 {
