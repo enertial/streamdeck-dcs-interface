@@ -10,8 +10,8 @@
 **/
 //==============================================================================
 
-#include "DcsInterface/DcsInterface.h"
 #include "ElgatoSD/ESDBasePlugin.h"
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "StreamdeckContext/StreamdeckContextFactory.h"
 
 #include <mutex>
@@ -69,14 +69,14 @@ class StreamdeckInterface : public ESDBasePlugin
      * @brief Helper function to extract connection settings from global settings
      *
      * @param global_settings Json object of global settings received from Streamdeck.
-     * @return DcsConnectionSettings
+     * @return SimulatorConnectionSettings
      */
-    DcsConnectionSettings get_connection_settings(const json &global_settings);
+    SimulatorConnectionSettings get_connection_settings(const json &global_settings);
 
     std::mutex mVisibleContextsMutex;
     std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> mVisibleContexts = {};
 
     CallBackTimer *mTimer;
-    std::optional<DcsInterface> dcs_interface_ = std::nullopt;
+    std::optional<DcsExportScriptInterface> simulator_interface_ = std::nullopt;
     StreamdeckContextFactory streamdeck_context_factory;
 };

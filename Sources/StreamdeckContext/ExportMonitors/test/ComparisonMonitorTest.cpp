@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 
 namespace test
@@ -31,16 +32,16 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     void set_current_dcs_id_value(const std::string value)
     {
         mock_dcs.send("header*123=" + value);
-        dcs_interface.update_dcs_state();
+        dcs_interface.update_simulator_state();
     }
 
     const double comparison_value = 1.56;
     ImageStateMonitor context_with_equals;
     ImageStateMonitor context_with_less_than;
     ImageStateMonitor context_with_greater_than;
-    DcsConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface; // DCS Interface to test.
+    SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
+    UdpSocket mock_dcs;                     // A socket that will mock Send/Receive messages from DCS.
+    DcsExportScriptInterface dcs_interface; // DCS Interface to test.
 };
 
 TEST_F(ImageStateMonitorTestFixture, CompareToZero)

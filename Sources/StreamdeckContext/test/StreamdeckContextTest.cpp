@@ -7,6 +7,7 @@
 
 #include "StreamdeckContext/StreamdeckContext.h"
 
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "StreamdeckContext/SendActions/IncrementContext.h"
 #include "StreamdeckContext/SendActions/MomentaryContext.h"
 #include "StreamdeckContext/SendActions/SwitchContext.h"
@@ -15,8 +16,8 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
 {
     // Test -- With an unpopulated game state in dcs_interface, try to update context state.
     StreamdeckContext test_context("def456");
-    DcsConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
-    DcsInterface dcs_interface(connection_settings);
+    SimulatorConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
+    DcsExportScriptInterface dcs_interface(connection_settings);
     MockESDConnectionManager esd_connection_manager{};
     test_context.updateContextState(dcs_interface, &esd_connection_manager);
     // Expect no state or title change as default context state and title values have not changed.
@@ -38,12 +39,12 @@ class StreamdeckContextTestFixture : public ::testing::Test
         // Send a single message from mock DCS that contains update for monitored ID.
         std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
         mock_dcs.send(mock_dcs_message);
-        dcs_interface.update_dcs_state();
+        dcs_interface.update_simulator_state();
     }
 
-    DcsConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
+    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
     UdpSocket mock_dcs;                                // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                        // DCS Interface to test.
+    DcsExportScriptInterface dcs_interface;            // DCS Interface to test.
     MockESDConnectionManager esd_connection_manager{}; // Streamdeck connection manager, using mock class definition.
 
     StreamdeckContext fixture_context;
@@ -176,7 +177,7 @@ TEST_F(StreamdeckContextTestFixture, derived_class_instances_within_container)
 
     std::string mock_dcs_message = "header*1=a:2=b:3=c";
     mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
+    dcs_interface.update_simulator_state();
 
     std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> ctx_map;
     ctx_map["ctx_a"] =

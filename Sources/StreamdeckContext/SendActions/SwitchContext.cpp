@@ -4,14 +4,14 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void SwitchContext::handleButtonPressedEvent(DcsInterface &dcs_interface,
+void SwitchContext::handleButtonPressedEvent(BaseSimulatorInterface &dcs_interface,
                                              ESDConnectionManager *mConnectionManager,
                                              const json &inPayload)
 {
     // Nothing sent to DCS on press.
 }
 
-void SwitchContext::handleButtonReleasedEvent(DcsInterface &dcs_interface,
+void SwitchContext::handleButtonReleasedEvent(BaseSimulatorInterface &dcs_interface,
                                               ESDConnectionManager *mConnectionManager,
                                               const json &inPayload)
 {
@@ -27,7 +27,7 @@ void SwitchContext::handleButtonReleasedEvent(DcsInterface &dcs_interface,
         !send_when_second_state_value.empty()) {
 
         const auto send_value = is_first_state ? send_when_first_state_value : send_when_second_state_value;
-        dcs_interface.send_dcs_command(std::stoi(button_id), device_id, send_value);
+        dcs_interface.send_simulator_command(std::stoi(button_id), device_id, send_value);
     }
 
     // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current

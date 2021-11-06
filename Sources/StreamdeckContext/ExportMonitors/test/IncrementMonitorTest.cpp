@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 
 namespace test
@@ -66,13 +67,13 @@ class IncrementMonitorTestFixture : public ::testing::Test
     void set_current_dcs_id_value(const std::string value)
     {
         mock_dcs.send("header*" + monitor_id_value + "=" + value);
-        dcs_interface.update_dcs_state();
+        dcs_interface.update_simulator_state();
     }
 
     std::string monitor_id_value = "123";
-    DcsConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface; // DCS Interface to test.
+    SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
+    UdpSocket mock_dcs;                     // A socket that will mock Send/Receive messages from DCS.
+    DcsExportScriptInterface dcs_interface; // DCS Interface to test.
 };
 
 TEST_F(IncrementMonitorTestFixture, CurrentValueIsUpdatedFromDcsInterface)

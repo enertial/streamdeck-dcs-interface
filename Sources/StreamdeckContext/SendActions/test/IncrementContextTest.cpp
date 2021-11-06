@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "StreamdeckContext/SendActions/IncrementContext.h"
 
 #include "Test/MockESDConnectionManager.h"
@@ -31,9 +32,9 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
         (void)mock_dcs.receive();
         fixture_context.updateContextSettings(payload["settings"]);
     }
-    DcsConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
+    SimulatorConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
     UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                      // DCS Interface to test.
+    DcsExportScriptInterface dcs_interface;          // DCS Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     IncrementContext fixture_context;
@@ -80,7 +81,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     // Send a single message from mock DCS that contains update for monitored ID.
     std::string mock_dcs_message = "header*" + dcs_id_increment_monitor + "=" + external_increment_start;
     mock_dcs.send(mock_dcs_message);
-    dcs_interface.update_dcs_state();
+    dcs_interface.update_simulator_state();
     fixture_context.updateContextState(dcs_interface, &esd_connection_manager);
 
     fixture_context.handleButtonPressedEvent(dcs_interface, &esd_connection_manager, payload);

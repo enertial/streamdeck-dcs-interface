@@ -4,6 +4,7 @@
 
 #include "StreamdeckContext/SendActions/SwitchContext.h"
 
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "Test/MockESDConnectionManager.h"
 namespace test
 {
@@ -27,9 +28,9 @@ class SwitchContextKeyPressTestFixture : public ::testing::Test
         (void)mock_dcs.receive();
     }
 
-    DcsConnectionSettings connection_settings = {"1948", "1949", "127.0.0.1"};
+    SimulatorConnectionSettings connection_settings = {"1948", "1949", "127.0.0.1"};
     UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                      // DCS Interface to test.
+    DcsExportScriptInterface dcs_interface;          // DCS Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     SwitchContext fixture_context;

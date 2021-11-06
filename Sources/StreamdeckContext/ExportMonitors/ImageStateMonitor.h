@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DcsInterface/DcsInterface.h"
 #include "ElgatoSD/EPLJSONUtils.h"
+#include "SimulatorInterface/BaseSimulatorInterface.h"
 #include "Utilities/Decimal.h"
 
 #include <optional>
@@ -26,7 +26,7 @@ class ImageStateMonitor
      * @param dcs_interface Interface to request current game state from.
      * @return The Streamdeck context should be set to if all settings are filled.
      */
-    int determineContextState(DcsInterface &dcs_interface) const;
+    int determineContextState(BaseSimulatorInterface &dcs_interface) const;
 
   private:
     enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };

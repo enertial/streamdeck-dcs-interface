@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
 #include "StreamdeckContext/SendActions/MomentaryContext.h"
 
 #include "Test/MockESDConnectionManager.h"
@@ -28,9 +29,9 @@ class MomentaryContextKeyPressTestFixture : public ::testing::Test
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
     }
-    DcsConnectionSettings connection_settings = {"1928", "1929", "127.0.0.1"};
+    SimulatorConnectionSettings connection_settings = {"1928", "1929", "127.0.0.1"};
     UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface;                      // DCS Interface to test.
+    DcsExportScriptInterface dcs_interface;          // DCS Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     MomentaryContext fixture_context;

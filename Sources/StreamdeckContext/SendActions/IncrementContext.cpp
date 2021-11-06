@@ -4,7 +4,7 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void IncrementContext::handleButtonPressedEvent(DcsInterface &dcs_interface,
+void IncrementContext::handleButtonPressedEvent(BaseSimulatorInterface &dcs_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {
@@ -14,12 +14,12 @@ void IncrementContext::handleButtonPressedEvent(DcsInterface &dcs_interface,
     if (is_integer(button_id) && is_integer(device_id)) {
         const auto send_command = determineSendValue(inPayload["settings"]);
         if (send_command) {
-            dcs_interface.send_dcs_command(std::stoi(button_id), device_id, send_command.value());
+            dcs_interface.send_simulator_command(std::stoi(button_id), device_id, send_command.value());
         }
     }
 }
 
-void IncrementContext::handleButtonReleasedEvent(DcsInterface &dcs_interface,
+void IncrementContext::handleButtonReleasedEvent(BaseSimulatorInterface &dcs_interface,
                                                  ESDConnectionManager *mConnectionManager,
                                                  const json &inPayload)
 {
