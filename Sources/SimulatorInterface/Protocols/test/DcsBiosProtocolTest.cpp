@@ -20,7 +20,7 @@ TEST(DcsBiosProtocolTest, dcs_reset_command_on_construction)
 
     // Test that the reset message "R" is received by DCS on creation of DcsBiosProtocol.
     std::stringstream ss = mock_dcs.receive();
-    EXPECT_EQ("SYNC E", ss.str());
+    EXPECT_EQ("SYNC E\n", ss.str());
 }
 
 class DcsBiosProtocolTestFixture : public ::testing::Test
@@ -129,7 +129,7 @@ TEST_F(DcsBiosProtocolTestFixture, send_simulator_reset_command)
 {
     simulator_interface.send_simulator_reset_command();
     std::stringstream ss_received = mock_dcs.receive();
-    EXPECT_EQ(ss_received.str(), "SYNC E");
+    EXPECT_EQ(ss_received.str(), "SYNC E\n");
 }
 
 TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_if_nonexistant)

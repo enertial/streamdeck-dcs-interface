@@ -18,4 +18,4 @@ void DcsBiosProtocol::send_simulator_command(const std::string &address, const s
     simulator_socket_.send(message_assembly);
 }
 
-void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send("SYNC E"); }
+void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send("SYNC E\n"); }
