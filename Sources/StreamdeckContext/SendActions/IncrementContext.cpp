@@ -10,13 +10,11 @@ void IncrementContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorI
 {
     const auto button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
     const auto device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
+    const auto address = device_id + "," + button_id;
 
-    if (is_integer(button_id) && is_integer(device_id)) {
-        const auto address = device_id + "," + button_id;
-        const auto send_command = determineSendValue(inPayload["settings"]);
-        if (send_command) {
-            simulator_interface->send_simulator_command(address, send_command.value());
-        }
+    const auto send_command = determineSendValue(inPayload["settings"]);
+    if (send_command) {
+        simulator_interface->send_simulator_command(address, send_command.value());
     }
 }
 

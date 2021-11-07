@@ -32,8 +32,11 @@ void DcsExportScriptProtocol::update_simulator_state()
 
 void DcsExportScriptProtocol::send_simulator_command(const std::string &address, const std::string &value)
 {
-    // String should be of the form "<device_id>,<button_id>"
-    if ((address.size() > 3) && (address.find(",") != std::string::npos)) {
+    // Check that a valid address should be of the form "<device_id>,<button_id>"
+    const auto address_as_components = split_pair(address, ',');
+    const bool address_is_valid = (address_as_components && is_integer(address_as_components.value().first) &&
+                                   is_integer(address_as_components.value().second));
+    if (address_is_valid) {
         const std::string message_assembly = "C" + address + "," + value;
         simulator_socket_.send(message_assembly);
     }

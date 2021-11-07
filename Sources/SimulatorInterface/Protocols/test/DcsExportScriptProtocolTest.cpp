@@ -107,7 +107,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, update_simulator_state_end_of_mission
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command)
+TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command_valid_address)
 {
     const std::string address = "24,3250";
     const std::string value = "1";
@@ -117,6 +117,45 @@ TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command)
     simulator_interface.send_simulator_command(address, value);
     std::stringstream ss_received = mock_dcs.receive();
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
+}
+
+TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command_invalid_address)
+{
+    std::string address = "";
+    const std::string value = "1";
+    simulator_interface.send_simulator_command(address, value);
+    std::stringstream ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
+
+    address = "24";
+    simulator_interface.send_simulator_command(address, value);
+    ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
+
+    address = "243250";
+    simulator_interface.send_simulator_command(address, value);
+    ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
+
+    address = ",3250";
+    simulator_interface.send_simulator_command(address, value);
+    ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
+
+    address = "24,";
+    simulator_interface.send_simulator_command(address, value);
+    ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
+
+    address = "24:3250";
+    simulator_interface.send_simulator_command(address, value);
+    ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
+
+    address = "24A,3250";
+    simulator_interface.send_simulator_command(address, value);
+    ss_received = mock_dcs.receive();
+    EXPECT_EQ(ss_received.str(), "");
 }
 
 TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_reset_command)
