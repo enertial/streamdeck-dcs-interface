@@ -7,7 +7,7 @@
 
 #include "StreamdeckContext/StreamdeckContext.h"
 
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "StreamdeckContext/SendActions/IncrementContext.h"
 #include "StreamdeckContext/SendActions/MomentaryContext.h"
 #include "StreamdeckContext/SendActions/SwitchContext.h"
@@ -16,8 +16,8 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
 {
     // Test -- With an unpopulated game state in simulator_interface, try to update context state.
     StreamdeckContext test_context("def456");
-    SimulatorConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
-    DcsExportScriptInterface simulator_interface(connection_settings);
+    const SimulatorConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
+    const auto simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
     MockESDConnectionManager esd_connection_manager{};
     test_context.updateContextState(simulator_interface, &esd_connection_manager);
     // Expect no state or title change as default context state and title values have not changed.
@@ -31,20 +31,21 @@ class StreamdeckContextTestFixture : public ::testing::Test
     StreamdeckContextTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          simulator_interface(connection_settings), fixture_context(fixture_context_id)
+          fixture_context(fixture_context_id)
     {
+        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
 
         // Send a single message from mock DCS that contains update for monitored ID.
         std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
         mock_dcs.send(mock_dcs_message);
-        simulator_interface.update_simulator_state();
+        simulator_interface->update_simulator_state();
     }
 
     SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                                // A socket that will mock Send/Receive messages from DCS.
-    DcsExportScriptInterface simulator_interface;      // Simulator Interface to test.
+    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
+    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager{}; // Streamdeck connection manager, using mock class definition.
 
     StreamdeckContext fixture_context;
@@ -177,7 +178,7 @@ TEST_F(StreamdeckContextTestFixture, derived_class_instances_within_container)
 
     std::string mock_dcs_message = "header*1=a:2=b:3=c";
     mock_dcs.send(mock_dcs_message);
-    simulator_interface.update_simulator_state();
+    simulator_interface->update_simulator_state();
 
     std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> ctx_map;
     ctx_map["ctx_a"] =

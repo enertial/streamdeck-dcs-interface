@@ -22,11 +22,11 @@ StreamdeckContextFactory::create(const std::string &action_uuid, const std::stri
 {
     switch (button_action_from_uuid_[action_uuid]) {
     case ButtonAction::MOMENTARY:
-        return std::unique_ptr<StreamdeckContext>(new MomentaryContext(context, settings));
+        return std::make_unique<MomentaryContext>(context, settings);
     case ButtonAction::INCREMENT:
-        return std::unique_ptr<StreamdeckContext>(new IncrementContext(context, settings));
+        return std::make_unique<IncrementContext>(context, settings);
     case ButtonAction::SWITCH:
-        return std::unique_ptr<StreamdeckContext>(new SwitchContext(context, settings));
+        return std::make_unique<SwitchContext>(context, settings);
     default:
         return NULL;
     }

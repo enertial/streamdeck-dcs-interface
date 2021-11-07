@@ -40,7 +40,7 @@ TEST(SimulatorInterfaceTest, empty_game_state_on_initialization)
 {
     SimulatorInterface simulator_interface(SimulatorConnectionSettings{"1908", "1909", "127.0.0.1", ""});
     // Test that current game state initializes as empty.
-    std::map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_EQ(0, current_game_state.size());
 }
 

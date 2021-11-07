@@ -11,7 +11,7 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
     updateContextSettings(settings);
 }
 
-void StreamdeckContext::updateContextState(SimulatorInterface &simulator_interface,
+void StreamdeckContext::updateContextState(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                            ESDConnectionManager *mConnectionManager)
 {
 

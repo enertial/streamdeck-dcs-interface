@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "StreamdeckContext/SendActions/IncrementContext.h"
 
 #include "Test/MockESDConnectionManager.h"
@@ -16,7 +16,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     IncrementContextKeyPressTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          simulator_interface(connection_settings), fixture_context(fixture_context_id),
+          fixture_context(fixture_context_id),
           // Create default json payload.
           payload({{"state", 0},
                    {"settings",
@@ -28,13 +28,14 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
                      {"increment_max", increment_max},
                      {"increment_cycle_allowed_check", false}}}})
     {
+        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
         fixture_context.updateContextSettings(payload["settings"]);
     }
     SimulatorConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
-    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
-    DcsExportScriptInterface simulator_interface;    // Simulator Interface to test.
+    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
+    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     IncrementContext fixture_context;
@@ -81,7 +82,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     // Send a single message from mock DCS that contains update for monitored ID.
     std::string mock_dcs_message = "header*" + dcs_id_increment_monitor + "=" + external_increment_start;
     mock_dcs.send(mock_dcs_message);
-    simulator_interface.update_simulator_state();
+    simulator_interface->update_simulator_state();
     fixture_context.updateContextState(simulator_interface, &esd_connection_manager);
 
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);

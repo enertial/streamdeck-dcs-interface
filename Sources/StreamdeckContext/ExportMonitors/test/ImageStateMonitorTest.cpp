@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 
 namespace test
@@ -22,9 +22,9 @@ class ImageStateMonitorTestFixture : public ::testing::Test
           context_with_greater_than({{"dcs_id_compare_monitor", "123"},
                                      {"dcs_id_compare_condition", "GREATER_THAN"},
                                      {"dcs_id_comparison_value", std::to_string(comparison_value)}}),
-          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          simulator_interface(connection_settings)
+          mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port)
     {
+        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
     }
@@ -32,7 +32,7 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     void set_current_dcs_id_value(const std::string value)
     {
         mock_dcs.send("header*123=" + value);
-        simulator_interface.update_simulator_state();
+        simulator_interface->update_simulator_state();
     }
 
     const double comparison_value = 1.56;
@@ -40,8 +40,8 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     ImageStateMonitor context_with_less_than;
     ImageStateMonitor context_with_greater_than;
     SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                           // A socket that will mock Send/Receive messages from DCS.
-    DcsExportScriptInterface simulator_interface; // Simulator Interface to test.
+    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
+    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
 };
 
 TEST_F(ImageStateMonitorTestFixture, CompareToZero)

@@ -26,7 +26,7 @@ class TitleMonitor
      * @param simulator_interface Interface to request current game state from.
      * @return The string that the Title should be set to if all settings are filled.
      */
-    std::string determineTitle(SimulatorInterface &simulator_interface);
+    std::string determineTitle(const std::unique_ptr<SimulatorInterface> &simulator_interface);
 
   private:
     /**
@@ -41,6 +41,6 @@ class TitleMonitor
     int dcs_id_string_monitor_ = 0;           // DCS ID to monitor for context title.
     int string_monitor_vertical_spacing_ = 0; // Vertical spacing (number of '\n') to include before or after title.
     bool string_monitor_passthrough_ = true;  // Flag set by user to passthrough string to title unaltered.
-    std::map<std::string, std::string>
+    std::unordered_map<std::string, std::string>
         string_monitor_mapping_; // Map of received values to title text to display on context.
 };

@@ -11,9 +11,10 @@
 //==============================================================================
 
 #include "ElgatoSD/ESDBasePlugin.h"
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 #include "StreamdeckContext/StreamdeckContextFactory.h"
 
+#include <memory>
 #include <mutex>
 #include <unordered_map>
 
@@ -77,6 +78,6 @@ class StreamdeckInterface : public ESDBasePlugin
     std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> mVisibleContexts = {};
 
     CallBackTimer *mTimer;
-    std::optional<DcsExportScriptInterface> simulator_interface_ = std::nullopt;
+    std::unique_ptr<SimulatorInterface> simulator_interface_;
     StreamdeckContextFactory streamdeck_context_factory;
 };

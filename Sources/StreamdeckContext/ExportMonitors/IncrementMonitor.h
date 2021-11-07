@@ -26,7 +26,7 @@ class IncrementMonitor
      *
      * @param simulator_interface Interface to request current game state from.
      */
-    void update(SimulatorInterface &simulator_interface);
+    void update(const std::unique_ptr<SimulatorInterface> &simulator_interface);
 
     /**
      * @brief Applies a commanded delta to the internal increment and returns the new current value.

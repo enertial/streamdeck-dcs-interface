@@ -4,7 +4,7 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void IncrementContext::handleButtonPressedEvent(SimulatorInterface &simulator_interface,
+void IncrementContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {
@@ -14,12 +14,12 @@ void IncrementContext::handleButtonPressedEvent(SimulatorInterface &simulator_in
     if (is_integer(button_id) && is_integer(device_id)) {
         const auto send_command = determineSendValue(inPayload["settings"]);
         if (send_command) {
-            simulator_interface.send_simulator_command(std::stoi(button_id), device_id, send_command.value());
+            simulator_interface->send_simulator_command(std::stoi(button_id), device_id, send_command.value());
         }
     }
 }
 
-void IncrementContext::handleButtonReleasedEvent(SimulatorInterface &simulator_interface,
+void IncrementContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                                  ESDConnectionManager *mConnectionManager,
                                                  const json &inPayload)
 {
