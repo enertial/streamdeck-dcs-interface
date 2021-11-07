@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DcsInterface/DcsInterface.h"
 #include "ElgatoSD/EPLJSONUtils.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 #include "Utilities/Decimal.h"
 
 #include <string>
@@ -24,9 +24,9 @@ class IncrementMonitor
     /**
      * @brief Keeps the increment status up to date with game state.
      *
-     * @param dcs_interface Interface to request current game state from.
+     * @param simulator_interface Interface to request current game state from.
      */
-    void update(DcsInterface &dcs_interface);
+    void update(SimulatorInterface &simulator_interface);
 
     /**
      * @brief Applies a commanded delta to the internal increment and returns the new current value.

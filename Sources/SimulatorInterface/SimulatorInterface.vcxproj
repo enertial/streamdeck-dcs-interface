@@ -22,7 +22,7 @@
     <VCProjectVersion>16.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
     <ProjectGuid>{2782d849-65f7-4b89-a856-964fd918269a}</ProjectGuid>
-    <RootNamespace>DcsInterface</RootNamespace>
+    <RootNamespace>SimulatorInterface</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -165,9 +165,11 @@
     </ComputeCompileInputsTargets>
   </PropertyGroup>
   <ItemGroup>
+    <_WildCardClCompile Include="Backends/*.cpp" />
     <_WildCardClCompile Include="*.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <_WildCardClInclude Include="Backends/*.h" />
     <_WildCardClInclude Include="*.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

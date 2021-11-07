@@ -2,8 +2,8 @@
 
 #include "gtest/gtest.h"
 
-#include "DcsInterface/DcsIdLookup.h"
 #include "ElgatoSD/EPLJSONUtils.h"
+#include "SimulatorInterface/DcsIdLookup.h"
 
 namespace test
 {

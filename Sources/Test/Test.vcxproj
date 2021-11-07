@@ -63,7 +63,7 @@
     <_WildCardClCompile Include="..\**\*Test.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\DcsInterface\DcsInterface.vcxproj">
+    <ProjectReference Include="..\SimulatorInterface\SimulatorInterface.vcxproj">
       <Project>{2782d849-65f7-4b89-a856-964fd918269a}</Project>
     </ProjectReference>
     <ProjectReference Include="..\ElgatoSD\ElgatoSD.vcxproj">

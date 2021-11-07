@@ -31,10 +31,11 @@ void ImageStateMonitor::update_settings(const json &settings)
     }
 }
 
-int ImageStateMonitor::determineContextState(DcsInterface &dcs_interface) const
+int ImageStateMonitor::determineContextState(SimulatorInterface &simulator_interface) const
 {
     if (settings_are_filled_) {
-        const auto maybe_current_game_value = dcs_interface.get_decimal_of_dcs_id(dcs_id_compare_monitor_);
+        const auto maybe_current_game_value =
+            simulator_interface.get_decimal_of_simulator_object_state(dcs_id_compare_monitor_);
         if (maybe_current_game_value.has_value()) {
             return comparison_is_satisfied(maybe_current_game_value.value()) ? 1 : 0;
         }

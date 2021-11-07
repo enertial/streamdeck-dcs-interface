@@ -2,6 +2,7 @@
 
 #include "gtest/gtest.h"
 
+#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 
 namespace test
@@ -57,7 +58,7 @@ class IncrementMonitorTestFixture : public ::testing::Test
   public:
     IncrementMonitorTestFixture()
         : mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          dcs_interface(connection_settings)
+          simulator_interface(connection_settings)
     {
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
@@ -66,20 +67,20 @@ class IncrementMonitorTestFixture : public ::testing::Test
     void set_current_dcs_id_value(const std::string value)
     {
         mock_dcs.send("header*" + monitor_id_value + "=" + value);
-        dcs_interface.update_dcs_state();
+        simulator_interface.update_simulator_state();
     }
 
     std::string monitor_id_value = "123";
-    DcsConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;         // A socket that will mock Send/Receive messages from DCS.
-    DcsInterface dcs_interface; // DCS Interface to test.
+    SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
+    UdpSocket mock_dcs;                           // A socket that will mock Send/Receive messages from DCS.
+    DcsExportScriptInterface simulator_interface; // Simulator Interface to test.
 };
 
 TEST_F(IncrementMonitorTestFixture, CurrentValueIsUpdatedFromDcsInterface)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0.5");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0"};
     const Decimal min{"0"};
     const Decimal max{"1"};
@@ -92,7 +93,7 @@ TEST_F(IncrementMonitorTestFixture, CurrentValueUpdateIsClampedToRange)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0.5");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0"};
     const Decimal min{"10"};
     const Decimal max{"20"};
@@ -105,7 +106,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementAfterExternalChange)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("-0.5");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0.1"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -118,7 +119,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementMultipleTimes)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0.1"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -136,7 +137,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementMultipleTimesNegative)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"-0.1"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -154,7 +155,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementToMax)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0.9");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0.1"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -167,7 +168,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementBeyondMaxCyclingOff)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0.9");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0.2"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -180,7 +181,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementBeyondMaxCyclingOn)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("0.9");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"0.2"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -193,7 +194,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementToMin)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("-0.9");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"-0.1"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -206,7 +207,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementBeyondMinCyclingOff)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("-0.9");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"-0.2"};
     const Decimal min{"-1"};
     const Decimal max{"1"};
@@ -219,7 +220,7 @@ TEST_F(IncrementMonitorTestFixture, IncrementBeyondMinCyclingOn)
 {
     IncrementMonitor monitor{{{"dcs_id_increment_monitor", monitor_id_value}}};
     set_current_dcs_id_value("-0.9");
-    monitor.update(dcs_interface);
+    monitor.update(simulator_interface);
     const Decimal delta{"-0.2"};
     const Decimal min{"-1"};
     const Decimal max{"1"};

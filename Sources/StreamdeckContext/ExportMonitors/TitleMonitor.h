@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DcsInterface/DcsInterface.h"
 #include "ElgatoSD/EPLJSONUtils.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 
 #include <string>
 
@@ -23,10 +23,10 @@ class TitleMonitor
     /**
      * @brief Determines what the context title text should be according to current the current game state.
      *
-     * @param dcs_interface Interface to request current game state from.
+     * @param simulator_interface Interface to request current game state from.
      * @return The string that the Title should be set to if all settings are filled.
      */
-    std::string determineTitle(DcsInterface &dcs_interface);
+    std::string determineTitle(SimulatorInterface &simulator_interface);
 
   private:
     /**

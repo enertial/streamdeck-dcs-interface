@@ -2,8 +2,8 @@
 
 #pragma once
 
-#include "DcsInterface/DcsInterface.h"
 #include "ElgatoSD/ESDConnectionManager.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
@@ -23,12 +23,12 @@ class StreamdeckContext
     StreamdeckContext(const std::string &context, const json &settings);
 
     /**
-     * @brief Queries the dcs_interface for updates to the Context's monitored DCS IDs.
+     * @brief Queries the simulator_interface for updates to the Context's monitored DCS IDs.
      *
-     * @param dcs_interface Interface to DCS containing current game state.
+     * @param simulator_interface Interface to simulator containing current game state.
      * @param mConnectionManager Interface to StreamDeck.
      */
-    void updateContextState(DcsInterface &dcs_interface, ESDConnectionManager *mConnectionManager);
+    void updateContextState(SimulatorInterface &simulator_interface, ESDConnectionManager *mConnectionManager);
 
     /**
      * @brief Forces an update to the Streamdeck of the context's current state be sent with current static values.
@@ -54,17 +54,18 @@ class StreamdeckContext
     void updateContextSettings(const json &settings);
 
     /**
-     * @brief Sends DCS commands according to button type and settings received during Key Pressed and Released events.
+     * @brief Sends simulator commands according to button type and settings received during Key Pressed and Released
+     * events.
      *
-     * @param dcs_interface Interface to DCS containing current game state.
+     * @param simulator_interface Interface to simulator containing current game state.
      * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonPressedEvent(DcsInterface &dcs_interface,
+    virtual void handleButtonPressedEvent(SimulatorInterface &simulator_interface,
                                           ESDConnectionManager *mConnectionManager,
                                           const json &inPayload){};
 
-    virtual void handleButtonReleasedEvent(DcsInterface &dcs_interface,
+    virtual void handleButtonReleasedEvent(SimulatorInterface &simulator_interface,
                                            ESDConnectionManager *mConnectionManager,
                                            const json &inPayload){};
 

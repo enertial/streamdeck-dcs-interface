@@ -16,7 +16,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StreamdeckContext", "..\Str
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Utilities", "..\Utilities\Utilities.vcxproj", "{329F64AC-6346-46D2-A671-9B5DD626B485}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "DcsInterface", "..\DcsInterface\DcsInterface.vcxproj", "{2782D849-65F7-4B89-A856-964FD918269A}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SimulatorInterface", "..\SimulatorInterface\SimulatorInterface.vcxproj", "{2782D849-65F7-4B89-A856-964FD918269A}"
 	ProjectSection(ProjectDependencies) = postProject
 		{59EEC206-84E0-4842-B89E-2025FD78E589} = {59EEC206-84E0-4842-B89E-2025FD78E589}
 		{329F64AC-6346-46D2-A671-9B5DD626B485} = {329F64AC-6346-46D2-A671-9B5DD626B485}
