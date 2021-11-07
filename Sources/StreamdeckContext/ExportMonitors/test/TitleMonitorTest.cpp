@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
+#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
 
 namespace test

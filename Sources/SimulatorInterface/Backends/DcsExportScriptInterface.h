@@ -2,11 +2,11 @@
 
 #pragma once
 
-#include "SimulatorInterface/BaseSimulatorInterface.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 #include "Utilities/Decimal.h"
 #include "Utilities/UdpSocket.h"
 
-class DcsExportScriptInterface : public BaseSimulatorInterface
+class DcsExportScriptInterface : public SimulatorInterface
 {
   public:
     DcsExportScriptInterface(const SimulatorConnectionSettings &settings);

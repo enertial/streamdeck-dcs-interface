@@ -4,7 +4,7 @@
 
 #include "StreamdeckContext/SendActions/SwitchContext.h"
 
-#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
+#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
 #include "Test/MockESDConnectionManager.h"
 namespace test
 {

@@ -33,7 +33,7 @@ void TitleMonitor::update_settings(const json &settings)
     }
 }
 
-std::string TitleMonitor::determineTitle(BaseSimulatorInterface &dcs_interface)
+std::string TitleMonitor::determineTitle(SimulatorInterface &dcs_interface)
 {
     std::string updated_title = "";
 

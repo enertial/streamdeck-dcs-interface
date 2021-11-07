@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ElgatoSD/EPLJSONUtils.h"
-#include "SimulatorInterface/BaseSimulatorInterface.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 
 #include <string>
 
@@ -26,7 +26,7 @@ class TitleMonitor
      * @param dcs_interface Interface to request current game state from.
      * @return The string that the Title should be set to if all settings are filled.
      */
-    std::string determineTitle(BaseSimulatorInterface &dcs_interface);
+    std::string determineTitle(SimulatorInterface &dcs_interface);
 
   private:
     /**

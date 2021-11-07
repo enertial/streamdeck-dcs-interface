@@ -108,7 +108,7 @@ void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
     SimulatorConnectionSettings connection_settings = get_connection_settings(settings);
 
-    // If settings have changed, close BaseSimulatorInterface so it can be re-opened with new connection.
+    // If settings have changed, close SimulatorInterface so it can be re-opened with new connection.
     if (simulator_interface_ && !simulator_interface_.value().connection_settings_match(connection_settings)) {
         simulator_interface_ = std::nullopt;
     }

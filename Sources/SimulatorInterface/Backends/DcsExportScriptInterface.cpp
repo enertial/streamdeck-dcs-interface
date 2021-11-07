@@ -5,7 +5,7 @@
 #include "Utilities/StringUtilities.h"
 
 DcsExportScriptInterface::DcsExportScriptInterface(const SimulatorConnectionSettings &settings)
-    : BaseSimulatorInterface(settings)
+    : SimulatorInterface(settings)
 {
     // Send a reset command on initialization by default.
     send_simulator_reset_command();

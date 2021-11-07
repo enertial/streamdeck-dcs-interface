@@ -31,7 +31,7 @@ void ImageStateMonitor::update_settings(const json &settings)
     }
 }
 
-int ImageStateMonitor::determineContextState(BaseSimulatorInterface &dcs_interface) const
+int ImageStateMonitor::determineContextState(SimulatorInterface &dcs_interface) const
 {
     if (settings_are_filled_) {
         const auto maybe_current_game_value =

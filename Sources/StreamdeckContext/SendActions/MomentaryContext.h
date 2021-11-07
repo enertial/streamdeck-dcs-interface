@@ -19,11 +19,11 @@ class MomentaryContext : public StreamdeckContext
      * @param mConnectionManager Interface to Streamdeck for current context.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void handleButtonPressedEvent(BaseSimulatorInterface &dcs_interface,
+    void handleButtonPressedEvent(SimulatorInterface &dcs_interface,
                                   ESDConnectionManager *mConnectionManager,
                                   const json &inPayload);
 
-    void handleButtonReleasedEvent(BaseSimulatorInterface &dcs_interface,
+    void handleButtonReleasedEvent(SimulatorInterface &dcs_interface,
                                    ESDConnectionManager *mConnectionManager,
                                    const json &inPayload);
 };

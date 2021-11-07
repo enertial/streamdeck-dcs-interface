@@ -7,7 +7,7 @@
 
 #include "StreamdeckContext/StreamdeckContext.h"
 
-#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
+#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
 #include "StreamdeckContext/SendActions/IncrementContext.h"
 #include "StreamdeckContext/SendActions/MomentaryContext.h"
 #include "StreamdeckContext/SendActions/SwitchContext.h"

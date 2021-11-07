@@ -17,10 +17,10 @@ using SimulatorConnectionSettings = struct {
     std::string multicast_address; //  UDP Multicast address group to join.
 };
 
-class BaseSimulatorInterface
+class SimulatorInterface
 {
   public:
-    BaseSimulatorInterface(const SimulatorConnectionSettings &settings);
+    SimulatorInterface(const SimulatorConnectionSettings &settings);
 
     /**
      * @brief Checks if the provided connection settings match the internally stored settings.

@@ -4,7 +4,7 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void MomentaryContext::handleButtonPressedEvent(BaseSimulatorInterface &dcs_interface,
+void MomentaryContext::handleButtonPressedEvent(SimulatorInterface &dcs_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {
@@ -17,7 +17,7 @@ void MomentaryContext::handleButtonPressedEvent(BaseSimulatorInterface &dcs_inte
     }
 }
 
-void MomentaryContext::handleButtonReleasedEvent(BaseSimulatorInterface &dcs_interface,
+void MomentaryContext::handleButtonReleasedEvent(SimulatorInterface &dcs_interface,
                                                  ESDConnectionManager *mConnectionManager,
                                                  const json &inPayload)
 {

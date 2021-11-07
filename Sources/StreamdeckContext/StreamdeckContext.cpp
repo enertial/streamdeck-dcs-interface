@@ -11,8 +11,7 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
     updateContextSettings(settings);
 }
 
-void StreamdeckContext::updateContextState(BaseSimulatorInterface &dcs_interface,
-                                           ESDConnectionManager *mConnectionManager)
+void StreamdeckContext::updateContextState(SimulatorInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
 {
 
     const auto updated_state = comparison_monitor_.determineContextState(dcs_interface);

@@ -11,7 +11,7 @@
 //==============================================================================
 
 #include "ElgatoSD/ESDBasePlugin.h"
-#include "SimulatorInterface/Derived/DcsExportScriptInterface.h"
+#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
 #include "StreamdeckContext/StreamdeckContextFactory.h"
 
 #include <mutex>

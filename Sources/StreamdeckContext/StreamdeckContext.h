@@ -3,7 +3,7 @@
 #pragma once
 
 #include "ElgatoSD/ESDConnectionManager.h"
-#include "SimulatorInterface/BaseSimulatorInterface.h"
+#include "SimulatorInterface/SimulatorInterface.h"
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
@@ -28,7 +28,7 @@ class StreamdeckContext
      * @param dcs_interface Interface to DCS containing current game state.
      * @param mConnectionManager Interface to StreamDeck.
      */
-    void updateContextState(BaseSimulatorInterface &dcs_interface, ESDConnectionManager *mConnectionManager);
+    void updateContextState(SimulatorInterface &dcs_interface, ESDConnectionManager *mConnectionManager);
 
     /**
      * @brief Forces an update to the Streamdeck of the context's current state be sent with current static values.
@@ -60,11 +60,11 @@ class StreamdeckContext
      * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonPressedEvent(BaseSimulatorInterface &dcs_interface,
+    virtual void handleButtonPressedEvent(SimulatorInterface &dcs_interface,
                                           ESDConnectionManager *mConnectionManager,
                                           const json &inPayload){};
 
-    virtual void handleButtonReleasedEvent(BaseSimulatorInterface &dcs_interface,
+    virtual void handleButtonReleasedEvent(SimulatorInterface &dcs_interface,
                                            ESDConnectionManager *mConnectionManager,
                                            const json &inPayload){};
 

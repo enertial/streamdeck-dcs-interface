@@ -165,11 +165,11 @@
     </ComputeCompileInputsTargets>
   </PropertyGroup>
   <ItemGroup>
-    <_WildCardClCompile Include="Derived/*.cpp" />
+    <_WildCardClCompile Include="Backends/*.cpp" />
     <_WildCardClCompile Include="*.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <_WildCardClInclude Include="Derived/*.h" />
+    <_WildCardClInclude Include="Backends/*.h" />
     <_WildCardClInclude Include="*.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -20,7 +20,7 @@ void IncrementMonitor::update_settings(const json &settings)
     }
 }
 
-void IncrementMonitor::update(BaseSimulatorInterface &dcs_interface)
+void IncrementMonitor::update(SimulatorInterface &dcs_interface)
 {
     if (increment_monitor_is_set_) {
         const std::optional<Decimal> maybe_current_game_value =
