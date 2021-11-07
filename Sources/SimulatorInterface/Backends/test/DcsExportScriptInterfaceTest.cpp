@@ -35,7 +35,7 @@ class DcsExportScriptInterfaceTestFixture : public ::testing::Test
         (void)mock_dcs.receive();
     }
 
-    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
+    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
     UdpSocket mock_dcs;                           // A socket that will mock Send/Receive messages from DCS.
     DcsExportScriptInterface simulator_interface; // Simulator Interface to test.
 };
