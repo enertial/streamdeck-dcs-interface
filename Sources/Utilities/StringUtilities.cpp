@@ -34,22 +34,25 @@ bool is_number(const std::string &str)
     return false;
 }
 
-bool pop_key_and_value(std::stringstream &ss,
-                       const char token_delim,
-                       const char key_value_delim,
-                       std::pair<std::string, std::string> &key_and_value)
+std::optional<std::pair<std::string, std::string>> split_pair(const std::string &str, const char delim)
+{
+    std::pair<std::string, std::string> string_pair;
+    const auto delim_loc = str.find(delim);
+    if (delim_loc != std::string::npos && delim_loc > 0) {
+        string_pair.first = str.substr(0, delim_loc);
+        string_pair.second = str.substr(delim_loc + 1, str.size());
+        return string_pair;
+    }
+    return std::nullopt;
+}
+
+std::optional<std::pair<std::string, std::string>>
+pop_key_and_value(std::stringstream &ss, const char token_delim, const char key_value_delim)
 {
     // Iterate through tokens received from single message.
     std::string token;
     if (std::getline(ss, token, token_delim)) {
-        // Parse token string of the form:
-        //   "key<key_value_delim>value"
-        const auto key_value_delim_loc = token.find(key_value_delim);
-        if (key_value_delim_loc != std::string::npos && key_value_delim_loc > 0) {
-            key_and_value.first = token.substr(0, key_value_delim_loc);
-            key_and_value.second = token.substr(key_value_delim_loc + 1, token.size());
-            return true;
-        }
+        return split_pair(token, key_value_delim);
     }
-    return false;
+    return std::nullopt;
 }

@@ -20,12 +20,12 @@ void DcsExportScriptProtocol::update_simulator_state()
     std::string token;
     if (std::getline(recv_msg, token, header_delimiter)) {
         // Iterate through tokens received from single message.
-        std::pair<std::string, std::string> key_and_value;
-        while (pop_key_and_value(recv_msg, ':', '=', key_and_value)) {
+        std::optional<std::pair<std::string, std::string>> maybe_token_pair;
+        while (maybe_token_pair = pop_key_and_value(recv_msg, ':', '=')) {
             // Strip any trailing newline chars from value.
-            auto value_end_loc = key_and_value.second.find_last_not_of('\n');
-            std::string value = key_and_value.second.substr(0, value_end_loc + 1);
-            handle_received_token(key_and_value.first, value);
+            auto ending_loc = maybe_token_pair.value().second.find_last_not_of('\n');
+            std::string value = maybe_token_pair.value().second.substr(0, ending_loc + 1);
+            handle_received_token(maybe_token_pair.value().first, value);
         }
     }
 }

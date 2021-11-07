@@ -25,9 +25,9 @@ void TitleMonitor::update_settings(const json &settings)
         }
         if (!string_monitor_passthrough_) {
             string_monitor_mapping_.clear();
-            std::pair<std::string, std::string> key_and_value;
-            while (pop_key_and_value(string_monitor_mapping_raw, ',', '=', key_and_value)) {
-                string_monitor_mapping_[key_and_value.first] = key_and_value.second;
+            std::optional<std::pair<std::string, std::string>> maybe_token_pair;
+            while (maybe_token_pair = pop_key_and_value(string_monitor_mapping_raw, ',', '=')) {
+                string_monitor_mapping_[maybe_token_pair.value().first] = maybe_token_pair.value().second;
             }
         }
     }

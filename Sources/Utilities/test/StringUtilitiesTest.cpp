@@ -102,80 +102,91 @@ TEST(StringUtilitiesTest, is_number_with_decimal)
     EXPECT_TRUE(is_number("16.0"));
 }
 
+TEST(StringUtilitiesTest, split_pair_valid)
+{
+    const auto string_pair = split_pair("key=value", '=');
+    EXPECT_TRUE(string_pair);
+    EXPECT_EQ("key", string_pair.value().first);
+    EXPECT_EQ("value", string_pair.value().second);
+}
+
+TEST(StringUtilitiesTest, split_pair_on_empty)
+{
+    const auto string_pair = split_pair("", '=');
+    EXPECT_FALSE(string_pair);
+}
+
+TEST(StringUtilitiesTest, split_pair_empty_first)
+{
+    const auto string_pair = split_pair("=value", '=');
+    EXPECT_FALSE(string_pair);
+}
+
+TEST(StringUtilitiesTest, split_pair_empty_second)
+{
+    const auto string_pair = split_pair("key=", '=');
+    EXPECT_TRUE(string_pair);
+    EXPECT_EQ("key", string_pair.value().first);
+    EXPECT_EQ("", string_pair.value().second);
+}
+
+TEST(StringUtilitiesTest, split_pair_missing_delim)
+{
+    const auto string_pair = split_pair("keyvalue", '=');
+    EXPECT_FALSE(string_pair);
+}
+
 TEST(StringUtilitiesTest, pop_key_and_value_on_empty)
 {
     std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
     ss << "";
-    EXPECT_FALSE(pop_key_and_value(ss, ',', '=', key_and_value));
+    EXPECT_FALSE(pop_key_and_value(ss, ',', '='));
 }
 
 TEST(StringUtilitiesTest, pop_key_and_value_single_token)
 {
     std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
     ss << "key=value";
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key", key_and_value.first);
-    EXPECT_EQ("value", key_and_value.second);
-    EXPECT_FALSE(pop_key_and_value(ss, ',', '=', key_and_value));
+    auto key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_TRUE(key_and_value);
+    EXPECT_EQ("key", key_and_value.value().first);
+    EXPECT_EQ("value", key_and_value.value().second);
+    key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_FALSE(key_and_value);
 }
 
 TEST(StringUtilitiesTest, pop_key_and_value_multiple_tokens)
 {
     std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
     ss << "key1=value1,key2=value2";
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key1", key_and_value.first);
-    EXPECT_EQ("value1", key_and_value.second);
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key2", key_and_value.first);
-    EXPECT_EQ("value2", key_and_value.second);
-    EXPECT_FALSE(pop_key_and_value(ss, ',', '=', key_and_value));
-}
-
-TEST(StringUtilitiesTest, pop_key_and_value_missing_key)
-{
-    std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
-    ss << "key1=value1,=value2";
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key1", key_and_value.first);
-    EXPECT_EQ("value1", key_and_value.second);
-    EXPECT_FALSE(pop_key_and_value(ss, ',', '=', key_and_value));
-}
-
-TEST(StringUtilitiesTest, pop_key_and_value_empty_value)
-{
-    std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
-    ss << "key1=,key2=value2";
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key1", key_and_value.first);
-    EXPECT_EQ("", key_and_value.second);
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key2", key_and_value.first);
-    EXPECT_EQ("value2", key_and_value.second);
-    EXPECT_FALSE(pop_key_and_value(ss, ',', '=', key_and_value));
+    auto key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_TRUE(key_and_value);
+    EXPECT_EQ("key1", key_and_value.value().first);
+    EXPECT_EQ("value1", key_and_value.value().second);
+    key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_TRUE(key_and_value);
+    EXPECT_EQ("key2", key_and_value.value().first);
+    EXPECT_EQ("value2", key_and_value.value().second);
+    key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_FALSE(key_and_value);
 }
 
 TEST(StringUtilitiesTest, pop_key_and_value_missing_key_value_delim)
 {
     std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
     ss << "key1value1";
-    EXPECT_FALSE(pop_key_and_value(ss, ',', '=', key_and_value));
+    auto key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_FALSE(key_and_value);
 }
 
 TEST(StringUtilitiesTest, pop_key_and_value_missing_token_delim)
 {
     std::stringstream ss;
-    std::pair<std::string, std::string> key_and_value;
     ss << "key1=value1key2=value2";
-    EXPECT_TRUE(pop_key_and_value(ss, ',', '=', key_and_value));
-    EXPECT_EQ("key1", key_and_value.first);
-    EXPECT_EQ("value1key2=value2", key_and_value.second);
+    auto key_and_value = pop_key_and_value(ss, ',', '=');
+    EXPECT_TRUE(key_and_value);
+    EXPECT_EQ("key1", key_and_value.value().first);
+    EXPECT_EQ("value1key2=value2", key_and_value.value().second);
 }
 
 } // namespace test
