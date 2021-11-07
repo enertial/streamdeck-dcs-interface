@@ -11,12 +11,13 @@ StreamdeckContext::StreamdeckContext(const std::string &context, const json &set
     updateContextSettings(settings);
 }
 
-void StreamdeckContext::updateContextState(SimulatorInterface &dcs_interface, ESDConnectionManager *mConnectionManager)
+void StreamdeckContext::updateContextState(SimulatorInterface &simulator_interface,
+                                           ESDConnectionManager *mConnectionManager)
 {
 
-    const auto updated_state = comparison_monitor_.determineContextState(dcs_interface);
-    const auto updated_title = title_monitor_.determineTitle(dcs_interface);
-    increment_monitor_.update(dcs_interface);
+    const auto updated_state = comparison_monitor_.determineContextState(simulator_interface);
+    const auto updated_title = title_monitor_.determineTitle(simulator_interface);
+    increment_monitor_.update(simulator_interface);
 
     if (updated_state != current_state_) {
         current_state_ = updated_state;

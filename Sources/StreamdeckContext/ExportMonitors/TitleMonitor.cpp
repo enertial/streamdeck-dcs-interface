@@ -33,13 +33,13 @@ void TitleMonitor::update_settings(const json &settings)
     }
 }
 
-std::string TitleMonitor::determineTitle(SimulatorInterface &dcs_interface)
+std::string TitleMonitor::determineTitle(SimulatorInterface &simulator_interface)
 {
     std::string updated_title = "";
 
     if (string_monitor_is_set_) {
         const std::optional<std::string> maybe_current_game_value =
-            dcs_interface.get_value_of_simulator_object_state(dcs_id_string_monitor_);
+            simulator_interface.get_value_of_simulator_object_state(dcs_id_string_monitor_);
         if (maybe_current_game_value.has_value()) {
             updated_title = convertGameStateToTitle(maybe_current_game_value.value());
         }

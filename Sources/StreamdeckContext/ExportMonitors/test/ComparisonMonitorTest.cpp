@@ -23,7 +23,7 @@ class ImageStateMonitorTestFixture : public ::testing::Test
                                      {"dcs_id_compare_condition", "GREATER_THAN"},
                                      {"dcs_id_comparison_value", std::to_string(comparison_value)}}),
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          dcs_interface(connection_settings)
+          simulator_interface(connection_settings)
     {
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
@@ -32,7 +32,7 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     void set_current_dcs_id_value(const std::string value)
     {
         mock_dcs.send("header*123=" + value);
-        dcs_interface.update_simulator_state();
+        simulator_interface.update_simulator_state();
     }
 
     const double comparison_value = 1.56;
@@ -40,8 +40,8 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     ImageStateMonitor context_with_less_than;
     ImageStateMonitor context_with_greater_than;
     SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                     // A socket that will mock Send/Receive messages from DCS.
-    DcsExportScriptInterface dcs_interface; // DCS Interface to test.
+    UdpSocket mock_dcs;                           // A socket that will mock Send/Receive messages from DCS.
+    DcsExportScriptInterface simulator_interface; // Simulator Interface to test.
 };
 
 TEST_F(ImageStateMonitorTestFixture, CompareToZero)
@@ -50,9 +50,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToZero)
     set_current_dcs_id_value("0");
     ASSERT_GT(comparison_value, 0);
 
-    EXPECT_EQ(1, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToNegativeValue)
@@ -61,9 +61,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToNegativeValue)
     set_current_dcs_id_value(std::to_string(-1 * comparison_value));
     ASSERT_GT(comparison_value, 0);
 
-    EXPECT_EQ(1, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToLesserPositiveValue)
@@ -71,9 +71,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToLesserPositiveValue)
     // Received value is less than reference settings value.
     set_current_dcs_id_value(std::to_string(comparison_value / 2.0));
 
-    EXPECT_EQ(1, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToEqualValue)
@@ -81,9 +81,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToEqualValue)
     // Received value is equal to to reference settings value.
     set_current_dcs_id_value(std::to_string(comparison_value));
 
-    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(1, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(1, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToGreaterValue)
@@ -91,9 +91,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToGreaterValue)
     // Received value is less than reference settings value.
     set_current_dcs_id_value(std::to_string(comparison_value * 2.0));
 
-    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(1, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(1, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, UpdateSettings)
@@ -103,7 +103,7 @@ TEST_F(ImageStateMonitorTestFixture, UpdateSettings)
     set_current_dcs_id_value(modified_reference);
 
     // Verify initial settings show equal comparison not satisfied.
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
 
     // Modify settings
     const json modified_settings = {{"dcs_id_compare_monitor", "123"},
@@ -112,7 +112,7 @@ TEST_F(ImageStateMonitorTestFixture, UpdateSettings)
     context_with_equals.update_settings(modified_settings);
 
     // Verify modified settings show equal comparison IS satisfied.
-    EXPECT_EQ(1, context_with_equals.determineContextState(dcs_interface));
+    EXPECT_EQ(1, context_with_equals.determineContextState(simulator_interface));
 }
 
 // Test comparison to invalid values.
@@ -123,9 +123,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareFloatToInt)
     set_current_dcs_id_value("20");
     ASSERT_GT(20, comparison_value);
 
-    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(1, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(1, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToAlphaNumeric)
@@ -135,9 +135,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToAlphaNumeric)
     ASSERT_GT(20, comparison_value);
 
     // Expect default state (0) returned.
-    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToEmptyString)
@@ -146,9 +146,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToEmptyString)
     set_current_dcs_id_value("");
 
     // Expect default state (0) returned.
-    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareToNumberWithSpacesPadding)
@@ -157,9 +157,9 @@ TEST_F(ImageStateMonitorTestFixture, CompareToNumberWithSpacesPadding)
     set_current_dcs_id_value("  " + std::to_string(comparison_value) + "  ");
 
     // Expect default state (0) returned.
-    EXPECT_EQ(0, context_with_less_than.determineContextState(dcs_interface));
-    EXPECT_EQ(1, context_with_equals.determineContextState(dcs_interface));
-    EXPECT_EQ(0, context_with_greater_than.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_less_than.determineContextState(simulator_interface));
+    EXPECT_EQ(1, context_with_equals.determineContextState(simulator_interface));
+    EXPECT_EQ(0, context_with_greater_than.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, CompareWithInvalidDcsID)
@@ -171,7 +171,7 @@ TEST_F(ImageStateMonitorTestFixture, CompareWithInvalidDcsID)
 
     set_current_dcs_id_value(std::to_string(comparison_value));
     // Expect default state (0) returned.
-    EXPECT_EQ(0, context_with_flot_id.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_flot_id.determineContextState(simulator_interface));
 }
 
 TEST_F(ImageStateMonitorTestFixture, InvalidComparisonValueSetting)
@@ -183,7 +183,7 @@ TEST_F(ImageStateMonitorTestFixture, InvalidComparisonValueSetting)
 
     set_current_dcs_id_value(std::to_string(comparison_value));
     // Expect default state (0) returned.
-    EXPECT_EQ(0, context_with_flot_id.determineContextState(dcs_interface));
+    EXPECT_EQ(0, context_with_flot_id.determineContextState(simulator_interface));
 }
 
 } // namespace test

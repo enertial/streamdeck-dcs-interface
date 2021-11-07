@@ -23,10 +23,10 @@ class ImageStateMonitor
     /**
      * @brief Determines what the context state should be according to current the current game state.
      *
-     * @param dcs_interface Interface to request current game state from.
+     * @param simulator_interface Interface to request current game state from.
      * @return The Streamdeck context should be set to if all settings are filled.
      */
-    int determineContextState(SimulatorInterface &dcs_interface) const;
+    int determineContextState(SimulatorInterface &simulator_interface) const;
 
   private:
     enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };
