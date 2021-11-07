@@ -2,16 +2,16 @@
 
 #include "SimulatorInterfaceFactory.h"
 
-#include "SimulatorInterface/Backends/DcsBiosInterface.h"
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/Protocols/DcsBiosProtocol.h"
+#include "SimulatorInterface/Protocols/DcsExportScriptProtocol.h"
 
 std::unique_ptr<SimulatorInterface> SimulatorInterfaceFactory(const SimulatorConnectionSettings &settings,
                                                               const std::string &backend)
 {
     if (backend == "DCS-BIOS") {
-        return std::make_unique<DcsBiosInterface>(settings);
+        return std::make_unique<DcsBiosProtocol>(settings);
     } else if (backend == "DCS-ExportScript") {
-        return std::make_unique<DcsExportScriptInterface>(settings);
+        return std::make_unique<DcsExportScriptProtocol>(settings);
     } else {
         return std::unique_ptr<SimulatorInterface>{};
     }

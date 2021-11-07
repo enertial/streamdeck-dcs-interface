@@ -1,17 +1,17 @@
 // Copyright 2020 Charles Tytler
 
-#include "DcsExportScriptInterface.h"
+#include "DcsExportScriptProtocol.h"
 
 #include "Utilities/StringUtilities.h"
 
-DcsExportScriptInterface::DcsExportScriptInterface(const SimulatorConnectionSettings &settings)
+DcsExportScriptProtocol::DcsExportScriptProtocol(const SimulatorConnectionSettings &settings)
     : SimulatorInterface(settings)
 {
     // Send a reset command on initialization by default.
     send_simulator_reset_command();
 }
 
-void DcsExportScriptInterface::update_simulator_state()
+void DcsExportScriptProtocol::update_simulator_state()
 {
     // Receive next UDP message from simulator and strip header.
     const char header_delimiter = '*'; // Header content ends in an '*'.
@@ -30,17 +30,17 @@ void DcsExportScriptInterface::update_simulator_state()
     }
 }
 
-void DcsExportScriptInterface::send_simulator_command(const int button_id,
-                                                      const std::string &device_id,
-                                                      const std::string &value)
+void DcsExportScriptProtocol::send_simulator_command(const int button_id,
+                                                     const std::string &device_id,
+                                                     const std::string &value)
 {
     const std::string message_assembly = "C" + device_id + "," + std::to_string(button_id) + "," + value;
     simulator_socket_.send(message_assembly);
 }
 
-void DcsExportScriptInterface::send_simulator_reset_command() { simulator_socket_.send("R"); }
+void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send("R"); }
 
-void DcsExportScriptInterface::handle_received_token(const std::string &key, const std::string &value)
+void DcsExportScriptProtocol::handle_received_token(const std::string &key, const std::string &value)
 {
     if (is_integer(key)) {
         current_game_state_.insert_or_assign(std::stoi(key), value);

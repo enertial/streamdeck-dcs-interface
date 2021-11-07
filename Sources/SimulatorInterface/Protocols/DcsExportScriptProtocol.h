@@ -4,10 +4,10 @@
 
 #include "SimulatorInterface/SimulatorInterface.h"
 
-class DcsExportScriptInterface : public SimulatorInterface
+class DcsExportScriptProtocol : public SimulatorInterface
 {
   public:
-    DcsExportScriptInterface(const SimulatorConnectionSettings &settings);
+    DcsExportScriptProtocol(const SimulatorConnectionSettings &settings);
 
     /**
      * @brief Receives simulator state broadcasts, updating internal current game state.

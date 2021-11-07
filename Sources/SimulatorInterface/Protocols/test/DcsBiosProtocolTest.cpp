@@ -2,31 +2,31 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/Backends/DcsBiosInterface.h"
+#include "SimulatorInterface/Protocols/DcsBiosProtocol.h"
 
 namespace test
 {
-TEST(DcsBiosInterfaceTest, invalid_connection_port_settings)
+TEST(DcsBiosProtocolTest, invalid_connection_port_settings)
 {
     SimulatorConnectionSettings connection_settings = {"19ab", "abc", "127.0.0.1", ""};
-    EXPECT_THROW(DcsBiosInterface simulator_interface(connection_settings), std::runtime_error);
+    EXPECT_THROW(DcsBiosProtocol simulator_interface(connection_settings), std::runtime_error);
 }
 
-TEST(DcsBiosInterfaceTest, dcs_reset_command_on_construction)
+TEST(DcsBiosProtocolTest, dcs_reset_command_on_construction)
 {
     SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
     UdpSocket mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port);
-    DcsBiosInterface simulator_interface(connection_settings);
+    DcsBiosProtocol simulator_interface(connection_settings);
 
-    // Test that the reset message "R" is received by DCS on creation of DcsBiosInterface.
+    // Test that the reset message "R" is received by DCS on creation of DcsBiosProtocol.
     std::stringstream ss = mock_dcs.receive();
     EXPECT_EQ("SYNC E", ss.str());
 }
 
-class DcsBiosInterfaceTestFixture : public ::testing::Test
+class DcsBiosProtocolTestFixture : public ::testing::Test
 {
   public:
-    DcsBiosInterfaceTestFixture()
+    DcsBiosProtocolTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           simulator_interface(connection_settings)
@@ -36,17 +36,17 @@ class DcsBiosInterfaceTestFixture : public ::testing::Test
     }
 
     SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
-    UdpSocket mock_dcs;                   // A socket that will mock Send/Receive messages from DCS.
-    DcsBiosInterface simulator_interface; // Simulator Interface to test.
+    UdpSocket mock_dcs;                  // A socket that will mock Send/Receive messages from DCS.
+    DcsBiosProtocol simulator_interface; // Simulator Interface to test.
 };
 
-TEST_F(DcsBiosInterfaceTestFixture, get_current_simulator_module_init)
+TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module_init)
 {
     // Test that the default value of an empty string is returned after initialization.
     EXPECT_EQ("", simulator_interface.get_current_simulator_module());
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_overwrite_values)
+TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrite_values)
 {
     // TEST 1 - Received values are stored and retrievable.
     // Send a single message from mock DCS that contains updates for multiple IDs.
@@ -70,7 +70,7 @@ TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_overwrite_values)
     EXPECT_TRUE(true); // TODO.
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_handle_incomplete_message)
+TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_incomplete_message)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
@@ -84,7 +84,7 @@ TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_handle_incomplete_mes
     EXPECT_TRUE(true); // TODO.
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_handle_start_of_mission)
+TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_start_of_mission)
 {
     ASSERT_EQ("", simulator_interface.get_current_simulator_module());
     // Send a single message from mock DCS that contains updates for multiple IDs.
@@ -99,7 +99,7 @@ TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_handle_start_of_missi
     // Test that game module is updated.
     EXPECT_TRUE(true); // TODO.
 }
-TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_handle_end_of_mission)
+TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_end_of_mission)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
@@ -114,7 +114,7 @@ TEST_F(DcsBiosInterfaceTestFixture, update_simulator_state_handle_end_of_mission
     // Test that game module is cleared.
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, send_simulator_command)
+TEST_F(DcsBiosProtocolTestFixture, send_simulator_command)
 {
     const std::string address = "BIOS_HANDLE";
     const std::string value = "1";
@@ -125,19 +125,19 @@ TEST_F(DcsBiosInterfaceTestFixture, send_simulator_command)
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, send_simulator_reset_command)
+TEST_F(DcsBiosProtocolTestFixture, send_simulator_reset_command)
 {
     simulator_interface.send_simulator_reset_command();
     std::stringstream ss_received = mock_dcs.receive();
     EXPECT_EQ(ss_received.str(), "SYNC E");
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_value_of_simulator_object_state_if_nonexistant)
+TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_if_nonexistant)
 {
     EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(999));
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_value_of_simulator_object_state_with_valid_value)
+TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_with_valid_value)
 {
     const unsigned char mock_dcs_bios_message[] = {0x55, 0x55, 0x55, 0x55, 0x08, 0x00, 0x02, 0x00, 0x01, 0x00};
     // mock_dcs.send(mock_dcs_message);
@@ -148,7 +148,7 @@ TEST_F(DcsBiosInterfaceTestFixture, get_value_of_simulator_object_state_with_val
     // EXPECT_EQ(maybe_value.value(), "99.99");
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_value_of_simulator_object_state_if_empty)
+TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_if_empty)
 {
     const unsigned char mock_dcs_bios_message[] = {0x55, 0x55, 0x55, 0x55};
     // mock_dcs.send(mock_dcs_message);
@@ -158,12 +158,12 @@ TEST_F(DcsBiosInterfaceTestFixture, get_value_of_simulator_object_state_if_empty
     EXPECT_FALSE(maybe_value);
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_if_nonexistant)
+TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_if_nonexistant)
 {
     EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(999));
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_with_valid_value)
+TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_with_valid_value)
 {
     std::string mock_dcs_message = "header*765=99.99";
     mock_dcs.send(mock_dcs_message);
@@ -174,7 +174,7 @@ TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_with_v
     // EXPECT_EQ(maybe_value.value(), Decimal("99.99"));
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_with_non_decimal_value)
+TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_with_non_decimal_value)
 {
     std::string mock_dcs_message = "header*765=STRING";
     mock_dcs.send(mock_dcs_message);
@@ -184,7 +184,7 @@ TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_with_n
     EXPECT_FALSE(maybe_value);
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_if_empty)
+TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_if_empty)
 {
     std::string mock_dcs_message = "header*765=";
     mock_dcs.send(mock_dcs_message);
@@ -194,7 +194,7 @@ TEST_F(DcsBiosInterfaceTestFixture, get_decimal_of_simulator_object_state_if_emp
     EXPECT_FALSE(maybe_value);
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, clear_game_state)
+TEST_F(DcsBiosProtocolTestFixture, clear_game_state)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
@@ -213,7 +213,7 @@ TEST_F(DcsBiosInterfaceTestFixture, clear_game_state)
     EXPECT_EQ(0, current_game_state.size());
 }
 
-TEST_F(DcsBiosInterfaceTestFixture, debug_print_format)
+TEST_F(DcsBiosProtocolTestFixture, debug_print_format)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
     const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //

@@ -165,11 +165,11 @@
     </ComputeCompileInputsTargets>
   </PropertyGroup>
   <ItemGroup>
-    <_WildCardClCompile Include="Backends/*.cpp" />
+    <_WildCardClCompile Include="Protocols/*.cpp" />
     <_WildCardClCompile Include="*.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <_WildCardClInclude Include="Backends/*.h" />
+    <_WildCardClInclude Include="Protocols/*.h" />
     <_WildCardClInclude Include="*.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

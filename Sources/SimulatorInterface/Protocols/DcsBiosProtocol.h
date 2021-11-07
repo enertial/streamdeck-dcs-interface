@@ -4,10 +4,10 @@
 
 #include "SimulatorInterface/SimulatorInterface.h"
 
-class DcsBiosInterface : public SimulatorInterface
+class DcsBiosProtocol : public SimulatorInterface
 {
   public:
-    DcsBiosInterface(const SimulatorConnectionSettings &settings);
+    DcsBiosProtocol(const SimulatorConnectionSettings &settings);
 
     /**
      * @brief Receives simulator state broadcasts, updating internal current game state.
