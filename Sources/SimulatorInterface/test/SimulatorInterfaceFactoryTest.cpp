@@ -14,6 +14,13 @@ TEST(SimulatorInterfaceFactoryTest, UnknownBackend)
     EXPECT_FALSE(ptr);
 }
 
+TEST(SimulatorInterfaceFactoryTest, DcsBiosBackend)
+{
+    const SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
+    auto ptr = SimulatorInterfaceFactory(connection_settings, "DCS-BIOS");
+    EXPECT_TRUE(ptr);
+}
+
 TEST(SimulatorInterfaceFactoryTest, DcsExportScriptBackend)
 {
     const SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
