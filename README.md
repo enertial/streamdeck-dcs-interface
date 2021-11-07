@@ -85,9 +85,9 @@ The Sources folder contains the source code of the plugin. The primary component
 ```
 Sources
 ├── ElgatoSD                  Elgato Streamdeck SDK source and utilities
-├── SimulatorInterface        Classes for interacting with DCS
+├── SimulatorInterface        Classes for interacting with the simulator state
 ├── StreamdeckContext         Classes for maintaining state of individual Streamdeck buttons
-│   ├── ExportMonitors        Classes that monitor DCS export state for individual buttons
+│   ├── ExportMonitors        Classes that monitor simulator export data for individual buttons
 │   ├── SendActions           Classes that define button press and release actions
 ├── StreamdeckInterface       Executable that interfaces C++ code with Streamdeck plugin
 ├── Test                      Unit test infrastructure and target
