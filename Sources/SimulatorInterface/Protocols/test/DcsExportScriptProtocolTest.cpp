@@ -109,13 +109,12 @@ TEST_F(DcsExportScriptProtocolTestFixture, update_simulator_state_end_of_mission
 
 TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command)
 {
-    const int button_id = 3250;
-    const std::string device_id = "24";
+    const std::string address = "24,3250";
     const std::string value = "1";
     // Message is sent prepended with "C".
     const std::string expected_msg_buffer = "C24,3250,1";
 
-    simulator_interface.send_simulator_command(button_id, device_id, value);
+    simulator_interface.send_simulator_command(address, value);
     std::stringstream ss_received = mock_dcs.receive();
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }

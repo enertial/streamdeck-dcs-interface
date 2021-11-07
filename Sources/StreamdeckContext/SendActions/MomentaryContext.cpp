@@ -13,7 +13,8 @@ void MomentaryContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorI
     const auto send_command = EPLJSONUtils::GetStringByName(inPayload["settings"], "press_value");
 
     if (is_integer(button_id) && is_integer(device_id) && !send_command.empty()) {
-        simulator_interface->send_simulator_command(std::stoi(button_id), device_id, send_command);
+        const auto address = device_id + "," + button_id;
+        simulator_interface->send_simulator_command(address, send_command);
     }
 }
 
@@ -32,6 +33,7 @@ void MomentaryContext::handleButtonReleasedEvent(const std::unique_ptr<Simulator
         EPLJSONUtils::GetBoolByName(inPayload["settings"], "disable_release_check");
 
     if (is_integer(button_id) && is_integer(device_id) && !send_command.empty() && !send_on_release_is_disabled) {
-        simulator_interface->send_simulator_command(std::stoi(button_id), device_id, send_command);
+        const auto address = device_id + "," + button_id;
+        simulator_interface->send_simulator_command(address, send_command);
     }
 }

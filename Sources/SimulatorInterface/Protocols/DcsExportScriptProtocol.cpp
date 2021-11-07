@@ -30,12 +30,13 @@ void DcsExportScriptProtocol::update_simulator_state()
     }
 }
 
-void DcsExportScriptProtocol::send_simulator_command(const int button_id,
-                                                     const std::string &device_id,
-                                                     const std::string &value)
+void DcsExportScriptProtocol::send_simulator_command(const std::string &address, const std::string &value)
 {
-    const std::string message_assembly = "C" + device_id + "," + std::to_string(button_id) + "," + value;
-    simulator_socket_.send(message_assembly);
+    // String should be of the form "<device_id>,<button_id>"
+    if ((address.size() > 3) && (address.find(",") != std::string::npos)) {
+        const std::string message_assembly = "C" + address + "," + value;
+        simulator_socket_.send(message_assembly);
+    }
 }
 
 void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send("R"); }

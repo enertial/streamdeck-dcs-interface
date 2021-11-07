@@ -26,8 +26,9 @@ void SwitchContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInt
     if (is_integer(button_id) && is_integer(device_id) && !send_when_first_state_value.empty() &&
         !send_when_second_state_value.empty()) {
 
+        const auto address = device_id + "," + button_id;
         const auto send_value = is_first_state ? send_when_first_state_value : send_when_second_state_value;
-        simulator_interface->send_simulator_command(std::stoi(button_id), device_id, send_value);
+        simulator_interface->send_simulator_command(address, send_value);
     }
 
     // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
