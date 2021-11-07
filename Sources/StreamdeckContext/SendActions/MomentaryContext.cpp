@@ -4,7 +4,7 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void MomentaryContext::handleButtonPressedEvent(SimulatorInterface &simulator_interface,
+void MomentaryContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {
@@ -13,11 +13,11 @@ void MomentaryContext::handleButtonPressedEvent(SimulatorInterface &simulator_in
     const auto send_command = EPLJSONUtils::GetStringByName(inPayload["settings"], "press_value");
 
     if (is_integer(button_id) && is_integer(device_id) && !send_command.empty()) {
-        simulator_interface.send_simulator_command(std::stoi(button_id), device_id, send_command);
+        simulator_interface->send_simulator_command(std::stoi(button_id), device_id, send_command);
     }
 }
 
-void MomentaryContext::handleButtonReleasedEvent(SimulatorInterface &simulator_interface,
+void MomentaryContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                                  ESDConnectionManager *mConnectionManager,
                                                  const json &inPayload)
 {
@@ -32,6 +32,6 @@ void MomentaryContext::handleButtonReleasedEvent(SimulatorInterface &simulator_i
         EPLJSONUtils::GetBoolByName(inPayload["settings"], "disable_release_check");
 
     if (is_integer(button_id) && is_integer(device_id) && !send_command.empty() && !send_on_release_is_disabled) {
-        simulator_interface.send_simulator_command(std::stoi(button_id), device_id, send_command);
+        simulator_interface->send_simulator_command(std::stoi(button_id), device_id, send_command);
     }
 }

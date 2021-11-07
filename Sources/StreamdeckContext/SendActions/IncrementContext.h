@@ -20,11 +20,11 @@ class IncrementContext : public StreamdeckContext
      * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    void handleButtonPressedEvent(SimulatorInterface &simulator_interface,
+    void handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                   ESDConnectionManager *mConnectionManager,
                                   const json &inPayload);
 
-    void handleButtonReleasedEvent(SimulatorInterface &simulator_interface,
+    void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                    ESDConnectionManager *mConnectionManager,
                                    const json &inPayload);
 

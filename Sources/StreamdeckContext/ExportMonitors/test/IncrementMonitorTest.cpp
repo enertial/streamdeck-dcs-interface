@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 
 namespace test
@@ -57,9 +57,10 @@ class IncrementMonitorTestFixture : public ::testing::Test
 {
   public:
     IncrementMonitorTestFixture()
-        : mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          simulator_interface(connection_settings)
+        : mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port)
+
     {
+        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
     }
@@ -67,13 +68,13 @@ class IncrementMonitorTestFixture : public ::testing::Test
     void set_current_dcs_id_value(const std::string value)
     {
         mock_dcs.send("header*" + monitor_id_value + "=" + value);
-        simulator_interface.update_simulator_state();
+        simulator_interface->update_simulator_state();
     }
 
     std::string monitor_id_value = "123";
     SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                           // A socket that will mock Send/Receive messages from DCS.
-    DcsExportScriptInterface simulator_interface; // Simulator Interface to test.
+    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
+    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
 };
 
 TEST_F(IncrementMonitorTestFixture, CurrentValueIsUpdatedFromDcsInterface)

@@ -4,7 +4,7 @@
 
 #include "StreamdeckContext/SendActions/SwitchContext.h"
 
-#include "SimulatorInterface/Backends/DcsExportScriptInterface.h"
+#include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "Test/MockESDConnectionManager.h"
 namespace test
 {
@@ -15,7 +15,7 @@ class SwitchContextKeyPressTestFixture : public ::testing::Test
     SwitchContextKeyPressTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          simulator_interface(connection_settings), fixture_context(fixture_context_id),
+          fixture_context(fixture_context_id),
           // Create default json payload.
           payload({{"state", 0},
                    {"settings",
@@ -24,13 +24,14 @@ class SwitchContextKeyPressTestFixture : public ::testing::Test
                      {"send_when_first_state_value", send_when_first_state_value},
                      {"send_when_second_state_value", send_when_second_state_value}}}})
     {
+        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive();
     }
 
     SimulatorConnectionSettings connection_settings = {"1948", "1949", "127.0.0.1"};
-    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
-    DcsExportScriptInterface simulator_interface;    // Simulator Interface to test.
+    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
+    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
     std::string fixture_context_id = "abc123";
     SwitchContext fixture_context;

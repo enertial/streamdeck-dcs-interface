@@ -43,7 +43,7 @@ class DcsExportScriptInterfaceTestFixture : public ::testing::Test
 TEST_F(DcsExportScriptInterfaceTestFixture, empty_game_state_on_initialization)
 {
     // Test that current game state initializes as empty.
-    std::map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_EQ(0, current_game_state.size());
 }
 
@@ -96,7 +96,7 @@ TEST_F(DcsExportScriptInterfaceTestFixture, update_simulator_state_end_of_missio
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.send(mock_dcs_message);
     simulator_interface.update_simulator_state();
-    std::map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is cleared when a "STOP" message is received, signifying end of mission.
@@ -217,7 +217,7 @@ TEST_F(DcsExportScriptInterfaceTestFixture, clear_game_state)
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.send(mock_dcs_message);
     simulator_interface.update_simulator_state();
-    std::map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is able to be cleared.
@@ -233,7 +233,7 @@ TEST_F(DcsExportScriptInterfaceTestFixture, debug_print_format)
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
     mock_dcs.send(mock_dcs_message);
     simulator_interface.update_simulator_state();
-    std::map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
 
     EXPECT_EQ(current_game_state[761], "1");
     EXPECT_EQ(current_game_state[765], "2.00");

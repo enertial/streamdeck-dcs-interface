@@ -9,11 +9,9 @@
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
 #include "Utilities/StringUtilities.h"
 
+#include <memory>
 #include <optional>
 #include <string>
-
-enum class KeyEvent { PRESSED, RELEASED };
-enum class ContextState { FIRST, SECOND };
 
 class StreamdeckContext
 {
@@ -28,7 +26,8 @@ class StreamdeckContext
      * @param simulator_interface Interface to simulator containing current game state.
      * @param mConnectionManager Interface to StreamDeck.
      */
-    void updateContextState(SimulatorInterface &simulator_interface, ESDConnectionManager *mConnectionManager);
+    void updateContextState(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                            ESDConnectionManager *mConnectionManager);
 
     /**
      * @brief Forces an update to the Streamdeck of the context's current state be sent with current static values.
@@ -61,11 +60,11 @@ class StreamdeckContext
      * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonPressedEvent(SimulatorInterface &simulator_interface,
+    virtual void handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                           ESDConnectionManager *mConnectionManager,
                                           const json &inPayload){};
 
-    virtual void handleButtonReleasedEvent(SimulatorInterface &simulator_interface,
+    virtual void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                            ESDConnectionManager *mConnectionManager,
                                            const json &inPayload){};
 

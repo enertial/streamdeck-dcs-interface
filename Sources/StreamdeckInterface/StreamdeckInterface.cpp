@@ -17,6 +17,7 @@
 #include "ElgatoSD/EPLJSONUtils.h"
 #include "ElgatoSD/ESDConnectionManager.h"
 #include "SimulatorInterface/DcsIdLookup.h"
+#include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "SimulatorInterface/SimulatorInterfaceParameters.h"
 
 #include "Vendor/json/src/json.hpp"
@@ -109,15 +110,15 @@ void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
     SimulatorConnectionSettings connection_settings = get_connection_settings(settings);
 
     // If settings have changed, close SimulatorInterface so it can be re-opened with new connection.
-    if (simulator_interface_ && !simulator_interface_.value().connection_settings_match(connection_settings)) {
-        simulator_interface_ = std::nullopt;
+    if (simulator_interface_ && !simulator_interface_->connection_settings_match(connection_settings)) {
+        simulator_interface_.reset();
     }
 
     // Create first instance of Simulator Interface only done under DidReceiveGlobalSettings to allow for any stored
     // settings to be used before binding socket to default port values.
-    if (!simulator_interface_.has_value()) {
+    if (!simulator_interface_) {
         try {
-            simulator_interface_.emplace(connection_settings);
+            simulator_interface_ = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         } catch (const std::exception &e) {
             mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
         }
@@ -132,12 +133,12 @@ void StreamdeckInterface::UpdateFromGameState()
 
     if (simulator_interface_) {
         // Update the Simulator game state in memory, then update each Streamdeck button context.
-        simulator_interface_.value().update_simulator_state();
+        simulator_interface_->update_simulator_state();
 
         if (mConnectionManager != nullptr) {
             mVisibleContextsMutex.lock();
             for (auto &elem : mVisibleContexts) {
-                elem.second->updateContextState(*simulator_interface_, mConnectionManager);
+                elem.second->updateContextState(simulator_interface_, mConnectionManager);
             }
             mVisibleContextsMutex.unlock();
         }
@@ -151,7 +152,7 @@ void StreamdeckInterface::KeyDownForAction(const std::string &inAction,
 {
     if (simulator_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext]->handleButtonPressedEvent(*simulator_interface_, mConnectionManager, inPayload);
+        mVisibleContexts[inContext]->handleButtonPressedEvent(simulator_interface_, mConnectionManager, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -164,7 +165,7 @@ void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
 
     if (simulator_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext]->handleButtonReleasedEvent(*simulator_interface_, mConnectionManager, inPayload);
+        mVisibleContexts[inContext]->handleButtonReleasedEvent(simulator_interface_, mConnectionManager, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -233,8 +234,8 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                                               {"current_game_state", ""},
                                                               {"error", "SimulatorInterface not connected"}}));
         } else {
-            const std::map<int, std::string> dcs_id_values =
-                simulator_interface_.value().debug_get_current_game_state();
+            const std::unordered_map<int, std::string> dcs_id_values =
+                simulator_interface_->debug_get_current_game_state();
             json current_game_state;
             for (const auto &[key, value] : dcs_id_values) {
                 current_game_state[std::to_string(key)] = value;
