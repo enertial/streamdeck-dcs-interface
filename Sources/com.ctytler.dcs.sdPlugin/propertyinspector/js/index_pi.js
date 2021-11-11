@@ -74,6 +74,7 @@ $SD.on('connected', (jsn) => {
 
     $SD.api.getGlobalSettings($SD.uuid);
     settings = addDefaultSettings(action, settings);
+    $SD.api.setSettings($SD.uuid, settings);
 
     if (settings) {
         updateUI(settings);
@@ -206,6 +207,10 @@ function saveSettings(sdpi_collection) {
             else {
                 console.log(sdpi_collection.key, " => ", sdpi_collection.value);
                 settings[sdpi_collection.key] = sdpi_collection.value;
+            }
+            // Define a custom send_address setting which is a concatenation of two user inputs.
+            if (settings["device_id"] && settings["button_id"]) {
+                settings["send_address"] = settings["device_id"] + "," + settings["button_id"];
             }
             console.log('setSettings....', settings);
             $SD.api.setSettings($SD.uuid, settings);

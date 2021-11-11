@@ -20,8 +20,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
           // Create default json payload.
           payload({{"state", 0},
                    {"settings",
-                    {{"button_id", button_id},
-                     {"device_id", device_id},
+                    {{"send_address", send_address},
                      {"dcs_id_increment_monitor", dcs_id_increment_monitor},
                      {"increment_value", increment_value},
                      {"increment_min", increment_min},
@@ -40,8 +39,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     std::string fixture_context_id = "abc123";
     IncrementContext fixture_context;
 
-    std::string button_id = "2";
-    std::string device_id = "23";
+    std::string send_address = "23,2";
     std::string dcs_id_increment_monitor = "321";
     std::string increment_value = "0.1";
     std::string increment_min = "0";
@@ -49,29 +47,11 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     json payload;
 };
 
-TEST_F(IncrementContextKeyPressTestFixture, handle_invalid_button_id)
-{
-    payload["settings"]["button_id"] = "abc";
-    fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
-    const std::stringstream ss_received = mock_dcs.receive();
-    std::string expected_command = "";
-    EXPECT_EQ(expected_command, ss_received.str());
-}
-
-TEST_F(IncrementContextKeyPressTestFixture, handle_invalid_device_id)
-{
-    payload["settings"]["device_id"] = "32.4";
-    fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
-    const std::stringstream ss_received = mock_dcs.receive();
-    std::string expected_command = "";
-    EXPECT_EQ(expected_command, ss_received.str());
-}
-
 TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment)
 {
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
-    std::string expected_command = "C" + device_id + "," + button_id + "," + increment_value;
+    std::string expected_command = "C" + send_address + "," + increment_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
@@ -88,7 +68,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive();
     const Decimal expected_increment_value = Decimal(external_increment_start) + Decimal(increment_value);
-    std::string expected_command = "C" + device_id + "," + button_id + "," + expected_increment_value.str();
+    std::string expected_command = "C" + send_address + "," + expected_increment_value.str();
     EXPECT_EQ(expected_command, ss_received.str());
 }
 

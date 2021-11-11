@@ -15,9 +15,7 @@ void SwitchContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInt
                                               ESDConnectionManager *mConnectionManager,
                                               const json &inPayload)
 {
-    const auto button_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "button_id");
-    const auto device_id = EPLJSONUtils::GetStringByName(inPayload["settings"], "device_id");
-    const auto address = device_id + "," + button_id;
+    const auto send_address = EPLJSONUtils::GetStringByName(inPayload["settings"], "send_address");
     const auto send_when_first_state_value =
         EPLJSONUtils::GetStringByName(inPayload["settings"], "send_when_first_state_value");
     const auto send_when_second_state_value =
@@ -26,7 +24,7 @@ void SwitchContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInt
 
     if (!send_when_first_state_value.empty() && !send_when_second_state_value.empty()) {
         const auto send_value = is_first_state ? send_when_first_state_value : send_when_second_state_value;
-        simulator_interface->send_simulator_command(address, send_value);
+        simulator_interface->send_simulator_command(send_address, send_value);
     }
 
     // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
