@@ -1,6 +1,7 @@
 .tableDiv {
-  height: 40rem;
+  height: 30rem;
   overflow: auto;
+  color: #242424;
 }
 
 table {
@@ -8,7 +9,7 @@ table {
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   font-size: 9pt;
   border-collapse: separate;
-  border: 3px solid #ddd;
+  border: 3px solid #1b1b1b;
   width: 100%;
 }
 
@@ -19,22 +20,30 @@ thead {
 
 td,
 th {
-  border: 1px solid #ddd;
-  padding: 8px;
+  border: 1px solid rgb(71, 71, 71);
+  padding: 6px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
+tr:nth-child(odd) {
+  background-color: #f1f1f1;
+}
 tr:nth-child(even) {
-  background-color: #f2f2f2;
+  background-color: #dddddd;
 }
 
 tr:hover {
-  background-color: #ddd;
+  background-color: rgb(167, 182, 231);
+  cursor: pointer;
 }
 
 th {
   padding-top: 12px;
   padding-bottom: 12px;
   text-align: center;
-  background-color: #4a548a;
+  background-color: #494e6b;
   color: white;
+  font-variant-caps: small-caps;
+  font-size: 11pt;
 }

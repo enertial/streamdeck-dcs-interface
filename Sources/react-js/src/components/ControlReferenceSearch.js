@@ -6,7 +6,7 @@ function ControlReferenceSearch() {
   }
 
   return (
-    <div align="center">
+    <div className={classes.searchBar}>
       <span className={classes.searchTitle}>Search Control References: </span>
       <input
         id="table_search"

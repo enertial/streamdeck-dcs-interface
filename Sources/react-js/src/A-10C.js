@@ -1,4 +1,4 @@
-export const controlReferencesData = {
+export const moduleData = {
   AAP: {
     AAP_CDUPWR: {
       category: "AAP",

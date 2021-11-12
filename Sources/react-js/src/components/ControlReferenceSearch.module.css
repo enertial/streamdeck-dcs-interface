@@ -1,7 +1,15 @@
+.searchBar {
+  background-color: rgb(79, 81, 112);
+  text-align: center;
+  height: 2rem;
+  border-radius: 3px;
+}
+
 .searchTitle {
   text-align: left;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  font-size: 9pt;
+  font-weight: bold;
+  font-size: 10pt;
   width: 40%;
 }
 
