@@ -1,11 +1,10 @@
 import "./App.css";
-import ControlReferenceTable from "./components/ControlReferenceTable";
-import { controlReferencesData } from "./A-10C";
+import ControlReferenceSelectionTool from "./components/ControlReferenceSelectionTool";
 
 function App() {
   return (
     <div>
-      <ControlReferenceTable />
+      <ControlReferenceSelectionTool />
     </div>
   );
 }

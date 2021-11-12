@@ -59,8 +59,8 @@ function ControlReferenceTable(props) {
   }
 
   return (
-    <div>
-      <table className={classes.table}>
+    <div className={classes.tableDiv}>
+      <table>
         <ControlReferenceTableHeader />
         <tbody>{RenderControlReferenceTable(controlReferencesData)}</tbody>
       </table>

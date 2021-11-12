@@ -1,9 +1,20 @@
+.tableDiv {
+  height: 40rem;
+  overflow: auto;
+}
+
 table {
   text-align: center;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  border-collapse: collapse;
+  font-size: 9pt;
+  border-collapse: separate;
   border: 3px solid #ddd;
   width: 100%;
+}
+
+thead {
+  position: sticky;
+  top: 0;
 }
 
 td,
