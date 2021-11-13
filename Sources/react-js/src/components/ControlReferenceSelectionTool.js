@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import classes from "./ControlReferenceSelectionTool.module.css";
 import ControlReferenceTable from "./ControlReferenceTable";
-import ControlReferenceSearch from "./ControlReferenceSearch";
+import SearchBar from "./SearchBar";
 import FlattenControlReferenceJson from "./FlattenControlReferenceJson";
 import { moduleData } from "../A-10C";
 
@@ -10,27 +10,25 @@ function ControlReferenceSelectionTool() {
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
     FlattenControlReferenceJson(moduleData)
   );
-  const [filteredControlRefs, setFilteredControlRefs] = useState(
-    fullModuleControlRefs
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredControlRefs = fullModuleControlRefs.filter(
+    (control) =>
+      control.category.includes(searchQuery) ||
+      control.identifier.includes(searchQuery)
   );
 
-  function FilterData(query) {
-    if (query.length > 0) {
-      setFilteredControlRefs(
-        (fullModuleControlRefs) =>
-          fullModuleControlRefs.category.includes(query) ||
-          fullModuleControlRefs.identifier.includes(query)
-      );
-    } else {
-      setFilteredControlRefs(fullModuleControlRefs);
-    }
-  }
+  const handleSearchQueryChange = (event) => {
+    setSearchQuery(event.target.value);
+  };
+  const handleSearchQueryClear = (event) => {
+    setSearchQuery("");
+  };
 
   function DisplayTableWhenDataLoaded(props) {
     if (props.isDataLoaded) {
       return (
         <div>
-          <ControlReferenceSearch filterDataHandle={FilterData} />
           <ControlReferenceTable tableData={filteredControlRefs} />
         </div>
       );
@@ -41,8 +39,13 @@ function ControlReferenceSelectionTool() {
 
   return (
     <div className={classes.main}>
+      <SearchBar
+        value={searchQuery}
+        onChange={handleSearchQueryChange}
+        onClickClear={handleSearchQueryClear}
+      />
       <DisplayTableWhenDataLoaded
-        isDataLoaded={filteredControlRefs.length > 0}
+        isDataLoaded={fullModuleControlRefs.length > 0}
       />
     </div>
   );

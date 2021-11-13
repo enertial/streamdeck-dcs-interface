@@ -19,3 +19,14 @@
   font-size: 9pt;
   width: 40%;
 }
+
+.button {
+  border-radius: 6px;
+  background-color: rgb(196, 197, 209);
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+.button:disabled {
+  background-color: rgb(91, 92, 109);
+}

@@ -18,6 +18,10 @@ thead {
   top: 0;
 }
 
+tbody {
+  cursor: pointer;
+}
+
 td,
 th {
   border: 1px solid rgb(71, 71, 71);
@@ -35,7 +39,6 @@ tr:nth-child(even) {
 
 tr:hover {
   background-color: rgb(167, 182, 231);
-  cursor: pointer;
 }
 
 th {

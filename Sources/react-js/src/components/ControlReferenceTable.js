@@ -2,14 +2,6 @@
 import classes from "./ControlReferenceTable.module.css";
 
 function ControlReferenceTable(props) {
-  //const [TableIsLoading, SetTableIsLoading] = UseState(true);
-
-  //function ReceiveControlReferenceDataHandler() {}
-
-  //       "category": "AHCP",
-  //   "control_type": "selector",
-  //    "description": "Hud Mode STBY - NORM",
-  //     "identifier": "AHCP_HUD_MODE",
   function ControlReferenceTableHeader() {
     return (
       <thead>
