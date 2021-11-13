@@ -1,12 +1,18 @@
 import { useState } from "react";
 
-import classes from "./ControlReferenceSelectionTool.module.css";
-import ControlReferenceTable from "./ControlReferenceTable";
+import classes from "./ControlReference.module.css";
+
+import Table from "./Table";
 import SearchBar from "./SearchBar";
 import FlattenControlReferenceJson from "./FlattenControlReferenceJson";
-import { moduleData } from "../A-10C";
 
-function ControlReferenceSelectionTool() {
+import { moduleData } from "../../A-10C";
+
+function ControlReference(props) {
+  /******* Internal State  *******/
+  /*
+   ** Internal State
+   */
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
     FlattenControlReferenceJson(moduleData)
   );
@@ -14,22 +20,39 @@ function ControlReferenceSelectionTool() {
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
-      control.category.includes(searchQuery) ||
-      control.identifier.includes(searchQuery)
+      control.category.toUpperCase().includes(searchQuery) ||
+      control.identifier.toUpperCase().includes(searchQuery) ||
+      control.description.toUpperCase().includes(searchQuery)
   );
 
+  /*
+   ** SearchBar Handlers
+   */
   const handleSearchQueryChange = (event) => {
-    setSearchQuery(event.target.value);
+    setSearchQuery(event.target.value.toUpperCase());
   };
   const handleSearchQueryClear = (event) => {
     setSearchQuery("");
   };
 
+  /*
+   ** Table Row-Click Handlers
+   */
+  const handleTableRowClick = (tableRowData) => {
+    props.onSelect(tableRowData);
+  };
+
+  /*
+   ** Table Row-Click Handlers
+   */
   function DisplayTableWhenDataLoaded(props) {
     if (props.isDataLoaded) {
       return (
         <div>
-          <ControlReferenceTable tableData={filteredControlRefs} />
+          <Table
+            tableData={filteredControlRefs}
+            onClick={handleTableRowClick}
+          />
         </div>
       );
     } else {
@@ -37,6 +60,9 @@ function ControlReferenceSelectionTool() {
     }
   }
 
+  /*
+   ** Render
+   */
   return (
     <div className={classes.main}>
       <SearchBar
@@ -51,4 +77,4 @@ function ControlReferenceSelectionTool() {
   );
 }
 
-export default ControlReferenceSelectionTool;
+export default ControlReference;

@@ -13,7 +13,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "set \"BUILD_PATH=../com.ctytler.dcs.sdPlugin/settingsUI\" && react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

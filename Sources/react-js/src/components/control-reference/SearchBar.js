@@ -1,8 +1,6 @@
-import { useState } from "react";
-
 import classes from "./SearchBar.module.css";
 
-function ControlReferenceSearch(props) {
+function SearchBar(props) {
   return (
     <div className={classes.searchBar}>
       <span className={classes.searchTitle}>Search Control References: </span>
@@ -26,4 +24,4 @@ function ControlReferenceSearch(props) {
   );
 }
 
-export default ControlReferenceSearch;
+export default SearchBar;

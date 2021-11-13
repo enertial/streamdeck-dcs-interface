@@ -1,10 +1,10 @@
 import "./App.css";
-import ControlReferenceSelectionTool from "./components/ControlReferenceSelectionTool";
+import ButtonSettings from "./pages/ButtonSettings";
 
 function App() {
   return (
     <div>
-      <ControlReferenceSelectionTool />
+      <ButtonSettings />
     </div>
   );
 }

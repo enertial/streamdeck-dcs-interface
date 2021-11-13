@@ -1,5 +1,5 @@
 .tableDiv {
-  height: 30rem;
+  height: 40rem;
   overflow: auto;
   color: #242424;
 }
@@ -7,9 +7,9 @@
 table {
   text-align: center;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
-  font-size: 9pt;
+  font-size: 11pt;
   border-collapse: separate;
-  border: 3px solid #1b1b1b;
+  border: 3px solid #303030;
   width: 100%;
 }
 
@@ -48,5 +48,5 @@ th {
   background-color: #494e6b;
   color: white;
   font-variant-caps: small-caps;
-  font-size: 11pt;
+  font-size: 13pt;
 }
