@@ -16,13 +16,21 @@ Sources\Windows\x64\Release\Test.exe
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed unit tests" && pause && exit /b %errorlevel%
 
 :: Copy C++ executable to StreamDeck Plugin package:
+echo. && echo *** C++ binary compilation complete, published to Sources/com.ctytler.dcs.sdPlugin/bin/ *** && echo.
 copy Sources\Windows\x64\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
 
 :: Remove any prior build of the Plugin:
-del Release\com.ctytler.dcs.streamDeckPlugin
+echo. && echo *** Removing any previous builds of com.ctytler.dcs.streamDeckPlugin from Release/ ***
+del Release\com.ctytler.dcs.streamDeckPlugin && echo ...Successfully removed
+
+:: Build the ReactJS user interface:
+cd Sources\react-js && call npm run build && cd ..\..
+echo *** React JS build complete, published to Sources/com.ctytler.dcs.sdPlugin/settingsUI/ *** && echo.
 
 :: Build StreamDeck Plugin:
+echo *** Building com.ctytler.dcs.streamDeckPlugin to Release/ *** && echo.
 Tools\DistributionTool.exe -b -i Sources\com.ctytler.dcs.sdPlugin -o Release
+echo. && echo  *** Build complete *** && echo.
 
 :: Pause for keypress to allow user to view output
 pause

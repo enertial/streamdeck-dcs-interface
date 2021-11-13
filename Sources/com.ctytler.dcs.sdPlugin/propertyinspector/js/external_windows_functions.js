@@ -6,9 +6,9 @@
 /**
  * Opens an external window when button is clicked.
  */
-function callbackHelpButtonPress() {
-    if (!window.helpWindow || window.helpWindow.closed) {
-        window.helpWindow = window.open('../helpDocs/helpWindow.html', 'Help Documentation');
+function callbackConfigButtonPress() {
+    if (!window.configWindow || window.configWindow.closed) {
+        window.configWindow = window.open('../settingsUI/index.html', 'Button Configuration');
     }
 }
 /**
