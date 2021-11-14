@@ -1,6 +1,9 @@
 name: C++ CI/CD Tests
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - "*.md"
 
 env:
   # Path to the solution file relative to the root of the project.
@@ -17,7 +20,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-      - uses: actions/checkout@v2
+        uses: actions/checkout@v2
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1

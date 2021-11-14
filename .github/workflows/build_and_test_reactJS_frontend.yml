@@ -3,7 +3,10 @@
 
 name: ReactJS CI/CD Tests
 
-on: [push]
+on:
+  push:
+    paths-ignore:
+      - "*.md"
 
 jobs:
   build:
@@ -16,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-      - uses: actions/checkout@v2
+        uses: actions/checkout@v2
 
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v2
@@ -25,10 +28,10 @@ jobs:
           cache: "npm"
 
       - name: CI Build
-      - run: npm ci
+        run: npm ci
 
       - name: BUILD
-      - run: npm run build --if-present
+        run: npm run build --if-present
 
       - name: Run tests with code coverage
-      - run: npm test -- --coverage
+        run: npm test -- --coverage
