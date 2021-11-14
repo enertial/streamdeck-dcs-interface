@@ -9,22 +9,22 @@ cd /D "%~dp0"\..
 call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
 
 :: Build C++ executable:
-devenv Sources\Windows\com.ctytler.dcs.sdPlugin.sln /build "Release|x64"
+devenv Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /build "Release|x64"
 
 :: Run unit tests, only continue if all tests pass
-Sources\Windows\x64\Release\Test.exe
+Sources\backend-cpp\Windows\x64\Release\Test.exe
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed unit tests" && pause && exit /b %errorlevel%
 
 :: Copy C++ executable to StreamDeck Plugin package:
 echo. && echo *** C++ binary compilation complete, published to Sources/com.ctytler.dcs.sdPlugin/bin/ *** && echo.
-copy Sources\Windows\x64\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
+copy Sources\backend-cpp\Windows\x64\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
 
 :: Remove any prior build of the Plugin:
 echo. && echo *** Removing any previous builds of com.ctytler.dcs.streamDeckPlugin from Release/ ***
 del Release\com.ctytler.dcs.streamDeckPlugin && echo ...Successfully removed
 
 :: Build the ReactJS user interface:
-cd Sources\react-js && call npm run build && cd ..\..
+cd Sources\frontend-react-js && call npm run build && cd ..\..
 echo *** React JS build complete, published to Sources/com.ctytler.dcs.sdPlugin/settingsUI/ *** && echo.
 
 :: Build StreamDeck Plugin:
