@@ -37,3 +37,20 @@ jobs:
 
       - name: Run C++ Unit Tests
         run: ./Sources/backend-cpp/Windows/x64/Release/Test.exe
+
+      - name: Setup OpenCppCoverage and add to PATH
+        id: setup_opencppcoverage
+        run: |
+          choco install OpenCppCoverage -y
+          echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
+
+      - name: Generate Coverage Report
+        id: generate_test_report
+        shell: cmd
+        run: OpenCppCoverage.exe --sources Sources\backend-cpp --excluded_sources Vendor --excluded_sources Windows --export_type cobertura:StreamdeckDcsInterfaceCov.xml .\Sources\backend-cpp\Windows\x64\Release\Test.exe
+
+      - name: Upload Report to Codecov
+        uses: codecov/codecov-action@v1.3.2
+        with:
+          files: ./StreamdeckDcsInterfaceCov.xml
+          fail_ci_if_error: true
