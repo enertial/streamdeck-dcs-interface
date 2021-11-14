@@ -1,6 +1,6 @@
 <img src="Images/DCS_Interface_Banner.png" width=400>
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/C++%20CI/CD%20Tests)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/C++%20CI/CD%20Tests?label=C%2B%2B%20Tests)
 [![codecov](https://codecov.io/gh/charlestytler/streamdeck-dcs-interface/branch/master/graph/badge.svg?token=9K0CA0IGSM)](https://codecov.io/gh/charlestytler/streamdeck-dcs-interface)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/clang-format?label=clang-format)
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/ReactJS%20CI/CD%20Tests?label=ReactJS%20Tests)
