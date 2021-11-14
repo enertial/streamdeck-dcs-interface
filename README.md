@@ -1,5 +1,12 @@
 <img src="Images/DCS_Interface_Banner.png" width=400>
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/C++%20CI/CD%20Tests)
+[![codecov](https://codecov.io/gh/charlestytler/streamdeck-dcs-interface/branch/react_js_config_window/graph/badge.svg?token=9K0CA0IGSM)](https://codecov.io/gh/charlestytler/streamdeck-dcs-interface)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/clang-format?label=clang-format)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/ReactJS%20CI/CD%20Tests?label=ReactJS%20Tests)
+![GitHub all releases](https://img.shields.io/github/downloads/charlestytler/streamdeck-dcs-interface/total)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/charlestytler/streamdeck-dcs-interface)
+
 `DCS Interface` is a plugin for the Streamdeck that allows communication with DCS via lua UDP sockets for both receiving updates of the simulation state as well as sending commands to interact with the clickable cockpits.
 
 - [Description](#description)
