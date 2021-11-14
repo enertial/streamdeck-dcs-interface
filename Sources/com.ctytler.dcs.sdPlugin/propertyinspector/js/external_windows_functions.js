@@ -6,14 +6,6 @@
 /**
  * Opens an external window when button is clicked.
  */
-function callbackConfigButtonPress() {
-    if (!window.configWindow || window.configWindow.closed) {
-        window.configWindow = window.open('../settingsUI/index.html', 'Button Configuration');
-    }
-}
-/**
- * Opens an external window when button is clicked.
- */
 function callbackIdLookupButtonPress() {
     if (!window.idLookupWindow || window.idLookupWindow.closed) {
         window.idLookupWindow = window.open('id_lookup_window.html', 'ID Lookup');
@@ -96,6 +88,12 @@ function sendToIdLookupWindowInstalledModules(installed_modules_list) {
 function sendToIdLookupWindowClickabledata(clickabledata_elements) {
     if (window.idLookupWindow) {
         window.idLookupWindow.gotClickabledata(clickabledata_elements);
+    }
+}
+
+function sendToConfigWindow(payload) {
+    if (window.configWindow) {
+        window.configWindow.handlePropInspectorMessage(payload);
     }
 }
 

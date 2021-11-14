@@ -5,6 +5,7 @@ import classes from "./ControlReference.module.css";
 import Table from "./Table";
 import SearchBar from "./SearchBar";
 import FlattenControlReferenceJson from "./FlattenControlReferenceJson";
+import { storeLastSearchQuery } from "../../StreamdeckApi";
 
 import { moduleData } from "../../A-10C";
 
@@ -16,7 +17,9 @@ function ControlReference(props) {
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
     FlattenControlReferenceJson(moduleData)
   );
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState(
+    window.opener ? window.opener.global_settings.last_search_query : ""
+  );
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
@@ -26,24 +29,25 @@ function ControlReference(props) {
   );
 
   /*
-   ** SearchBar Handlers
+   ** Handlers
    */
   const handleSearchQueryChange = (event) => {
-    setSearchQuery(event.target.value.toUpperCase());
-  };
-  const handleSearchQueryClear = (event) => {
-    setSearchQuery("");
+    const query = event.target.value.toUpperCase();
+    setSearchQuery(query);
+    storeLastSearchQuery(query);
   };
 
-  /*
-   ** Table Row-Click Handlers
-   */
+  const handleSearchQueryClear = (event) => {
+    setSearchQuery("");
+    storeLastSearchQuery("");
+  };
+
   const handleTableRowClick = (tableRowData) => {
     props.onSelect(tableRowData);
   };
 
   /*
-   ** Table Row-Click Handlers
+   ** Loading message
    */
   function DisplayTableWhenDataLoaded(props) {
     if (props.isDataLoaded) {

@@ -7,10 +7,10 @@ import Modal from "../components/ui/Modal";
 function ButtonSettings(props) {
   const [selectedControlReference, setSelectedControlReference] = useState({});
   const isSelection = Object.keys(selectedControlReference).length > 0;
-  console.log(selectedControlReference);
 
   function handleControlReferenceSelect(controlData) {
     setSelectedControlReference(controlData);
+    console.log(controlData);
   }
 
   function clearSelection() {

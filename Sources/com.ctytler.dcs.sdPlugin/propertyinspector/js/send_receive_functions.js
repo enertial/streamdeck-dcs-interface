@@ -41,6 +41,7 @@ function callbackReceivedPayloadFromPlugin(payload) {
 
     if (payload.event == 'InstalledModules') {
         sendToIdLookupWindowInstalledModules(payload.installed_modules);
+        sendToConfigWindow(payload);
     }
 
     if (payload.event == 'Clickabledata') {
