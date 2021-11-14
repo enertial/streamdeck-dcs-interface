@@ -42,7 +42,6 @@ jobs:
           echo "C:\Program Files\OpenCppCoverage" >> $env:GITHUB_PATH
 
       - name: Run C++ Unit Tests and Generate Coverage Report
-        run: ./Sources/backend-cpp/Windows/x64/Release/Test.exe
         id: generate_test_report
         shell: cmd
         run: OpenCppCoverage.exe --sources Sources\backend-cpp --excluded_sources Vendor --excluded_sources Windows --export_type cobertura:StreamdeckDcsInterfaceCov.xml .\Sources\backend-cpp\Windows\x64\Release\Test.exe
