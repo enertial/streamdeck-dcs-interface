@@ -1,4 +1,4 @@
-name: C++ Unit Tests
+name: C++ CI/CD Tests
 
 on:
   push:
@@ -19,6 +19,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
+      - name: Checkout repository
       - uses: actions/checkout@v2
 
       - name: Add MSBuild to PATH
