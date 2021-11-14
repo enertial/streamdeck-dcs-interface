@@ -34,22 +34,26 @@ function Table(props) {
     );
   }
 
-  return (
-    <div className={classes.tableDiv}>
-      <table>
-        <TableHeader />
-        <tbody>
-          {props.tableData.map((control) => (
-            <TableRow
-              key={control.identifier}
-              control={control}
-              onClick={props.onClick}
-            />
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
+  if (props.isDataLoaded) {
+    return (
+      <div className={classes.tableDiv}>
+        <table>
+          <TableHeader />
+          <tbody>
+            {props.tableData.map((control) => (
+              <TableRow
+                key={control.identifier}
+                control={control}
+                onClick={props.onClick}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  } else {
+    return <p align="center">Loading module data...</p>;
+  }
 }
 
 export default Table;

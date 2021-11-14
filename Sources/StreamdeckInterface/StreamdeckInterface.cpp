@@ -16,9 +16,10 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 #include "ElgatoSD/ESDConnectionManager.h"
-#include "SimulatorInterface/DcsIdLookup.h"
 #include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "SimulatorInterface/SimulatorInterfaceParameters.h"
+#include "Utilities/JsonReader.h"
+#include "Utilities/LuaReader.h"
 
 #include "Vendor/json/src/json.hpp"
 using json = nlohmann::json;
@@ -274,5 +275,27 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
             inAction,
             inContext,
             json({{"event", "Clickabledata"}, {"clickabledata", clickabledata_and_result["clickabledata_items"]}}));
+    }
+
+    if (event == "requestModuleList") {
+        const std::string path = EPLJSONUtils::GetStringByName(inPayload, "path");
+        const auto maybe_module_list = get_module_list(path);
+        if (maybe_module_list) {
+            mConnectionManager->SendToPropertyInspector(
+                inAction, inContext, json({{"event", "ModuleList"}, {"moduleList", maybe_module_list.value()}}));
+        } else {
+            mConnectionManager->LogMessage("Get list of json modules failed at: " + path);
+        }
+    }
+
+    if (event == "requestJsonFile") {
+        const std::string filename = EPLJSONUtils::GetStringByName(inPayload, "filename");
+        const auto maybe_json = read_json_file(filename);
+        if (maybe_json) {
+            mConnectionManager->SendToPropertyInspector(
+                inAction, inContext, json({{"event", "JsonFile"}, {"jsonFile", maybe_json.value()}}));
+        } else {
+            mConnectionManager->LogMessage("Unable to read in json file from: " + filename);
+        }
     }
 }

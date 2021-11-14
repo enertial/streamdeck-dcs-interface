@@ -1,6 +1,6 @@
 // Copyright 2020 Charles Tytler
 
-#include "DcsIdLookup.h"
+#include "LuaReader.h"
 
 #include "Vendor/lua-5.1.5/etc/lua.hpp"
 

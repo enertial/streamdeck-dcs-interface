@@ -12,18 +12,22 @@ function callbackConfigButtonPress() {
   }
 }
 
+const configWindowChannel = new BroadcastChannel("config-window-channel");
+
 /**
  * Callback function to allow external window to make SD.api function calls.
  */
-function handleExternalWindowCall(message) {
+configWindowChannel.addEventListener("message", (e) => {
+  const message = e.data;
+
   if (message.event == "storeLastSearchQuery") {
-    global_settings["last_search_query"] = message.payload.searchQuery;
+    global_settings["last_search_query"] = message.searchQuery;
     console.log("Store Last Search Query: ", global_settings);
     $SD.api.setGlobalSettings($SD.uuid, global_settings);
   }
 
   if (message.event == "storeLastSelectedModule") {
-    global_settings["last_selected_module"] = message.payload.selectedModule;
+    global_settings["last_selected_module"] = message.selectedModule;
     console.log("Store Last Selected Module: ", global_settings);
     $SD.api.setGlobalSettings($SD.uuid, global_settings);
   }
@@ -40,15 +44,14 @@ function handleExternalWindowCall(message) {
   if (message.event == "requestModuleList") {
     sendPayloadToPlugin({
       event: "requestModuleList",
-      path: message.payload.path,
+      path: message.path,
     });
   }
 
   if (message.event == "requestControlReferenceJson") {
     sendPayloadToPlugin({
-      event: "requestControlReferenceJson",
-      path: message.payload.path,
-      module: message.payload.module,
+      event: "requestJsonFile",
+      filename: message.filename,
     });
   }
 
@@ -62,4 +65,4 @@ function handleExternalWindowCall(message) {
   }
 
   console.log("Callback from Config window: ", message);
-}
+});
