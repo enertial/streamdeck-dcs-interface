@@ -47,10 +47,10 @@ jobs:
         run: OpenCppCoverage.exe --sources Sources\backend-cpp --excluded_sources Vendor --excluded_sources Windows --export_type cobertura:StreamdeckDcsInterfaceCov.xml .\Sources\backend-cpp\Windows\x64\Release\Test.exe
 
       - name: Upload Report to Codecov
-        uses: codecov/codecov-action@v1.3.2
+        uses: codecov/codecov-action@v2
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./StreamdeckDcsInterfaceCov.xml
+          flags: Cpp
           fail_ci_if_error: true
           functionalities: fix
-          verbose: true
