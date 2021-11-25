@@ -34,20 +34,19 @@ function ControlReference(props) {
   function requestModuleList() {
     props.extWindowChannel.postMessage({
       event: "requestModuleList",
-      path:
-        "C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json",
+      path: "C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json",
     });
   }
   function requestModule() {
     props.extWindowChannel.postMessage({
       event: "requestControlReferenceJson",
       filename:
-        "C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\Ka-50.json",
+        "C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\FA-18C_hornet.json",
     });
   }
 
   props.extWindowChannel.addEventListener("message", (e) => {
-    console.log("Broadcast received: ", e.data);
+    console.log("Broadcast received: ", e);
     if (e.data.event === "ModuleList") {
       console.log("Module List: ", e.data.moduleList);
     }

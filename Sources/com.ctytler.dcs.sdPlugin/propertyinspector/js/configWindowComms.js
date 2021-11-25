@@ -18,6 +18,7 @@ const configWindowChannel = new BroadcastChannel("config-window-channel");
  * Callback function to allow external window to make SD.api function calls.
  */
 configWindowChannel.addEventListener("message", (e) => {
+  console.log("Callback from Config window: ", e);
   const message = e.data;
 
   if (message.event == "storeLastSearchQuery") {
@@ -63,6 +64,4 @@ configWindowChannel.addEventListener("message", (e) => {
     $SD.api.setSettings($SD.uuid, settings);
     sendPayloadToPlugin({ event: "SettingsUpdate", settings: settings });
   }
-
-  console.log("Callback from Config window: ", message);
 });
