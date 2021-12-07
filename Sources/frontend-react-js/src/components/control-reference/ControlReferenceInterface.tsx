@@ -1,22 +1,61 @@
-/* Provides utility function for flattening DCS BIOS control reference json and returning an array of controls. */
-
-function FlattenControlReferenceJson(controlsObject) {
-  console.log("Flatten:", controlsObject);
-  var controlsArray = [];
-  Object.keys(controlsObject).forEach((category) =>
-    Object.keys(controlsObject[category]).forEach((control) => {
-      return controlsArray.push(controlsObject[category][control]);
-    })
-  );
-  return controlsArray;
+interface ModuleControlsJson {
+  [key: string]: ControlCategory
 }
 
-export default FlattenControlReferenceJson;
+interface ControlCategory {
+  [key: string]: ControlData
+}
+
+interface ControlData {
+  category: string,
+  control_type: string,
+  description: string,
+  identifier: string,
+  inputs: Array<ControlInput>,
+  outputs: Array<ControlOutputInteger | ControlOutputString>,
+  momentary_positions?: string,
+  physical_variant?: string,
+}
+
+interface ControlInput {
+  description: string,
+  interface: string,
+  max_value?: number,
+  argument?: string,
+}
+
+interface ControlOutputInteger {
+  address: number,
+  description: string,
+  mask: number,
+  max_value: number,
+  shift_by: number,
+  suffix: string,
+  type: string, // Will be "integer"
+}
+
+interface ControlOutputString {
+  address: number,
+  description: string,
+  max_length: number,
+  suffix: string,
+  type: string, // Will be "string"
+}
+
+export type {
+  ModuleControlsJson,
+  ControlCategory,
+  ControlData,
+  ControlInput,
+  ControlOutputInteger,
+  ControlOutputString
+}
+
 
 /* EXAMPLE
 Generally takes the form of an object containing {categories: {controls:{} } }
 
-A-10C_Subset_Example = 
+A-10C_Subset_Example =
 {
   UFC: {
     MASTER_CAUTION: {

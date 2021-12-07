@@ -1,22 +1,28 @@
-import { useState } from "react";
+import { ChangeEvent, useState } from "react";
 
 import classes from "./ControlReference.module.css";
 
 import Table from "./Table";
 import SearchBar from "./SearchBar";
-import FlattenControlReferenceJson from "./FlattenControlReferenceJson";
+import { ControlData } from "./ControlReferenceInterface";
+import FlattenModuleControlsJson from "./FlattenModuleControlsJson";
 
 import { moduleData } from "../../A-10C";
 
-function ControlReference(props) {
+interface Props {
+  extWindowChannel: BroadcastChannel;
+  onSelect: (arg: ControlData) => void;
+}
+
+function ControlReference(props: Props) {
   /******* Internal State  *******/
   /*
    ** Internal State
    */
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
-    FlattenControlReferenceJson(moduleData)
+    FlattenModuleControlsJson(moduleData)
   );
-  const [searchQuery, setSearchQuery] = useState(
+  const [searchQuery, setSearchQuery] = useState<string>(
     window.opener ? window.opener.global_settings.last_search_query : ""
   );
 
@@ -52,12 +58,12 @@ function ControlReference(props) {
     }
     if (e.data.event === "JsonFile") {
       console.log("Json File loaded", e);
-      setFullModuleControlRefs(FlattenControlReferenceJson(e.data.jsonFile));
+      setFullModuleControlRefs(FlattenModuleControlsJson(e.data.jsonFile));
     }
   });
 
-  const handleSearchQueryChange = (event) => {
-    const query = event.target.value.toUpperCase();
+  const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const query = event.currentTarget.value.toUpperCase();
     setSearchQuery(query);
     props.extWindowChannel.postMessage({
       event: "storeLastSearchQuery",
@@ -65,7 +71,7 @@ function ControlReference(props) {
     });
   };
 
-  const handleSearchQueryClear = (event) => {
+  const handleSearchQueryClear = () => {
     setSearchQuery("");
     props.extWindowChannel.postMessage({
       event: "storeLastSearchQuery",
@@ -73,7 +79,7 @@ function ControlReference(props) {
     });
   };
 
-  const handleTableRowClick = (tableRowData) => {
+  const handleTableRowClick = (tableRowData: ControlData) => {
     props.onSelect(tableRowData);
   };
 

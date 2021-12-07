@@ -5,18 +5,20 @@ import ControlReference from "../components/control-reference/ControlReference";
 import Backdrop from "../components/ui/Backdrop";
 import Modal from "../components/ui/Modal";
 
-function ButtonSettings(props) {
-  const [selectedControlReference, setSelectedControlReference] = useState({});
-  const isSelection = Object.keys(selectedControlReference).length > 0;
+import { ControlData } from "../components/control-reference/ControlReferenceInterface"
+
+function ButtonSettings() {
+  const [selectedControlReference, setSelectedControlReference] = useState<ControlData | null>(null);
+  const isSelection: boolean = (selectedControlReference != null);
   const externalWindowChannel = new BroadcastChannel("config-window-channel");
 
-  function handleControlReferenceSelect(controlData) {
+  function handleControlReferenceSelect(controlData: ControlData) {
     setSelectedControlReference(controlData);
     console.log(controlData);
   }
 
   function clearSelection() {
-    setSelectedControlReference({});
+    setSelectedControlReference(null);
   }
 
   return (
@@ -26,7 +28,7 @@ function ButtonSettings(props) {
         extWindowChannel={externalWindowChannel}
       />
       {isSelection && (
-        <Modal data={selectedControlReference} onClick={clearSelection} />
+        <Modal controlData={selectedControlReference} onClick={clearSelection} />
       )}
       {isSelection && <Backdrop onClick={clearSelection} />}
     </div>

@@ -1,6 +1,13 @@
+import { ChangeEventHandler, MouseEventHandler } from "react";
 import classes from "./SearchBar.module.css";
 
-function SearchBar(props) {
+interface Props {
+  value: string,
+  onChange: ChangeEventHandler<HTMLInputElement>,
+  onClickClear: MouseEventHandler<HTMLButtonElement>,
+}
+
+function SearchBar(props: Props) {
   return (
     <div className={classes.searchBar}>
       <span className={classes.searchTitle}>Search Control References: </span>
