@@ -15,9 +15,9 @@ class DcsExportScriptProtocol : public SimulatorInterface
 
     void send_simulator_reset_command();
 
-    std::optional<std::string> get_value_of_simulator_object_state(const int object_id) const;
+    std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const;
 
-    std::optional<Decimal> get_decimal_of_simulator_object_state(const int object_id) const;
+    std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const;
 
     void clear_game_state();
 

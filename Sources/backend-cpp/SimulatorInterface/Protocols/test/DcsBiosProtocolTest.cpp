@@ -1,4 +1,4 @@
-// Copyright 2020 Charles Tytler
+// Copyright 2021 Charles Tytler
 
 #include "gtest/gtest.h"
 
@@ -6,6 +6,8 @@
 
 namespace test
 {
+#define SIZE_OF(x) (sizeof(x) / sizeof((x)[0]))
+
 TEST(DcsBiosProtocolTest, invalid_connection_port_settings)
 {
     SimulatorConnectionSettings connection_settings = {"19ab", "abc", "127.0.0.1", ""};
@@ -46,15 +48,44 @@ TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module_init)
     EXPECT_EQ("", simulator_interface.get_current_simulator_module());
 }
 
+TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module)
+{
+    // Test that game module is updated when the ACFT_NAME string is received.
+    constexpr int ACFT_NAME_MAX_LENGTH = 24; // From DCS BIOS json files: Metadata Start
+    // clang-format off
+    const char mock_dcs_start_message[ACFT_NAME_MAX_LENGTH] = {0x55, 0x55, 0x55, 0x55,                          // Sync frame
+                                                               0x00, 0x00, 0x08, 0x00,                          // Addr 0x0000 (8 bytes)
+                                                               'A', 'V', '8', 'B', 'N', 'A', '\0', 0x20,        // String contents
+                                                               (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    // clang-format on
+    mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
+    simulator_interface.update_simulator_state();
+
+    EXPECT_EQ("AV8BNA", simulator_interface.get_current_simulator_module());
+
+    // Expect that successive sends with partial strings of Aircraft Name don't interfere with module name.
+    // clang-format off
+    const char mock_dcs_message[ACFT_NAME_MAX_LENGTH] = {0x55, 0x55, 0x55, 0x55,                          // Sync frame
+                                                         0x00, 0x00, 0x02, 0x00, 'A', 'V',                // First letters only
+                                                         (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    // clang-format on
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
+    simulator_interface.update_simulator_state();
+
+    EXPECT_EQ("AV8BNA", simulator_interface.get_current_simulator_module());
+}
+
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrite_values)
 {
     // TEST 1 - Received values are stored and retrievable.
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                                       0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                                       0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                                       0x0C, 0x74, 0x02, 0x00, 0x00, 0x02};
-    // mock_dcs.send_string(mock_dcs_message_one);
+    const char mock_dcs_message_one[] = {0x55,       0x55,       0x55, 0x55,             // Sync frame
+                                         0x08,       0x00,       0x02, 0x00, 0x6F, 0x72, // Addr 0x0008 (2 bytes)
+                                         0x02,       0x04,       0x04, 0x00, 0x31, 0x30,
+                                         0x2E,       0x30,                                // Addr 0x0402 (4 bytes)
+                                         0x0C,       0x74,       0x02, 0x00, 0x00, 0x02,  // Addr 0x740C (2 bytes)
+                                         (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    mock_dcs.send_bytes(mock_dcs_message_one, SIZE_OF(mock_dcs_message_one));
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
@@ -62,8 +93,8 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrite_values)
 
     // TEST 2 - Received values will overwrite their previous values.
     // Send a new message with one ID value updated.
-    const unsigned char mock_dcs_bios_message_two[] = {0x55, 0x55, 0x55, 0x55, 0x0C, 0x74, 0x02, 0x00, 0x00, 0x00};
-    // mock_dcs.send_string(mock_dcs_message_two);
+    const char mock_dcs_message_two[] = {0x55, 0x55, 0x55, 0x55, 0x0C, 0x74, 0x02, 0x00, 0x00, 0x00};
+    mock_dcs.send_bytes(mock_dcs_message_two, SIZE_OF(mock_dcs_message_two));
     simulator_interface.update_simulator_state();
 
     // Query for ID updates - Test that only the value for address x740C has changed.
@@ -73,11 +104,12 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrite_values)
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_incomplete_message)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                                       0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                                       0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                                       0x0C, 0x74, 0x02, 0x00};
-    // mock_dcs.send_string(mock_dcs_message_one);
+    const char mock_dcs_message[] = {0x55,       0x55,       0x55, 0x55,                         // Sync frame
+                                     0x08,       0x00,       0x02, 0x00, 0x6F, 0x72,             //
+                                     0x02,       0x04,       0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
+                                     0x0C,       0x74,       0x02, 0x00,                         //
+                                     (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00};            // End of frame
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
@@ -88,11 +120,11 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_start_of_missio
 {
     ASSERT_EQ("", simulator_interface.get_current_simulator_module());
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                                       0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                                       0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                                       0x0C, 0x74, 0x02, 0x00};
-    // mock_dcs.send_string(mock_dcs_message_one);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55,                         //
+                                     0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
+                                     0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
+                                     0x0C, 0x74, 0x02, 0x00};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
@@ -102,11 +134,11 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_start_of_missio
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_end_of_mission)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                                       0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                                       0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                                       0x0C, 0x74, 0x02, 0x00};
-    // mock_dcs.send_string(mock_dcs_message_one);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55,                         //
+                                     0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
+                                     0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
+                                     0x0C, 0x74, 0x02, 0x00};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
@@ -114,18 +146,18 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_end_of_mission)
     // Test that game module is cleared.
 }
 
-TEST_F(DcsBiosProtocolTestFixture, send_simulator_command)
+TEST_F(DcsBiosProtocolTestFixture, send_bytes_simulator_command)
 {
-    const std::string address = "BIOS_HANDLE";
+    const std::string control_reference = "BIOS_HANDLE";
     const std::string value = "1";
     const std::string expected_msg_buffer = "BIOS_HANDLE 1\n";
 
-    simulator_interface.send_simulator_command(address, value);
+    simulator_interface.send_simulator_command(control_reference, value);
     std::stringstream ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
-TEST_F(DcsBiosProtocolTestFixture, send_simulator_reset_command)
+TEST_F(DcsBiosProtocolTestFixture, send_bytes_simulator_reset_command)
 {
     simulator_interface.send_simulator_reset_command();
     std::stringstream ss_received = mock_dcs.receive_stream();
@@ -139,8 +171,8 @@ TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_if_nonexi
 
 TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_with_valid_value)
 {
-    const unsigned char mock_dcs_bios_message[] = {0x55, 0x55, 0x55, 0x55, 0x08, 0x00, 0x02, 0x00, 0x01, 0x00};
-    // mock_dcs.send_string(mock_dcs_message);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55, 0x08, 0x00, 0x02, 0x00, 0x01, 0x00};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     // auto maybe_value = simulator_interface.get_value_of_simulator_object_state(765);
@@ -150,8 +182,8 @@ TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_with_vali
 
 TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_if_empty)
 {
-    const unsigned char mock_dcs_bios_message[] = {0x55, 0x55, 0x55, 0x55};
-    // mock_dcs.send_string(mock_dcs_message);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_value_of_simulator_object_state(765);
@@ -165,8 +197,8 @@ TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_if_none
 
 TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_with_valid_value)
 {
-    std::string mock_dcs_message = "header*765=99.99";
-    mock_dcs.send_string(mock_dcs_message);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     // auto maybe_value = simulator_interface.get_decimal_of_simulator_object_state(765);
@@ -176,8 +208,8 @@ TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_with_va
 
 TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_with_non_decimal_value)
 {
-    std::string mock_dcs_message = "header*765=STRING";
-    mock_dcs.send_string(mock_dcs_message);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_decimal_of_simulator_object_state(765);
@@ -186,8 +218,8 @@ TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_with_no
 
 TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_if_empty)
 {
-    std::string mock_dcs_message = "header*765=";
-    mock_dcs.send_string(mock_dcs_message);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_value_of_simulator_object_state(765);
@@ -197,14 +229,14 @@ TEST_F(DcsBiosProtocolTestFixture, get_decimal_of_simulator_object_state_if_empt
 TEST_F(DcsBiosProtocolTestFixture, clear_game_state)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                                       0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                                       0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                                       0x0C, 0x74, 0x02, 0x00, 0x00, 0x02};
-    // mock_dcs.send_string(mock_dcs_message_one);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55,                         //
+                                     0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
+                                     0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
+                                     0x0C, 0x74, 0x02, 0x00, 0x00, 0x02};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
-    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    auto current_game_state = simulator_interface.debug_get_current_game_state();
     // EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is able to be cleared.
@@ -216,13 +248,13 @@ TEST_F(DcsBiosProtocolTestFixture, clear_game_state)
 TEST_F(DcsBiosProtocolTestFixture, debug_print_format)
 {
     // Send a single message from mock DCS that contains updates for multiple IDs.
-    const unsigned char mock_dcs_bios_message_one[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                                       0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                                       0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                                       0x0C, 0x74, 0x02, 0x00, 0x00, 0x02};
-    // mock_dcs.send_string(mock_dcs_message_one);
+    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55,                         //
+                                     0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
+                                     0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
+                                     0x0C, 0x74, 0x02, 0x00, 0x00, 0x02};
+    mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
-    std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
+    const auto current_game_state = simulator_interface.debug_get_current_game_state();
 
     // EXPECT_EQ(current_game_state[761], "1");
     // EXPECT_EQ(current_game_state[765], "2.00");

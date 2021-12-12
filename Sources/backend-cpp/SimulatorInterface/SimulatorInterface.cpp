@@ -4,6 +4,16 @@
 
 #include "Utilities/StringUtilities.h"
 
+SimulatorAddress::SimulatorAddress(unsigned int address) : type(AddressType::ADDRESS_ONLY), address(address) {}
+SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int mask, uint8_t shift)
+    : type(AddressType::INTEGER), mask(mask), shift(shift)
+{
+}
+SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int max_length)
+    : type(AddressType::STRING), address(address), max_length(max_length)
+{
+}
+
 SimulatorInterface::SimulatorInterface(const SimulatorConnectionSettings &settings)
     : simulator_socket_(settings.ip_address, settings.rx_port, settings.tx_port, settings.multicast_address),
       connection_settings_(settings)

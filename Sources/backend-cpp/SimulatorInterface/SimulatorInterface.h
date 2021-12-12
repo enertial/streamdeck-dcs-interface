@@ -19,6 +19,22 @@ using SimulatorConnectionSettings = struct {
     std::string multicast_address; //  UDP Multicast address group to join.
 };
 
+enum class AddressType { ADDRESS_ONLY, INTEGER, STRING };
+
+struct SimulatorAddress {
+    AddressType type;
+    unsigned int address;
+    // Only for INTEGER:
+    unsigned int mask;
+    uint8_t shift;
+    // Only for STRING:
+    unsigned int max_length;
+
+    SimulatorAddress(unsigned int address);
+    SimulatorAddress(unsigned int address, unsigned int mask, uint8_t shift);
+    SimulatorAddress(unsigned int address, unsigned int max_length);
+};
+
 class SimulatorInterface
 {
   public:
@@ -58,13 +74,23 @@ class SimulatorInterface
      * @brief Get the value of object from current game state.
      * @return Optional value of object ID is returned if a value has been logged.
      */
-    virtual std::optional<std::string> get_value_of_simulator_object_state(const int object_id) const = 0;
+    virtual std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const = 0;
+
+    std::optional<std::string> get_value_of_simulator_object_state(const int address) const // Convenience overload.
+    {
+        return get_value_of_simulator_object_state(SimulatorAddress(address));
+    }
 
     /**
      * @brief Get the value as Decimal of object from current game state.
      * @return Optional value of object is returned if a value has been logged that is a Decimal.
      */
-    virtual std::optional<Decimal> get_decimal_of_simulator_object_state(const int object_id) const = 0;
+    virtual std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const = 0;
+
+    std::optional<Decimal> get_decimal_of_simulator_object_state(const int address) const // Convenience overload.
+    {
+        return get_value_of_simulator_object_state(SimulatorAddress(address));
+    }
 
     /**
      * @brief For debugging purposes, outputs all logged object key value pairs stored in current game state.

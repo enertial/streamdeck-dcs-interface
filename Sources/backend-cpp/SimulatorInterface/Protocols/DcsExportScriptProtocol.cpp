@@ -44,21 +44,23 @@ void DcsExportScriptProtocol::send_simulator_command(const std::string &address,
 
 void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send_string("R"); }
 
-std::optional<std::string> DcsExportScriptProtocol::get_value_of_simulator_object_state(const int object_id) const
+std::optional<std::string>
+DcsExportScriptProtocol::get_value_of_simulator_object_state(const SimulatorAddress &address) const
 {
-    if (current_game_state_by_dcs_id_.count(object_id) > 0) {
-        if (!current_game_state_by_dcs_id_.at(object_id).empty()) {
-            return current_game_state_by_dcs_id_.at(object_id);
+    if (current_game_state_by_dcs_id_.count(address.address) > 0) {
+        if (!current_game_state_by_dcs_id_.at(address.address).empty()) {
+            return current_game_state_by_dcs_id_.at(address.address);
         }
     }
     return std::nullopt;
 }
 
-std::optional<Decimal> DcsExportScriptProtocol::get_decimal_of_simulator_object_state(const int object_id) const
+std::optional<Decimal>
+DcsExportScriptProtocol::get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
 {
-    if (current_game_state_by_dcs_id_.count(object_id) > 0) {
-        if (is_number(current_game_state_by_dcs_id_.at(object_id))) {
-            return current_game_state_by_dcs_id_.at(object_id);
+    if (current_game_state_by_dcs_id_.count(address.address) > 0) {
+        if (is_number(current_game_state_by_dcs_id_.at(address.address))) {
+            return current_game_state_by_dcs_id_.at(address.address);
         }
     }
     return std::nullopt;

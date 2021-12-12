@@ -14,8 +14,14 @@ class SimulatorInterfaceDerivedClass : public SimulatorInterface
     void update_simulator_state(){};
     void send_simulator_command(const std::string &address, const std::string &value){};
     void send_simulator_reset_command(){};
-    std::optional<std::string> get_value_of_simulator_object_state(const int object_id) const { return std::nullopt; }
-    std::optional<Decimal> get_decimal_of_simulator_object_state(const int object_id) const { return std::nullopt; }
+    std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const
+    {
+        return std::nullopt;
+    }
+    std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
+    {
+        return std::nullopt;
+    }
     json debug_get_current_game_state() const { return json{}; };
 };
 
