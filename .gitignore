@@ -1,5 +1,7 @@
 x64/
 x86/
+settingsUI/
+*.exe
 .vs
 .vscode
 .vcxproj.*
