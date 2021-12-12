@@ -101,6 +101,9 @@ function addDefaultSettings(action, settings) {
     if (!settings.hasOwnProperty("string_monitor_passthrough_check")) {
         settings["string_monitor_passthrough_check"] = true;
     }
+    if (settings["device_id"] && settings["button_id"]) {
+        settings["send_address"] = settings["device_id"] + "," + settings["button_id"];
+    }
 
     return settings;
 }
@@ -149,10 +152,12 @@ function callbackStringMonitorPassthroughCheck(isChecked) {
 function callbackClearDcsCommand() {
     delete settings["button_id"];
     delete settings["device_id"];
+    delete settings["send_address"];
     delete settings["dcs_id_increment_monitor"];
     $SD.api.setSettings($SD.uuid, settings);
     button_id.value = "";
     device_id.value = "";
+    send_address.value = "";
     dcs_id_increment_monitor.value = "";
     // Don't need to send to plugin as it always reads in latest settings on button push.
     console.log("Clear DCS Command", settings);

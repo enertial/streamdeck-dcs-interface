@@ -7,11 +7,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - uses: DoozyX/clang-format-lint-action@v0.12
-      with:
-        source: './Sources'
-        exclude: './Sources/Vendor ./Sources/Windows'
-        extensions: 'h,cpp'
-        clangFormatVersion: 12
-        style: '{BasedOnStyle: LLVM, IndentWidth: 4, BreakBeforeBraces: Linux, UseTab: Never, AllowShortBlocksOnASingleLine: Empty, BinPackArguments: false, BinPackParameters: false, ColumnLimit: 120}'
+      - uses: actions/checkout@v2
+      - uses: DoozyX/clang-format-lint-action@v0.12
+        with:
+          source: "./Sources/backend-cpp"
+          exclude: "./Sources/backend-cpp/Vendor ./Sources/backend-cpp/Windows"
+          extensions: "h,cpp"
+          clangFormatVersion: 12
+          style: "{BasedOnStyle: LLVM, IndentWidth: 4, BreakBeforeBraces: Linux, UseTab: Never, AllowShortBlocksOnASingleLine: Empty, BinPackArguments: false, BinPackParameters: false, ColumnLimit: 120}"

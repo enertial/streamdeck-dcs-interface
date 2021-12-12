@@ -6,14 +6,6 @@
 /**
  * Opens an external window when button is clicked.
  */
-function callbackHelpButtonPress() {
-    if (!window.helpWindow || window.helpWindow.closed) {
-        window.helpWindow = window.open('../helpDocs/helpWindow.html', 'Help Documentation');
-    }
-}
-/**
- * Opens an external window when button is clicked.
- */
 function callbackIdLookupButtonPress() {
     if (!window.idLookupWindow || window.idLookupWindow.closed) {
         window.idLookupWindow = window.open('id_lookup_window.html', 'ID Lookup');
@@ -96,6 +88,12 @@ function sendToIdLookupWindowInstalledModules(installed_modules_list) {
 function sendToIdLookupWindowClickabledata(clickabledata_elements) {
     if (window.idLookupWindow) {
         window.idLookupWindow.gotClickabledata(clickabledata_elements);
+    }
+}
+
+function sendToConfigWindow(payload) {
+    if (window.configWindow) {
+        window.configWindow.handlePropInspectorMessage(payload);
     }
 }
 

@@ -1,22 +1,21 @@
 // Copyright 2020, Charles Tytler
 
-
 /**
  *  Sends data to plugin which is received with the "sendToPlugin" callback function in C++.
- * 
+ *
  *  payload - Function expects a payload with at least an "event" field.
  */
 function sendPayloadToPlugin(payload) {
-    if ($SD.connection && $SD.connection.readyState === 1) {
-        const json = {
-            action: $SD.actionInfo['action'],
-            event: 'sendToPlugin',
-            context: $SD.uuid,
-            payload: payload
-        };
+  if ($SD.connection && $SD.connection.readyState === 1) {
+    const json = {
+      action: $SD.actionInfo["action"],
+      event: "sendToPlugin",
+      context: $SD.uuid,
+      payload: payload,
+    };
 
-        $SD.connection.send(JSON.stringify(json));
-    }
+    $SD.connection.send(JSON.stringify(json));
+  }
 }
 
 /**
@@ -24,27 +23,44 @@ function sendPayloadToPlugin(payload) {
  *
  */
 function sendSettingsToPlugin() {
-    console.log("sendSettingsToPlugin", settings);
-    const payload = { event: 'SettingsUpdate', settings: settings };
-    sendPayloadToPlugin(payload);
+  console.log("sendSettingsToPlugin", settings);
+  const payload = { event: "SettingsUpdate", settings: settings };
+  sendPayloadToPlugin(payload);
 }
-
 
 /**
  * 'ReceivedPayloadFromPlugin' handles all messages sent from Plugin to Property Inspector.
  *
  */
 function callbackReceivedPayloadFromPlugin(payload) {
-    if (payload.event == 'DebugDcsGameState') {
-        sendToCommsWindowDcsGameState(payload.current_game_state);
-    }
+  console.log("Received payload from C++ Plugin:", payload);
 
-    if (payload.event == 'InstalledModules') {
-        sendToIdLookupWindowInstalledModules(payload.installed_modules);
-    }
+  if (payload.event == "DebugDcsGameState") {
+    sendToCommsWindowDcsGameState(payload.current_game_state);
+  }
 
-    if (payload.event == 'Clickabledata') {
-        sendToIdLookupWindowClickabledata(payload.clickabledata);
-    }
+  if (payload.event == "InstalledModules") {
+    sendToIdLookupWindowInstalledModules(payload.installed_modules);
+    sendToConfigWindow(payload);
+  }
+
+  if (payload.event == "Clickabledata") {
+    sendToIdLookupWindowClickabledata(payload.clickabledata);
+  }
+
+  if (payload.event == "ModuleList") {
+    console.log("Sending module list");
+    configWindowChannel.postMessage({
+      event: "ModuleList",
+      moduleList: payload.moduleList,
+    });
+  }
+
+  if (payload.event == "JsonFile") {
+    console.log("Sending json");
+    configWindowChannel.postMessage({
+      event: "JsonFile",
+      jsonFile: payload.jsonFile,
+    });
+  }
 }
-

@@ -1,0 +1,33 @@
+.searchBar {
+  background-color: rgb(79, 81, 112);
+  text-align: center;
+  height: 2rem;
+  padding-top: 8px;
+}
+
+.searchTitle {
+  text-align: left;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-weight: bold;
+  font-size: 12pt;
+  width: 40%;
+}
+
+.searchInput {
+  text-align: left;
+  font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
+  font-size: 11pt;
+  width: 40%;
+}
+
+.button {
+  border-radius: 6px;
+  background-color: rgb(196, 197, 209);
+  padding-left: 5px;
+  padding-right: 5px;
+  font-size: 11pt;
+}
+
+.button:disabled {
+  background-color: rgb(91, 92, 109);
+}
