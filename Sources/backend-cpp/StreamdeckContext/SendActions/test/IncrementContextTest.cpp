@@ -29,7 +29,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     {
         simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
-        (void)mock_dcs.receive();
+        (void)mock_dcs.receive_stream();
         fixture_context.updateContextSettings(payload["settings"]);
     }
     SimulatorConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
@@ -50,7 +50,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
 TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment)
 {
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
-    const std::stringstream ss_received = mock_dcs.receive();
+    const std::stringstream ss_received = mock_dcs.receive_stream();
     std::string expected_command = "C" + send_address + "," + increment_value;
     EXPECT_EQ(expected_command, ss_received.str());
 }
@@ -61,12 +61,12 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     const std::string external_increment_start = "0.5";
     // Send a single message from mock DCS that contains update for monitored ID.
     std::string mock_dcs_message = "header*" + dcs_id_increment_monitor + "=" + external_increment_start;
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface->update_simulator_state();
     fixture_context.updateContextState(simulator_interface, &esd_connection_manager);
 
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
-    const std::stringstream ss_received = mock_dcs.receive();
+    const std::stringstream ss_received = mock_dcs.receive_stream();
     const Decimal expected_increment_value = Decimal(external_increment_start) + Decimal(increment_value);
     std::string expected_command = "C" + send_address + "," + expected_increment_value.str();
     EXPECT_EQ(expected_command, ss_received.str());
@@ -75,7 +75,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
 TEST_F(IncrementContextKeyPressTestFixture, handle_keyup_increment)
 {
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
-    const std::stringstream ss_received = mock_dcs.receive();
+    const std::stringstream ss_received = mock_dcs.receive_stream();
     // Expect no command sent (empty string is due to mock socket functionality).
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());

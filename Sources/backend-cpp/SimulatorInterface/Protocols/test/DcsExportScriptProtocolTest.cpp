@@ -19,7 +19,7 @@ TEST(DcsExportScriptProtocolTest, dcs_reset_command_on_construction)
     DcsExportScriptProtocol simulator_interface(connection_settings);
 
     // Test that the reset message "R" is received by DCS on creation of DcsExportScriptProtocol.
-    std::stringstream ss = mock_dcs.receive();
+    std::stringstream ss = mock_dcs.receive_stream();
     EXPECT_EQ("R", ss.str());
 }
 
@@ -32,7 +32,7 @@ class DcsExportScriptProtocolTestFixture : public ::testing::Test
           simulator_interface(connection_settings)
     {
         // Consume intial reset command sent to to mock_dcs.
-        (void)mock_dcs.receive();
+        (void)mock_dcs.receive_stream();
     }
 
     SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
@@ -52,7 +52,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, update_simulator_state)
     // TEST 1 - Received values are stored and retrievable.
     // Send a single message from mock DCS that contains updates for multiple IDs.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
@@ -64,7 +64,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, update_simulator_state)
     // TEST 2 - Received values will overwrite their previous values.
     // Send a new message with one ID value updated.
     mock_dcs_message = "header*765=99.99";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     // Query for ID updates - Test that only the value for ID 765 has changed.
@@ -79,7 +79,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, update_simulator_state_handle_newline
 {
     // Send a single message from mock DCS that contains newline characters at the end of tokens.
     std::string mock_dcs_message = "header*761=1\n:765=2.00\n:2026=TEXT_STR\n:2027=4\n";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
@@ -94,14 +94,14 @@ TEST_F(DcsExportScriptProtocolTestFixture, update_simulator_state_end_of_mission
     // Send a single message from mock DCS that contains updates for multiple IDs.
     // Expect that the number of stored values in game state is non-zero.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
     std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is cleared when a "STOP" message is received, signifying end of mission.
     mock_dcs_message = "header*Ikarus=stop";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
     current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_EQ(0, current_game_state.size());
@@ -115,7 +115,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command_valid_address)
     const std::string expected_msg_buffer = "C24,3250,1";
 
     simulator_interface.send_simulator_command(address, value);
-    std::stringstream ss_received = mock_dcs.receive();
+    std::stringstream ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
@@ -124,44 +124,44 @@ TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_command_invalid_addres
     std::string address = "";
     const std::string value = "1";
     simulator_interface.send_simulator_command(address, value);
-    std::stringstream ss_received = mock_dcs.receive();
+    std::stringstream ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 
     address = "24";
     simulator_interface.send_simulator_command(address, value);
-    ss_received = mock_dcs.receive();
+    ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 
     address = "243250";
     simulator_interface.send_simulator_command(address, value);
-    ss_received = mock_dcs.receive();
+    ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 
     address = ",3250";
     simulator_interface.send_simulator_command(address, value);
-    ss_received = mock_dcs.receive();
+    ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 
     address = "24,";
     simulator_interface.send_simulator_command(address, value);
-    ss_received = mock_dcs.receive();
+    ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 
     address = "24:3250";
     simulator_interface.send_simulator_command(address, value);
-    ss_received = mock_dcs.receive();
+    ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 
     address = "24A,3250";
     simulator_interface.send_simulator_command(address, value);
-    ss_received = mock_dcs.receive();
+    ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
 }
 
 TEST_F(DcsExportScriptProtocolTestFixture, send_simulator_reset_command)
 {
     simulator_interface.send_simulator_reset_command();
-    std::stringstream ss_received = mock_dcs.receive();
+    std::stringstream ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "R");
 }
 
@@ -175,13 +175,13 @@ TEST_F(DcsExportScriptProtocolTestFixture, get_current_simulator_module)
 {
     // Test that game module is updated when the "File" message with module name is received.
     std::string mock_dcs_message = "header*File=AV8BNA";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
     EXPECT_EQ("AV8BNA", simulator_interface.get_current_simulator_module());
 
     // Test that game module is cleared when a "STOP" message is received, signifying end of mission.
     mock_dcs_message = "header*Ikarus=stop";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
     EXPECT_EQ("", simulator_interface.get_current_simulator_module());
 }
@@ -194,7 +194,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, get_value_of_simulator_object_state_i
 TEST_F(DcsExportScriptProtocolTestFixture, get_value_of_simulator_object_state_with_valid_value)
 {
     std::string mock_dcs_message = "header*765=99.99";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_value_of_simulator_object_state(765);
@@ -205,7 +205,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, get_value_of_simulator_object_state_w
 TEST_F(DcsExportScriptProtocolTestFixture, get_value_of_simulator_object_state_if_empty)
 {
     std::string mock_dcs_message = "header*765=";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_value_of_simulator_object_state(765);
@@ -220,7 +220,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, get_decimal_of_simulator_object_state
 TEST_F(DcsExportScriptProtocolTestFixture, get_decimal_of_simulator_object_state_with_valid_value)
 {
     std::string mock_dcs_message = "header*765=99.99";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_decimal_of_simulator_object_state(765);
@@ -231,7 +231,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, get_decimal_of_simulator_object_state
 TEST_F(DcsExportScriptProtocolTestFixture, get_decimal_of_simulator_object_state_with_non_decimal_value)
 {
     std::string mock_dcs_message = "header*765=STRING";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_decimal_of_simulator_object_state(765);
@@ -241,7 +241,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, get_decimal_of_simulator_object_state
 TEST_F(DcsExportScriptProtocolTestFixture, get_decimal_of_simulator_object_state_if_empty)
 {
     std::string mock_dcs_message = "header*765=";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
 
     auto maybe_value = simulator_interface.get_value_of_simulator_object_state(765);
@@ -253,7 +253,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, clear_game_state)
     // Send a single message from mock DCS that contains updates for multiple IDs.
     // Expect that the number of stored values in game state is non-zero.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
     std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
     EXPECT_TRUE(current_game_state.size() > 0);
@@ -269,7 +269,7 @@ TEST_F(DcsExportScriptProtocolTestFixture, debug_print_format)
     // Send a single message from mock DCS that contains updates for multiple IDs.
     // Expect that the number of stored values in game state is non-zero.
     std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=4";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface.update_simulator_state();
     std::unordered_map<int, std::string> current_game_state = simulator_interface.debug_get_current_game_state();
 

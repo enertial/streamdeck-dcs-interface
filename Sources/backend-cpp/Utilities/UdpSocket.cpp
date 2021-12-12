@@ -105,28 +105,42 @@ UdpSocket::~UdpSocket()
     WSACleanup();
 }
 
-std::stringstream UdpSocket::receive()
+int UdpSocket::receive_bytes(char *buffer, const int buffer_size)
 {
     // Sender address - dummy variable as it is unused outside recvfrom.
     sockaddr sender_addr;
     int sender_addr_size = sizeof(sender_addr);
 
     // Receive next UDP message.
-    constexpr int MAX_UDP_MSG_SIZE = 1024; // Maximum UDP buffer size to read.
-    char msg[MAX_UDP_MSG_SIZE] = {};
-    (void)recvfrom(socket_id_, msg, MAX_UDP_MSG_SIZE, 0, &sender_addr, &sender_addr_size);
+    int num_bytes_receieved = recvfrom(socket_id_, buffer, buffer_size, 0, &sender_addr, &sender_addr_size);
 
     if (dest_addr_len_ == 0) {
         dest_addr_ = sender_addr;
         dest_addr_len_ = sender_addr_size;
     }
 
+    return num_bytes_receieved;
+}
+
+std::stringstream UdpSocket::receive_stream()
+{
+    constexpr int MAX_UDP_MSG_SIZE = 1024; // Maximum UDP buffer size to read.
+    char msg[MAX_UDP_MSG_SIZE] = {0};
+    (void)receive_bytes(msg, MAX_UDP_MSG_SIZE);
+
     std::stringstream ss;
     ss << msg;
     return ss;
 }
 
-void UdpSocket::send(const std::string &message)
+int UdpSocket::send_bytes(const char *byte_buffer, const int buffer_size)
 {
-    (void)sendto(socket_id_, message.c_str(), static_cast<int>(message.length()), 0, &dest_addr_, dest_addr_len_);
+    const int num_bytes_sent = sendto(socket_id_, byte_buffer, buffer_size, 0, &dest_addr_, dest_addr_len_);
+    return num_bytes_sent;
+}
+
+int UdpSocket::send_string(const std::string &message)
+{
+    const int num_bytes_sent = send_bytes(message.c_str(), static_cast<int>(message.length()));
+    return num_bytes_sent;
 }

@@ -26,12 +26,12 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     {
         simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
-        (void)mock_dcs.receive();
+        (void)mock_dcs.receive_stream();
     }
 
     void set_current_dcs_id_value(const std::string value)
     {
-        mock_dcs.send("header*123=" + value);
+        mock_dcs.send_string("header*123=" + value);
         simulator_interface->update_simulator_state();
     }
 

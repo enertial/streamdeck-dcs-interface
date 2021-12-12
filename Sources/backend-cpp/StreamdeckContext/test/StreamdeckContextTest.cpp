@@ -35,11 +35,11 @@ class StreamdeckContextTestFixture : public ::testing::Test
     {
         simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
-        (void)mock_dcs.receive();
+        (void)mock_dcs.receive_stream();
 
         // Send a single message from mock DCS that contains update for monitored ID.
         std::string mock_dcs_message = "header*761=1:765=2.00:2026=TEXT_STR:2027=0.1";
-        mock_dcs.send(mock_dcs_message);
+        mock_dcs.send_string(mock_dcs_message);
         simulator_interface->update_simulator_state();
     }
 
@@ -177,7 +177,7 @@ TEST_F(StreamdeckContextTestFixture, derived_class_instances_within_container)
     // This is more of a test of the StreamdeckInterface.cpp use of this class than of the class itself.
 
     std::string mock_dcs_message = "header*1=a:2=b:3=c";
-    mock_dcs.send(mock_dcs_message);
+    mock_dcs.send_string(mock_dcs_message);
     simulator_interface->update_simulator_state();
 
     std::unordered_map<std::string, std::unique_ptr<StreamdeckContext>> ctx_map;

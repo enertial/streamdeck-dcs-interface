@@ -36,18 +36,28 @@ class UdpSocket
     UdpSocket &operator=(UdpSocket &&) = delete;
 
     /**
-     * @brief Reads the UDP buffer and adds received data to the queue of tokens.
-     *
+     * @brief Reads the UDP buffer populating the data into the provided byte buffer.
+     * @return Byte buffer of received data.
+     */
+    int receive_bytes(char *buffer, const int buffer_size);
+
+    /**
+     * @brief Reads the UDP buffer returning data in a string stream.
      * @return String stream of received messages.
      */
-    std::stringstream receive();
+    std::stringstream receive_stream();
+
+    /**
+     * @brief Sends a UDP message of the provided byte buffer to the destination port.
+     * @return Number of bytes sent.
+     */
+    int send_bytes(const char *byte_buffer, const int buffer_size);
 
     /**
      * @brief Sends a UDP message to the destination port.
-     *
-     * @param message String to send.
+     * @return Number of bytes sent.
      */
-    void send(const std::string &message);
+    int send_string(const std::string &message);
 
   private:
     SOCKET socket_id_;      // Socket which is binded to the rx port.

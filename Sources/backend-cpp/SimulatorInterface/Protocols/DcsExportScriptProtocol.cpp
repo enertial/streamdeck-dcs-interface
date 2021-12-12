@@ -15,7 +15,7 @@ void DcsExportScriptProtocol::update_simulator_state()
 {
     // Receive next UDP message from simulator and strip header.
     const char header_delimiter = '*'; // Header content ends in an '*'.
-    std::stringstream recv_msg = simulator_socket_.receive();
+    std::stringstream recv_msg = simulator_socket_.receive_stream();
 
     std::string token;
     if (std::getline(recv_msg, token, header_delimiter)) {
@@ -38,11 +38,11 @@ void DcsExportScriptProtocol::send_simulator_command(const std::string &address,
                                    is_integer(address_as_components.value().second));
     if (address_is_valid) {
         const std::string message_assembly = "C" + address + "," + value;
-        simulator_socket_.send(message_assembly);
+        simulator_socket_.send_string(message_assembly);
     }
 }
 
-void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send("R"); }
+void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send_string("R"); }
 
 void DcsExportScriptProtocol::handle_received_token(const std::string &key, const std::string &value)
 {

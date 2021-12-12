@@ -15,7 +15,7 @@ void DcsBiosProtocol::update_simulator_state() {}
 void DcsBiosProtocol::send_simulator_command(const std::string &address, const std::string &value)
 {
     const std::string message_assembly = address + " " + value + "\n";
-    simulator_socket_.send(message_assembly);
+    simulator_socket_.send_string(message_assembly);
 }
 
-void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send("SYNC E\n"); }
+void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send_string("SYNC E\n"); }

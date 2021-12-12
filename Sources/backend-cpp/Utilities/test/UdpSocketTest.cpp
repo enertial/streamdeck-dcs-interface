@@ -43,19 +43,35 @@ class UdpSocketTestFixture : public ::testing::Test
     static inline std::string ip_address = "127.0.0.1";
 };
 
-TEST_F(UdpSocketTestFixture, send_and_receive)
+TEST_F(UdpSocketTestFixture, send_and_receive_string)
 {
     const std::string test_message = "test send from one UdpSocket to another.";
-    sender_socket.send(test_message);
-    std::stringstream ss_received = receiver_socket.receive();
+    const int num_bytes_sent = sender_socket.send_string(test_message);
+    std::stringstream ss_received = receiver_socket.receive_stream();
+    EXPECT_EQ(num_bytes_sent, test_message.length());
     EXPECT_EQ(ss_received.str(), test_message);
+}
+
+TEST_F(UdpSocketTestFixture, send_and_receive_bytes)
+{
+    constexpr int EXPECTED_NUM_BYTES = 8;
+    const char byte_buffer[EXPECTED_NUM_BYTES] = {0x01, 0x02, 0x03, 0x04, 0x05, 0x0, 0x01, 0x03};
+    const int num_bytes_sent = sender_socket.send_bytes(byte_buffer, EXPECTED_NUM_BYTES);
+    char recv_buffer[1024];
+    const int num_bytes_received = receiver_socket.receive_bytes(recv_buffer, 1024);
+    EXPECT_EQ(num_bytes_sent, EXPECTED_NUM_BYTES);
+    EXPECT_EQ(num_bytes_received, EXPECTED_NUM_BYTES);
 }
 
 TEST_F(UdpSocketTestFixture, receive_timeout)
 {
-    std::stringstream ss_received = receiver_socket.receive();
-    // Expect timeout after 100 msec and return of empty string.
+    // Expect timeout after 100 msec.
+    std::stringstream ss_received = receiver_socket.receive_stream();
     EXPECT_EQ(ss_received.str(), "");
+
+    char buffer[1024];
+    const int num_bytes_received = receiver_socket.receive_bytes(buffer, 1024);
+    EXPECT_EQ(num_bytes_received, SOCKET_ERROR);
 }
 
 TEST_F(UdpSocketTestFixture, dynamic_tx_port_discovery)
@@ -64,13 +80,13 @@ TEST_F(UdpSocketTestFixture, dynamic_tx_port_discovery)
     UdpSocket server_socket(ip_address, "1792", new_common_port);
     UdpSocket client_socket(ip_address, new_common_port);
     const std::string test_msg_a = "test_a";
-    server_socket.send(test_msg_a);
-    std::stringstream client_received_ss = client_socket.receive();
+    server_socket.send_string(test_msg_a);
+    std::stringstream client_received_ss = client_socket.receive_stream();
     EXPECT_EQ(test_msg_a, client_received_ss.str());
     // Expect client socket to have dynamically set tx_port to sender_socket's bound port.
     const std::string test_msg_b = "test_b";
-    client_socket.send(test_msg_b);
-    std::stringstream server_received_ss = server_socket.receive();
+    client_socket.send_string(test_msg_b);
+    std::stringstream server_received_ss = server_socket.receive_stream();
     EXPECT_EQ(test_msg_b, server_received_ss.str());
 }
 } // namespace test
