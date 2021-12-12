@@ -22,8 +22,10 @@ DcsBiosStreamParser::DcsBiosStreamParser()
     _sync_byte_count = 0;
 }
 
-void DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address)
+bool DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address)
 {
+    bool end_of_frame_sync_received = false;
+
     switch (_state) {
     case DcsBiosState::WAIT_FOR_SYNC:
         /* do nothing */
@@ -66,11 +68,11 @@ void DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int
         if (_count == 0) {
             _state = DcsBiosState::ADDRESS_LOW;
 
-            // Frame sync moved to end of frame.  All time consuming updates should
+            // Frame sync moved to end of frame.All time consuming updates should
             // be handled in framesync during the down time between frame transmissions.
-            // if (_address == 0xfffe) {
-            //     // Perform operation if desired here.
-            // }
+            if (_address == 0xfffe) {
+                end_of_frame_sync_received = true;
+            }
         } else {
             _address += 2;
             _state = DcsBiosState::DATA_LOW;
@@ -88,4 +90,6 @@ void DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int
         _state = DcsBiosState::ADDRESS_LOW;
         _sync_byte_count = 0;
     }
+
+    return end_of_frame_sync_received;
 }

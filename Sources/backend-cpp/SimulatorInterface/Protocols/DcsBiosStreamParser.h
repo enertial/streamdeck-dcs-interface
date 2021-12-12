@@ -26,9 +26,10 @@ class DcsBiosStreamParser
     /**
      * @brief Processes a single byte from the export stream at a time, populating data by address.
      * @param Single byte of DCS BIOS export stream.
-     * @param Map to populate data by address when full address contents are received.
+     * @param Map to populate data by address as full address contents are received.
+     * @return End of frame flag, true if address 0xFFFE is received.
      */
-    void processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address);
+    bool processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address);
 
   private:
     // State machine states for parsing protocol.
