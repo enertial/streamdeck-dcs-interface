@@ -44,10 +44,41 @@ void DcsExportScriptProtocol::send_simulator_command(const std::string &address,
 
 void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send_string("R"); }
 
+std::optional<std::string> DcsExportScriptProtocol::get_value_of_simulator_object_state(const int object_id) const
+{
+    if (current_game_state_by_dcs_id_.count(object_id) > 0) {
+        if (!current_game_state_by_dcs_id_.at(object_id).empty()) {
+            return current_game_state_by_dcs_id_.at(object_id);
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<Decimal> DcsExportScriptProtocol::get_decimal_of_simulator_object_state(const int object_id) const
+{
+    if (current_game_state_by_dcs_id_.count(object_id) > 0) {
+        if (is_number(current_game_state_by_dcs_id_.at(object_id))) {
+            return current_game_state_by_dcs_id_.at(object_id);
+        }
+    }
+    return std::nullopt;
+}
+
+void DcsExportScriptProtocol::clear_game_state() { current_game_state_by_dcs_id_.clear(); }
+
+json DcsExportScriptProtocol::debug_get_current_game_state() const
+{
+    json current_game_state_printout;
+    for (const auto &[key, value] : current_game_state_by_dcs_id_) {
+        current_game_state_printout[std::to_string(key)] = value;
+    }
+    return current_game_state_printout;
+}
+
 void DcsExportScriptProtocol::handle_received_token(const std::string &key, const std::string &value)
 {
     if (is_integer(key)) {
-        current_game_state_.insert_or_assign(std::stoi(key), value);
+        current_game_state_by_dcs_id_.insert_or_assign(std::stoi(key), value);
     } else if (key == "File") {
         current_game_module_ = value;
     } else if (key == "Ikarus" || key == "DAC" || key == "DCS") {
