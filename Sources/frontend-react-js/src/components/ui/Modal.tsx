@@ -2,7 +2,7 @@ import { MouseEventHandler } from "react";
 import { ControlData } from "../control-reference/ControlReferenceInterface"
 
 interface Props {
-  controlData: ControlData | null,
+  controlData: ControlData,
   onClick: MouseEventHandler,
 }
 

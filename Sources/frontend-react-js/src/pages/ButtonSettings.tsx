@@ -28,7 +28,7 @@ function ButtonSettings() {
         extWindowChannel={externalWindowChannel}
       />
       {isSelection && (
-        <Modal controlData={selectedControlReference} onClick={clearSelection} />
+        <Modal controlData={selectedControlReference!} onClick={clearSelection} />
       )}
       {isSelection && <Backdrop onClick={clearSelection} />}
     </div>
