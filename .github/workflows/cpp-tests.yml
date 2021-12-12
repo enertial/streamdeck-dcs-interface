@@ -1,4 +1,4 @@
-name: C++ CI/CD Tests
+name: cpp-tests
 
 on:
   push:
