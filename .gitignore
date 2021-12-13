@@ -1,7 +1,9 @@
 x64/
 x86/
 settingsUI/
-*.exe
+Sources/**/*.exe
+*.pdb
+*.log
 .vs
 .vscode
 .vcxproj.*
