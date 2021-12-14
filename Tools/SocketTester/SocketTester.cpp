@@ -3,8 +3,8 @@
 #include "Utilities/UdpSocket.cpp"
 #include <bitset>
 #include <csignal>
-#include <ctime>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 
 /**
@@ -37,7 +37,9 @@ int main()
         if (num_bytes != SOCKET_ERROR) {
             log_file << std::dec << "Bytes recv: " << num_bytes << std::endl;
             for (size_t byte = 0; byte < num_bytes; byte++) {
-                log_file << std::hex << static_cast<uint16_t>(msg[byte]) << " ";
+                // Set format to "0x00"
+                log_file << "0x" << std::setfill('0') << std::setw(2) << std::right << std::hex;
+                log_file << static_cast<uint16_t>((unsigned char)(msg[byte])) << " ";
             }
             log_file << std::endl;
         }
