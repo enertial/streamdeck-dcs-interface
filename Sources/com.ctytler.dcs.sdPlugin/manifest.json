@@ -1,6 +1,29 @@
 {
   "Actions": [
     {
+      "Icon": "images/button_light_on",
+      "Name": "DCS-BIOS Button",
+      "States": [
+        {
+          "Image": "images/button_light_off",
+          "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
+          "FontSize": "17"
+        },
+        {
+          "Image": "images/button_light_on",
+          "TitleAlignment": "middle",
+          "FontFamily": "Tahoma",
+          "FontSize": "17"
+        }
+      ],
+      "SupportedInMultiActions": false,
+      "Tooltip": "Button which communicates with DCS-BIOS",
+      "UUID": "com.ctytler.dcs.dcs-bios",
+      "PropertyInspectorPath": "propertyinspector/dcs_bios_prop_inspector.html",
+      "ShowTitle": false
+    },
+    {
       "Icon": "images/Chrome_Switch_Low",
       "Name": "Switch Input",
       "States": [
@@ -127,7 +150,10 @@
   "SDKVersion": 2,
   "Author": "Charlie Tytler",
   "CodePathWin": "bin/streamdeck_dcs_interface.exe",
-  "DefaultWindowSize": [1000, 1100],
+  "DefaultWindowSize": [
+    1000,
+    1100
+  ],
   "Description": "Allows buttons which communicate with Digital Combat Simulator (DCS)",
   "Name": "DCS Interface",
   "Icon": "images/plugin_icon",

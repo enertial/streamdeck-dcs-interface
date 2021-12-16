@@ -22,9 +22,8 @@ function ControlReference(props: Props) {
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
     FlattenModuleControlsJson(moduleData)
   );
-  const [searchQuery, setSearchQuery] = useState<string>(
-    window.opener ? window.opener.global_settings.last_search_query : ""
-  );
+  // TODO: Restore searchQuery from Global Settings before overwriting.
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>

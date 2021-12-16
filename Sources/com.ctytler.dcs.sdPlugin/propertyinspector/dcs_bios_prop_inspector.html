@@ -1,0 +1,44 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+    <title>Property Inspector</title>
+    <meta charset="utf-8" />
+</head>
+
+<body>
+    <script>
+        // This callback function is called by the Streamdeck application populating socketSettings to use.
+        function connectElgatoStreamDeckSocket(inPort, inPluginUUID, inRegisterEvent, inInfo) {
+            // Store settings to the window object, so the Config Window when opened can access it.
+            window.socketSettings = {
+                port: inPort,
+                propertyInspectorUUID: inPluginUUID,
+                registerEvent: inRegisterEvent,
+                info: inInfo
+            };
+            console.log("Received settings:", socketSettings);
+        };
+
+        function handleButtonPress() {
+            // Only open if socketSettings have been populated.
+            if (window.socketSettings) {
+                // Only open window if there is not one already open.
+                if (!window.configWindow || window.configWindow.closed) {
+                    window.configWindow = window.open(
+                        "../settingsUI/index.html",
+                        "Button Configuration"
+                    );
+                }
+            }
+        }
+    </script>
+    <div>
+        <button class="sdpi-item-value" id="external_config_window_button" onclick="handleButtonPress()">
+            Configure
+        </button>
+
+    </div>
+</body>
+
+</html>
