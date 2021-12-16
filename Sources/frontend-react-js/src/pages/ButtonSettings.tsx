@@ -6,11 +6,18 @@ import Backdrop from "../components/ui/Backdrop";
 import Modal from "../components/ui/Modal";
 
 import { ControlData } from "../components/control-reference/ControlReferenceInterface"
+import StreamdeckApi from "../comms/StreamdeckApi";
 
-function ButtonSettings() {
+interface Props {
+  streamdeckApi: StreamdeckApi,
+}
+
+function ButtonSettings({ streamdeckApi }: Props) {
   const [selectedControlReference, setSelectedControlReference] = useState<ControlData | null>(null);
   const isSelection: boolean = (selectedControlReference != null);
   const externalWindowChannel = new BroadcastChannel("config-window-channel");
+
+  streamdeckApi.getGlobalSettings();
 
   function handleControlReferenceSelect(controlData: ControlData) {
     setSelectedControlReference(controlData);
