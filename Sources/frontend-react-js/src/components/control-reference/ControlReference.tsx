@@ -1,4 +1,4 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent, useMemo, useState } from "react";
 
 import classes from "./ControlReference.module.css";
 
@@ -21,9 +21,8 @@ function ControlReference(props: Props) {
   /*
    ** Internal State
    */
-  const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
-    FlattenModuleControlsJson(moduleData)
-  );
+  const initialFullModuleControlRefs = useMemo(() => FlattenModuleControlsJson(moduleData), [moduleData]);
+  const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs);
   const [searchQuery, setSearchQuery] = useState(props.globalSettings.last_search_query || "");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
