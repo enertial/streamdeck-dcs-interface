@@ -22,9 +22,13 @@ DcsBiosStreamParser::DcsBiosStreamParser()
     _sync_byte_count = 0;
 }
 
-bool DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address)
+void DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address)
 {
-    bool end_of_frame_sync_received = false;
+    // Reset if last byte processed was at end of frame.
+    if (_at_end_of_frame) {
+        _data_by_address_in_current_frame.clear();
+        _at_end_of_frame = false;
+    }
 
     switch (_state) {
     case DcsBiosState::WAIT_FOR_SYNC:
@@ -64,14 +68,14 @@ bool DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int
     case DcsBiosState::DATA_HIGH:
         _data = (c << 8u) | _data;
         _count--;
-        data_by_address[_address] = _data;
+        fill_data_by_address(data_by_address);
         if (_count == 0) {
             _state = DcsBiosState::ADDRESS_LOW;
 
             // Frame sync moved to end of frame.All time consuming updates should
             // be handled in framesync during the down time between frame transmissions.
             if (_address == 0xfffe) {
-                end_of_frame_sync_received = true;
+                _at_end_of_frame = true;
             }
         } else {
             _address += 2;
@@ -90,6 +94,13 @@ bool DcsBiosStreamParser::processByte(uint8_t c, std::unordered_map<unsigned int
         _state = DcsBiosState::ADDRESS_LOW;
         _sync_byte_count = 0;
     }
+}
 
-    return end_of_frame_sync_received;
+void DcsBiosStreamParser::fill_data_by_address(std::unordered_map<unsigned int, unsigned int> &data_by_address)
+{
+    data_by_address[_address] = _data;
+    // Limit size of stored addresses to prevent excessive memory usage if end of frame detection is failing.
+    if (_data_by_address_in_current_frame.size() < MAX_NUM_ADDRESSES_STORED_PER_FRAME) {
+        _data_by_address_in_current_frame[_address] = _data;
+    }
 }

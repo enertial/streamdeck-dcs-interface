@@ -133,17 +133,32 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_start_of_missio
 }
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_end_of_mission)
 {
-    // Send a single message from mock DCS that contains updates for multiple IDs.
-    const char mock_dcs_message[] = {0x55, 0x55, 0x55, 0x55,                         //
-                                     0x08, 0x00, 0x02, 0x00, 0x6F, 0x72,             //
-                                     0x02, 0x04, 0x04, 0x00, 0x31, 0x30, 0x2E, 0x30, //
-                                     0x0C, 0x74, 0x02, 0x00};
+    const char mock_dcs_message[] = {0x55,       0x55,       0x55, 0x55,              //
+                                     0x00,       0x00,       0x06, 0x00,              //
+                                     'A',        'C',        'F',  'T',  '\0', 0x20,  // ACFT_NAME = "ACFT"
+                                     0x10,       0x11,       0x02, 0x00, 0x01, 0x23,  // Data at Address 0x1110
+                                     (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
     mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
+    EXPECT_EQ("ACFT", simulator_interface.get_current_simulator_module());
+    const auto debugjson = simulator_interface.debug_get_current_game_state();
+    std::cout << debugjson.dump() << std::endl;
+    auto data_at_0x1110 = simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1110));
+    std::cout << "IS data? " << data_at_0x1110.has_value() << std::endl;
+    std::cout << data_at_0x1110.value() << std::endl;
+    // EXPECT_EQ(data_at_0x1110.value(), 0x2301);
 
-    // Query for ID updates.
-    EXPECT_TRUE(true); // TODO.
+    // Send a message with ACFT_NAME="" (starts with a '\0' character).
+    const char mock_dcs_end_message[] = {0x55,       0x55,       0x55, 0x55, //
+                                         0x00,       0x00,       0x06, 0x00, 0x00, 0x20,
+                                         0x20,       0x20,       0x20, 0x20,              // Empty ACFT_NAME
+                                         (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    mock_dcs.send_bytes(mock_dcs_end_message, SIZE_OF(mock_dcs_end_message));
+    simulator_interface.update_simulator_state();
+
+    EXPECT_EQ("", simulator_interface.get_current_simulator_module());
     // Test that game module is cleared.
+    // EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1110)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, send_bytes_simulator_command)

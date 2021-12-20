@@ -19,8 +19,8 @@ void DcsBiosProtocol::update_simulator_state()
     const int message_size = simulator_socket_.receive_bytes(message_buffer, MAX_UDP_MSG_SIZE);
     // Read byte by byte.
     for (size_t i = 0; i < message_size; i++) {
-        const bool is_end_of_frame = protocol_parser_.processByte(message_buffer[i], current_game_state_by_address_);
-        if (is_end_of_frame) {
+        protocol_parser_.processByte(message_buffer[i], current_game_state_by_address_);
+        if (protocol_parser_.at_end_of_frame()) {
             set_current_game_module();
         }
     }
@@ -73,6 +73,7 @@ json DcsBiosProtocol::debug_get_current_game_state() const
 {
     json current_game_state_printout;
     for (const auto &[key, value] : current_game_state_by_address_) {
+        std::cout << "KEY: " << key << " VALUE: " << value << std::endl;
         current_game_state_printout[std::to_string(key)] = value;
     }
     return current_game_state_printout;
@@ -81,7 +82,15 @@ json DcsBiosProtocol::debug_get_current_game_state() const
 void DcsBiosProtocol::set_current_game_module()
 {
     const auto maybe_aircraft_name = get_value_of_simulator_object_state(ACFT_NAME_ADDRESS_);
+    std::cout << "Got maybe aircraft" << std::endl;
+    std::cout << maybe_aircraft_name.has_value() << std::endl;
     if (maybe_aircraft_name) {
-        current_game_module_ = maybe_aircraft_name.value();
+        std::cout << "Did get aircraft" << std::endl;
+        std::cout << maybe_aircraft_name.value() << std::endl;
+        if (maybe_aircraft_name.value() != current_game_module_) {
+            // Clear game state when new active aircraft module is detected.
+            clear_game_state();
+            current_game_module_ = maybe_aircraft_name.value();
+        }
     }
 }
