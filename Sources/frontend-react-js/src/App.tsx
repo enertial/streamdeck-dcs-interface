@@ -1,7 +1,7 @@
 import { StreamdeckSocketSettings } from "./comms/StreamdeckWebsocket";
 import StreamdeckWebsocket from "./comms/StreamdeckWebsocket";
 
-// Augment the Window type for known varaible in opening window.
+// Augment the Window type for known variable in opening window.
 interface Window { socketSettings: StreamdeckSocketSettings }
 
 function App() {
