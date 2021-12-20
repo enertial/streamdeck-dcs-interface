@@ -152,7 +152,7 @@
   "CodePathWin": "bin/streamdeck_dcs_interface.exe",
   "DefaultWindowSize": [
     1000,
-    1100
+    1000
   ],
   "Description": "Allows buttons which communicate with Digital Combat Simulator (DCS)",
   "Name": "DCS Interface",

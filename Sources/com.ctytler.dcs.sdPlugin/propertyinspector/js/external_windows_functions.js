@@ -14,6 +14,14 @@ function callbackIdLookupButtonPress() {
 /**
  * Opens an external window when button is clicked.
  */
+function callbackHelpButtonPress() {
+    if (!window.commsWindow || window.commsWindow.closed) {
+        window.commsWindow = window.open('../helpDocs/helpWindow.html', 'Help');
+    }
+}
+/**
+ * Opens an external window when button is clicked.
+ */
 function callbackCommsSettingsButtonPress() {
     if (!window.commsWindow || window.commsWindow.closed) {
         window.commsWindow = window.open('comms_window.html', 'Comms Settings');

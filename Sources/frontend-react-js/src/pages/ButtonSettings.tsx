@@ -1,23 +1,21 @@
 import { useState } from "react";
-// import { BroadcastChannel } from "broadcast-channel";
 
 import ControlReference from "../components/control-reference/ControlReference";
 import Backdrop from "../components/ui/Backdrop";
 import Modal from "../components/ui/Modal";
 
 import { ControlData } from "../components/control-reference/ControlReferenceInterface"
-import StreamdeckApi from "../comms/StreamdeckApi";
+import { StreamdeckApi, StreamdeckButtonSettings, StreamdeckGlobalSettings } from "../comms/StreamdeckApi";
 
 interface Props {
   streamdeckApi: StreamdeckApi,
+  sdButtonSettings: StreamdeckButtonSettings,
+  sdGlobalSettings: StreamdeckGlobalSettings,
 }
 
-function ButtonSettings({ streamdeckApi }: Props) {
+function ButtonSettings({ streamdeckApi, sdButtonSettings, sdGlobalSettings }: Props) {
   const [selectedControlReference, setSelectedControlReference] = useState<ControlData | null>(null);
   const isSelection: boolean = (selectedControlReference != null);
-  const externalWindowChannel = new BroadcastChannel("config-window-channel");
-
-  streamdeckApi.getGlobalSettings();
 
   function handleControlReferenceSelect(controlData: ControlData) {
     setSelectedControlReference(controlData);
@@ -32,7 +30,8 @@ function ButtonSettings({ streamdeckApi }: Props) {
     <div>
       <ControlReference
         onSelect={handleControlReferenceSelect}
-        extWindowChannel={externalWindowChannel}
+        streamdeckApi={streamdeckApi}
+        globalSettings={sdGlobalSettings}
       />
       {isSelection && (
         <Modal controlData={selectedControlReference!} onClick={clearSelection} />
