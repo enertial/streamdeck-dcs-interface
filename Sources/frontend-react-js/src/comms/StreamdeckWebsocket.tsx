@@ -1,7 +1,7 @@
 import { appendFile } from 'fs';
 import React, { useState, useEffect, useRef } from 'react';
 import ButtonSettings from "../pages/ButtonSettings";
-import { StreamdeckApi, StreamdeckButtonSettings, StreamdeckGlobalSettings } from './StreamdeckApi';
+import { StreamdeckApi, StreamdeckButtonSettings, StreamdeckGlobalSettings, defaultGlobalSettings, defaultButtonSettings } from './StreamdeckApi';
 
 export interface StreamdeckSocketSettings {
     port: number,
@@ -11,15 +11,9 @@ export interface StreamdeckSocketSettings {
 }
 
 function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
-    const [buttonSettings, setButtonSettings] = useState<StreamdeckButtonSettings>({});
-    const [globalSettings, setGlobalSettings] = useState<StreamdeckGlobalSettings>({});
+    const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings);
+    const [globalSettings, setGlobalSettings] = useState(defaultGlobalSettings);
     const websocket = useRef<WebSocket | null>(null);
-
-    const DestinationEnum = Object.freeze({
-        HARDWARE_AND_SOFTWARE: 0,
-        HARDWARE_ONLY: 1,
-        SOFTWARE_ONLY: 2
-    });
 
     // Websocket connect and shutdown setup.
     useEffect(() => {
@@ -43,7 +37,7 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
         return function onUnmount() {
             websocket.current?.close();
         }
-    });
+    }, []);
 
     // This message registers this Websocket binding as the Property Inspector
     // for the selected button in the Streamdeck GUI.
@@ -68,22 +62,6 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
         console.log("Sent message (", event, "):", json);
     }
 
-    function parseJson(jsonString: string): (object | null) {
-        try {
-            const o = JSON.parse(jsonString);
-
-            // Handle non-exception-throwing cases:
-            // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
-            // but... JSON.parse(null) returns null, and typeof null === "object",
-            // so we must check for that, too. Thankfully, null is falsey, so this suffices:
-            if (o && typeof o === 'object') {
-                return o;
-            }
-        } catch (e) { }
-
-        return null;
-    };
-
     function handleReceivedMessage(msg: any) {
         let jsonObj = null
         try {
@@ -100,7 +78,7 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
                     console.log("Received Button Settings", jsonObj.payload.settings);
                     break;
                 case "didReceiveGlobalSettings":
-                    //setGlobalSettings(jsonObj.payload.settings);
+                    setGlobalSettings(updateFieldsWithNewDataOnly(globalSettings, jsonObj.payload.settings));
                     console.log("Received Global Settings", jsonObj.payload.settings);
                     break;
                 default:
@@ -108,6 +86,15 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
             }
 
         }
+    }
+
+    // Allows updating state for messages with only partially defined structures.
+    function updateFieldsWithNewDataOnly(current: any, update: any) {
+        let newState = { ...current };
+        for (const key in update) {
+            newState[key] = update[key];
+        }
+        return newState;
     }
 
     // Definition of the API that is used by other components.
