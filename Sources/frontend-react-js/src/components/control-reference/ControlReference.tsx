@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useEffect, useMemo, useState } from "react";
 
 import classes from "./ControlReference.module.css";
 
@@ -23,7 +23,7 @@ function ControlReference(props: Props) {
    */
   const initialFullModuleControlRefs = useMemo(() => FlattenModuleControlsJson(moduleData), [moduleData]);
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs);
-  const [searchQuery, setSearchQuery] = useState(props.globalSettings.last_search_query || "");
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
@@ -35,6 +35,10 @@ function ControlReference(props: Props) {
   /*
    ** Handlers
    */
+
+  useEffect(() => {
+    setSearchQuery(props.globalSettings.last_search_query);
+  }, [props.globalSettings])
 
   function requestModuleList() {
     props.streamdeckApi.requestModuleList("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json");

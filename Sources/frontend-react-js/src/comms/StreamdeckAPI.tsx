@@ -26,16 +26,30 @@ export interface StreamdeckApi {
 }
 
 export interface StreamdeckButtonSettings {
-    action?: string;
+    send_value: string;
+}
+
+export const defaultButtonSettings: StreamdeckButtonSettings = {
+    send_value: "",
 }
 
 export interface StreamdeckGlobalSettings {
     // Connection settings to Simulator export.
-    ip_address?: string,
-    listener_port?: string,
-    send_port?: string,
+    ip_address: string,
+    listener_port: string,
+    send_port: string,
     // Control reference query settings.
-    last_search_query?: string,
-    last_selected_module?: string,
-    dcs_install_path?: string,
+    last_search_query: string,
+    last_selected_module: string,
+    dcs_install_path: string,
 }
+
+export const defaultGlobalSettings: StreamdeckGlobalSettings = {
+    ip_address: "",
+    listener_port: "",
+    send_port: "",
+    last_search_query: "",
+    last_selected_module: "",
+    dcs_install_path: "",
+}
+
