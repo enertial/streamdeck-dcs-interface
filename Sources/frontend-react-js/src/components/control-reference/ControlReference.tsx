@@ -8,9 +8,11 @@ import { ControlData } from "./ControlReferenceInterface";
 import FlattenModuleControlsJson from "./FlattenModuleControlsJson";
 
 import { moduleData } from "../../A-10C";
+import { StreamdeckApi, StreamdeckGlobalSettings } from "../../comms/StreamdeckApi";
 
 interface Props {
-  extWindowChannel: BroadcastChannel;
+  streamdeckApi: StreamdeckApi;
+  globalSettings: StreamdeckGlobalSettings;
   onSelect: (arg: ControlData) => void;
 }
 
@@ -22,8 +24,7 @@ function ControlReference(props: Props) {
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(
     FlattenModuleControlsJson(moduleData)
   );
-  // TODO: Restore searchQuery from Global Settings before overwriting.
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState(props.globalSettings.last_search_query || "");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
@@ -37,45 +38,24 @@ function ControlReference(props: Props) {
    */
 
   function requestModuleList() {
-    props.extWindowChannel.postMessage({
-      event: "requestModuleList",
-      path: "C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json",
-    });
+    props.streamdeckApi.requestModuleList("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json");
   }
   function requestModule() {
-    props.extWindowChannel.postMessage({
-      event: "requestControlReferenceJson",
-      filename:
-        "C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\FA-18C_hornet.json",
-    });
+    props.streamdeckApi.requestModule("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\FA-18C_hornet.json");
   }
 
-  props.extWindowChannel.addEventListener("message", (e) => {
-    console.log("Broadcast received: ", e);
-    if (e.data.event === "ModuleList") {
-      console.log("Module List: ", e.data.moduleList);
-    }
-    if (e.data.event === "JsonFile") {
-      console.log("Json File loaded", e);
-      setFullModuleControlRefs(FlattenModuleControlsJson(e.data.jsonFile));
-    }
-  });
-
+  function updateStoredSearchQuery(query: string) {
+    setSearchQuery(query);
+    let globalSettingsMutable = props.globalSettings;
+    globalSettingsMutable.last_search_query = query;
+    props.streamdeckApi.setGlobalSettings(globalSettingsMutable);
+  }
   const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.currentTarget.value.toUpperCase();
-    setSearchQuery(query);
-    props.extWindowChannel.postMessage({
-      event: "storeLastSearchQuery",
-      searchQuery: query,
-    });
+    updateStoredSearchQuery(query);
   };
-
-  const handleSearchQueryClear = () => {
-    setSearchQuery("");
-    props.extWindowChannel.postMessage({
-      event: "storeLastSearchQuery",
-      searchQuery: "",
-    });
+  function handleSearchQueryClear() {
+    updateStoredSearchQuery("");
   };
 
   const handleTableRowClick = (tableRowData: ControlData) => {
