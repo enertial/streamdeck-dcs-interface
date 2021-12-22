@@ -1,4 +1,3 @@
-import { appendFile } from 'fs';
 import React, { useState, useEffect, useRef } from 'react';
 import ButtonSettings from "../pages/ButtonSettings";
 import { StreamdeckApi, StreamdeckButtonSettings, StreamdeckGlobalSettings, defaultGlobalSettings, defaultButtonSettings } from './StreamdeckApi';

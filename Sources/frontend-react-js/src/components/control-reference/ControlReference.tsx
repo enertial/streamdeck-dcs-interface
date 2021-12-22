@@ -41,7 +41,7 @@ function ControlReference(props: Props) {
   }, [props.globalSettings])
 
   function requestModuleList() {
-    props.streamdeckApi.requestModuleList("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json");
+    props.streamdeckApi.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
   }
   function requestModule() {
     props.streamdeckApi.requestModule("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\FA-18C_hornet.json");
@@ -49,7 +49,7 @@ function ControlReference(props: Props) {
 
   function updateStoredSearchQuery(query: string) {
     setSearchQuery(query);
-    let globalSettingsMutable = props.globalSettings;
+    let globalSettingsMutable = { ...props.globalSettings };
     globalSettingsMutable.last_search_query = query;
     props.streamdeckApi.setGlobalSettings(globalSettingsMutable);
   }
