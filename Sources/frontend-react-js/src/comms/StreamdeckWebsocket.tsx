@@ -8,7 +8,7 @@ export interface StreamdeckSocketSettings {
     info: any, // A large json object that only needs to be gatewayed
 }
 
-export function DefaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
+export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
         port: 8000,
         propertyInspectorUUID: "123",
@@ -26,11 +26,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     const sdApi: StreamdeckApi = useMemo(() => {
         // Protocol to send messages to the Streamdeck application.
         function send(event: string, payload: object) {
-            const json = {
-                event: event,
-                context: socketSettings.propertyInspectorUUID,
-                payload: payload,
-            };
+            const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
             websocket.current?.send(JSON.stringify(json));
             console.log("Sent message (", event, "):", json);
         }
@@ -41,7 +37,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             },
 
             setSettings: function (payload: object) {
-                send('setSettings', payload);
+                send('setSettings', { payload: payload });
             },
 
             getGlobalSettings: function () {
@@ -49,7 +45,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             },
 
             setGlobalSettings: function (payload: object) {
-                send('setGlobalSettings', payload);
+                send('setGlobalSettings', { payload: payload });
             },
 
             logMessage: function (message: string) {
@@ -128,11 +124,11 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             if (jsonObj.hasOwnProperty("event")) {
                 switch (jsonObj.event) {
                     case "didReceiveSettings":
-                        setButtonSettings(prevButtonSetting => updateFieldsWithNewDataOnly(prevButtonSetting, jsonObj.payload.settings));
+                        setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, jsonObj.payload.settings));
                         console.log("Received Button Settings", jsonObj.payload.settings);
                         break;
                     case "didReceiveGlobalSettings":
-                        setGlobalSettings(prevGlobalSettings => updateFieldsWithNewDataOnly(prevGlobalSettings, jsonObj.payload.settings));
+                        setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, jsonObj.payload.settings));
                         console.log("Received Global Settings", jsonObj.payload.settings);
                         break;
                     default:
@@ -140,15 +136,6 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 }
 
             }
-        }
-
-        // Allows updating state for messages with only partially defined structures.
-        function updateFieldsWithNewDataOnly(current: any, update: any) {
-            let newState = { ...current };
-            for (const key in update) {
-                newState[key] = update[key];
-            }
-            return newState;
         }
 
     }, [socketSettings, sdApi]);
