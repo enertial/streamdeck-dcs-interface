@@ -5,7 +5,7 @@ import classes from "./ControlReference.module.css";
 import Table from "./Table";
 import SearchBar from "./SearchBar";
 import { ControlData } from "./ControlReferenceInterface";
-import FlattenModuleControlsJson from "./FlattenModuleControlsJson";
+import flattenModuleControlsJson from "./FlattenModuleControlsJson";
 
 import { moduleData } from "../../A-10C";
 import { StreamdeckApi, StreamdeckGlobalSettings } from "../../comms/StreamdeckApi";
@@ -21,7 +21,7 @@ function ControlReference(props: Props) {
   /*
    ** Internal State
    */
-  const initialFullModuleControlRefs = useMemo(() => FlattenModuleControlsJson(moduleData), [moduleData]);
+  const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), [moduleData]);
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs);
   const [searchQuery, setSearchQuery] = useState("");
 

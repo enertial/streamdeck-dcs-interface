@@ -1,16 +1,21 @@
-import { StreamdeckSocketSettings } from "./comms/StreamdeckWebsocket";
-import StreamdeckWebsocket from "./comms/StreamdeckWebsocket";
+import { StreamdeckSocketSettings, DefaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./comms/StreamdeckWebsocket";
+import ButtonSettings from "./pages/ButtonSettings";
+//import StreamdeckWebsocket from "./comms/StreamdeckWebsocket";
 
 // Augment the Window type for known variable in opening window.
 interface Window { socketSettings: StreamdeckSocketSettings }
 
 function App() {
   const propInspectorWindow = window.opener as Window;
-  const socketSettings = propInspectorWindow.socketSettings;
+  const socketSettings = propInspectorWindow ? propInspectorWindow.socketSettings : DefaultStreamdeckSocketSettings();
+  const { sdApi, buttonSettings, globalSettings } = useStreamdeckWebsocket(socketSettings);
 
   return (
     <div>
-      <StreamdeckWebsocket {...socketSettings} />
+      <ButtonSettings
+        streamdeckApi={sdApi}
+        sdButtonSettings={buttonSettings}
+        sdGlobalSettings={globalSettings} />
     </div>
   );
 }
