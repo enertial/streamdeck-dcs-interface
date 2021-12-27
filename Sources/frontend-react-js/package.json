@@ -39,5 +39,9 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "jest-websocket-mock": "^2.2.1",
+    "mock-socket": "^9.0.8"
   }
 }

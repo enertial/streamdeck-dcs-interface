@@ -9,10 +9,58 @@ export interface StreamdeckSocketSettings {
     info: any, // A large json object that only needs to be gatewayed
 }
 
-function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
+export function DefaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
+    return {
+        port: 8000,
+        propertyInspectorUUID: "123",
+        registerEvent: "registerPropertyInspector",
+        info: {}
+    };
+}
+
+export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
     const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings);
     const [globalSettings, setGlobalSettings] = useState(defaultGlobalSettings);
     const websocket = useRef<WebSocket | null>(null);
+
+    // Definition of the API that is used by other components.
+    const sdApi: StreamdeckApi = {
+        getSettings: function () {
+            send('getSettings', {});
+        },
+
+        setSettings: function (payload: object) {
+            send('setSettings', payload);
+        },
+
+        getGlobalSettings: function () {
+            send('getGlobalSettings', {});
+        },
+
+        setGlobalSettings: function (payload: object) {
+            send('setGlobalSettings', payload);
+        },
+
+        logMessage: function (message: string) {
+            send('logMessage', { payload: { message: message } });
+        },
+
+        sendToPlugin: function (action: string, payload: object) {
+            send('sendToPlugin',
+                {
+                    action: action,
+                    payload: payload || {}
+                });
+        },
+
+        requestModuleList: function (path: string) {
+            this.sendToPlugin("", { event: "requestModuleList", path: path });
+        },
+
+        requestModule: function (filename: string) {
+            this.sendToPlugin("", { event: "requestControlReferenceJson", filename: filename });
+        },
+    };
 
     // Websocket connect and shutdown setup.
     useEffect(() => {
@@ -31,12 +79,12 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
         websocket.current.onclose = function (event: any) {
             // Websocket is closed
             var reason = WEBSOCKETERROR(event);
-            console.warn('[STREAMDECK]***** WEBOCKET CLOSED **** reason:', reason);
+            console.log('[STREAMDECK]***** WEBOCKET CLOSED **** reason:', reason);
         };
         return function onUnmount() {
             websocket.current?.close();
         }
-    }, []);
+    }, [socketSettings, registerPropertyInspector, handleReceivedMessage]);
 
     // This message registers this Websocket binding as the Property Inspector
     // for the selected button in the Streamdeck GUI.
@@ -96,45 +144,8 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
         return newState;
     }
 
-    // Definition of the API that is used by other components.
-    const sdApi: StreamdeckApi = {
-        getSettings: function () {
-            send('getSettings', {});
-        },
-
-        setSettings: function (payload: object) {
-            send('setSettings', payload);
-        },
-
-        getGlobalSettings: function () {
-            send('getGlobalSettings', {});
-        },
-
-        setGlobalSettings: function (payload: object) {
-            send('setGlobalSettings', payload);
-        },
-
-        logMessage: function (message: string) {
-            send('logMessage', { payload: { message: message } });
-        },
-
-        sendToPlugin: function (action: string, payload: object) {
-            send('sendToPlugin',
-                {
-                    action: action,
-                    payload: payload || {}
-                });
-        },
-
-        requestModuleList: function (path: string) {
-            this.sendToPlugin("", { event: "requestModuleList", path: path });
-        },
-
-        requestModule: function (filename: string) {
-            this.sendToPlugin("", { event: "requestControlReferenceJson", filename: filename });
-        },
-    };
-
+    return { sdApi, buttonSettings, globalSettings };
+    /*
     return (
         <div>
             <ButtonSettings
@@ -143,6 +154,7 @@ function StreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
                 sdGlobalSettings={globalSettings} />
         </div >
     );
+    */
 }
 
 /**
@@ -190,5 +202,3 @@ const SOCKETERRORS = {
     '2': 'The connection is going through the closing handshake',
     '3': 'The connection has been closed or could not be opened'
 };
-
-export default StreamdeckWebsocket;

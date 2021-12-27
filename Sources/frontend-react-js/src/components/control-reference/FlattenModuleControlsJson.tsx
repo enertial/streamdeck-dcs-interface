@@ -1,10 +1,8 @@
 /* Provides utility function for flattening DCS BIOS control reference json and returning an array of controls. */
 
-import {ControlData, ModuleControlsJson} from "./ControlReferenceInterface";
+import { ControlData, ModuleControlsJson } from "./ControlReferenceInterface";
 
-function FlattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlData[] {
-  console.log("Flatten:", moduleControls);
-
+function flattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlData[] {
   let controls: ControlData[] = [];
 
   Object.keys(moduleControls).forEach((category) =>
@@ -16,5 +14,5 @@ function FlattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlD
   return controls;
 }
 
-export default FlattenModuleControlsJson;
+export default flattenModuleControlsJson;
 
