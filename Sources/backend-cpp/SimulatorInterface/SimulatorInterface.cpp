@@ -6,7 +6,7 @@
 
 SimulatorAddress::SimulatorAddress(unsigned int address) : type(AddressType::ADDRESS_ONLY), address(address) {}
 SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int mask, uint8_t shift)
-    : type(AddressType::INTEGER), mask(mask), shift(shift)
+    : type(AddressType::INTEGER), address(address), mask(mask), shift(shift)
 {
 }
 SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int max_length)

@@ -21,7 +21,7 @@ void DcsBiosProtocol::update_simulator_state()
     for (size_t i = 0; i < message_size; i++) {
         protocol_parser_.processByte(message_buffer[i], current_game_state_by_address_);
         if (protocol_parser_.at_end_of_frame()) {
-            set_current_game_module();
+            monitor_for_module_change();
         }
     }
 }
@@ -36,6 +36,10 @@ void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send_st
 
 std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(const SimulatorAddress &address) const
 {
+    if (address.type != AddressType::STRING) {
+        return std::nullopt;
+    }
+
     std::string assembled_string = "";
     for (unsigned int loc = address.address; loc < address.address + address.max_length; loc += 2) {
         if (current_game_state_by_address_.count(address.address) > 0) {
@@ -57,7 +61,7 @@ std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(
 
 std::optional<Decimal> DcsBiosProtocol::get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
 {
-    if (current_game_state_by_address_.count(address.address) > 0) {
+    if (address.type == AddressType::INTEGER && current_game_state_by_address_.count(address.address) > 0) {
         return Decimal((current_game_state_by_address_.at(address.address) & address.mask) >> address.shift, 0);
     }
     return std::nullopt;
@@ -73,23 +77,19 @@ json DcsBiosProtocol::debug_get_current_game_state() const
 {
     json current_game_state_printout;
     for (const auto &[key, value] : current_game_state_by_address_) {
-        std::cout << "KEY: " << key << " VALUE: " << value << std::endl;
         current_game_state_printout[std::to_string(key)] = value;
     }
     return current_game_state_printout;
 }
 
-void DcsBiosProtocol::set_current_game_module()
+void DcsBiosProtocol::monitor_for_module_change()
 {
     const auto maybe_aircraft_name = get_value_of_simulator_object_state(ACFT_NAME_ADDRESS_);
-    std::cout << "Got maybe aircraft" << std::endl;
-    std::cout << maybe_aircraft_name.has_value() << std::endl;
     if (maybe_aircraft_name) {
-        std::cout << "Did get aircraft" << std::endl;
-        std::cout << maybe_aircraft_name.value() << std::endl;
         if (maybe_aircraft_name.value() != current_game_module_) {
-            // Clear game state when new active aircraft module is detected.
-            clear_game_state();
+            // Clear game state when and reset to only data received in the most recent frame when new active aircraft
+            // module is detected.
+            current_game_state_by_address_ = protocol_parser_.get_data_by_address_updated_this_frame();
             current_game_module_ = maybe_aircraft_name.value();
         }
     }

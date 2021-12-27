@@ -1,7 +1,7 @@
 x64/
 x86/
 settingsUI/
-Sources/**/*.exe
+*.exe
 *.pdb
 *.log
 .vs

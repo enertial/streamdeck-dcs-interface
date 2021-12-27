@@ -26,9 +26,9 @@ class DcsBiosProtocol : public SimulatorInterface
 
   private:
     /**
-     * @brief Sets the current game module (aircraft name) from received data
+     * @brief Monitors and sets the current game module (aircraft name) from received data
      */
-    void set_current_game_module();
+    void monitor_for_module_change();
 
     DcsBiosStreamParser protocol_parser_;
 

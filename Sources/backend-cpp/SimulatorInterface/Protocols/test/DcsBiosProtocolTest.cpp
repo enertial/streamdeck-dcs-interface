@@ -89,16 +89,19 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrite_values)
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
-    EXPECT_TRUE(true); // TODO.
+    const auto address_0x740C = SimulatorAddress{0x740C, 0xFF, 0};
+    auto data_at_0x740C = simulator_interface.get_decimal_of_simulator_object_state(address_0x740C);
+    EXPECT_EQ(data_at_0x740C.value(), Decimal{0x0200, 0});
 
     // TEST 2 - Received values will overwrite their previous values.
     // Send a new message with one ID value updated.
-    const char mock_dcs_message_two[] = {0x55, 0x55, 0x55, 0x55, 0x0C, 0x74, 0x02, 0x00, 0x00, 0x00};
+    const char mock_dcs_message_two[] = {0x55, 0x55, 0x55, 0x55, 0x0C, 0x74, 0x02, 0x00, 0x22, 0x00};
     mock_dcs.send_bytes(mock_dcs_message_two, SIZE_OF(mock_dcs_message_two));
     simulator_interface.update_simulator_state();
 
     // Query for ID updates - Test that only the value for address x740C has changed.
-    EXPECT_TRUE(true); // TODO.
+    data_at_0x740C = simulator_interface.get_decimal_of_simulator_object_state(address_0x740C);
+    EXPECT_EQ(data_at_0x740C.value(), Decimal{0x0022, 0});
 }
 
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_incomplete_message)
@@ -140,13 +143,10 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_end_of_mission)
                                      (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
     mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
+    // Verify
     EXPECT_EQ("ACFT", simulator_interface.get_current_simulator_module());
-    const auto debugjson = simulator_interface.debug_get_current_game_state();
-    std::cout << debugjson.dump() << std::endl;
-    auto data_at_0x1110 = simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1110));
-    std::cout << "IS data? " << data_at_0x1110.has_value() << std::endl;
-    std::cout << data_at_0x1110.value() << std::endl;
-    // EXPECT_EQ(data_at_0x1110.value(), 0x2301);
+    auto address_0x1110 = SimulatorAddress{0x1110, 0xFF, 0};
+    EXPECT_TRUE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1110));
 
     // Send a message with ACFT_NAME="" (starts with a '\0' character).
     const char mock_dcs_end_message[] = {0x55,       0x55,       0x55, 0x55, //
@@ -155,10 +155,10 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_end_of_mission)
                                          (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
     mock_dcs.send_bytes(mock_dcs_end_message, SIZE_OF(mock_dcs_end_message));
     simulator_interface.update_simulator_state();
-
+    // Verify
     EXPECT_EQ("", simulator_interface.get_current_simulator_module());
-    // Test that game module is cleared.
-    // EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1110)));
+    // Test that game state is cleared.
+    EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1110));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, send_bytes_simulator_command)
@@ -252,7 +252,7 @@ TEST_F(DcsBiosProtocolTestFixture, clear_game_state)
     simulator_interface.update_simulator_state();
 
     auto current_game_state = simulator_interface.debug_get_current_game_state();
-    // EXPECT_TRUE(current_game_state.size() > 0);
+    EXPECT_TRUE(current_game_state.size() > 0);
 
     // Test that game state is able to be cleared.
     simulator_interface.clear_game_state();
