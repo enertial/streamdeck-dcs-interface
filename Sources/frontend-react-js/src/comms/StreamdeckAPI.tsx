@@ -9,11 +9,11 @@ export interface StreamdeckApi {
     // Gets settings for the current Streamdeck button.
     getSettings: () => void;
     // Sets settings for the current Streamdeck button.
-    setSettings(payload: object): void;
+    setSettings(payload: StreamdeckButtonSettings): void;
     // Gets global settings for all buttons of the Streamdeck plugin.
     getGlobalSettings(): void;
     // Sets global settings for all buttons of the Streamdeck plugin.
-    setGlobalSettings(payload: object): void;
+    setGlobalSettings(payload: StreamdeckGlobalSettings): void;
     // Logs a message to the Elgato Streamdeck error log.
     logMessage(message: string): void;
     // Sends a message to the C++ plugin executable.
@@ -29,8 +29,8 @@ export interface StreamdeckButtonSettings {
     send_value: string;
 }
 
-export const defaultButtonSettings: StreamdeckButtonSettings = {
-    send_value: "",
+export function defaultButtonSettings(): StreamdeckButtonSettings {
+    return { send_value: "" };
 }
 
 export interface StreamdeckGlobalSettings {
@@ -44,12 +44,14 @@ export interface StreamdeckGlobalSettings {
     dcs_install_path: string,
 }
 
-export const defaultGlobalSettings: StreamdeckGlobalSettings = {
-    ip_address: "",
-    listener_port: "",
-    send_port: "",
-    last_search_query: "",
-    last_selected_module: "",
-    dcs_install_path: "",
+export function defaultGlobalSettings(): StreamdeckGlobalSettings {
+    return {
+        ip_address: "",
+        listener_port: "",
+        send_port: "",
+        last_search_query: "",
+        last_selected_module: "",
+        dcs_install_path: ""
+    };
 }
 
