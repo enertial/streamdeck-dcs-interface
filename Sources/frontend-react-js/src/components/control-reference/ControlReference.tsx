@@ -21,7 +21,7 @@ function ControlReference(props: Props) {
   /*
    ** Internal State
    */
-  const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), [moduleData]);
+  const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), []);
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs);
   const [searchQuery, setSearchQuery] = useState("");
 
