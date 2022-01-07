@@ -1,7 +1,8 @@
 import { render, fireEvent, screen } from "@testing-library/react";
+import { ControlData } from "./ControlReferenceInterface";
 import Table from "../Table";
 
-const sampleControlSet = [
+const sampleControlSet: ControlData = [
   {
     identifier: "control1",
     category: "Sample",
@@ -18,34 +19,38 @@ const sampleControlSet = [
   },
 ];
 
+function doNothing() {
+  // do nothing.
+}
+
 test("renders loading message when isDataLoaded is false", () => {
-  render(<Table tableData={[]} isDataLoaded={false} onClick={() => { }} />);
+  render(<Table tableData={[]} isDataLoaded={false} onClick={doNothing} />);
   screen.getByText(/Loading module data/i);
   expect(screen.queryByRole("table")).toBeNull();
 });
 
 test("renders loading message when isDataLoaded is false even when data provided", () => {
-  render(<Table tableData={sampleControlSet} isDataLoaded={false} onClick={() => { }} />);
+  render(<Table tableData={sampleControlSet} isDataLoaded={false} onClick={doNothing} />);
   screen.getByText(/Loading module data/i);
   expect(screen.queryByRole("table")).toBeNull();
 });
 
 test("renders table with empty data when isDataLoaded is true", () => {
-  render(<Table tableData={[]} isDataLoaded={true} onClick={() => { }} />);
+  render(<Table tableData={[]} isDataLoaded={true} onClick={doNothing} />);
   screen.getByRole("table");
   screen.getByText(/Category/i); // Expect column header text to be present.
 });
 
 test("renders table with sample control set", () => {
-  render(<Table tableData={sampleControlSet} isDataLoaded={true} onClick={() => { }} />);
+  render(<Table tableData={sampleControlSet} isDataLoaded={true} onClick={doNothing} />);
   screen.getByText(sampleControlSet[0].identifier);
   const numRowsWithHeader = sampleControlSet.length + 1;
   expect(screen.getAllByRole("row")).toHaveLength(numRowsWithHeader);
 });
 
 test("renders table with sample control set", () => {
-  let clickOutput;
-  const testClickFunction = (retData) => { clickOutput = retData };
+  let clickOutput: ControlData;
+  const testClickFunction = (retData: ControlData) => { clickOutput = retData };
   render(<Table tableData={sampleControlSet} isDataLoaded={true} onClick={testClickFunction} />);
   fireEvent.click(screen.getByText('control1'));
 

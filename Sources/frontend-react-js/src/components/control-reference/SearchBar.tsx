@@ -7,7 +7,7 @@ interface Props {
   onClickClear: MouseEventHandler<HTMLButtonElement>,
 }
 
-function SearchBar(props: Props) {
+function SearchBar(props: Props): JSX.Element {
   return (
     <div className={classes.searchBar}>
       <span className={classes.searchTitle}>Search Control References: </span>

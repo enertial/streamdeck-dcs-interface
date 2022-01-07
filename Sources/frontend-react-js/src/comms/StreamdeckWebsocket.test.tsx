@@ -6,24 +6,24 @@ import { defaultGlobalSettings } from "./StreamdeckApi";
 // Settings used for unit under test.
 const socketSettings = defaultStreamdeckSocketSettings();
 const exampleButtonSettings = { send_value: "test_send_value" };
-let exampleGlobalSettings = defaultGlobalSettings();
+const exampleGlobalSettings = defaultGlobalSettings();
 
 // Server that can listen to communications from unit under test.
 const mockServer = new WS("ws://127.0.0.1:" + socketSettings.port)
 
 // React function that uses custom hook.
 function UserOfStreamdeckWebsocket() {
-    const { sdApi, buttonSettings, globalSettings } = useStreamdeckWebsocket(socketSettings);
+    const sdApi = useStreamdeckWebsocket(socketSettings);
     return (
         <div>
-            <button id="setSettings" onClick={() => { sdApi.setSettings(exampleButtonSettings) }}>setSettings</button>
-            <button onClick={() => { sdApi.setGlobalSettings(exampleGlobalSettings) }}>setGlobalSettings</button>
-            <button onClick={() => { sdApi.logMessage("test log message") }}>logMessage</button>
-            <button onClick={() => { sdApi.sendToPlugin("test_action", { test_key: "test_value" }) }}>sendToPlugin</button>
-            <button onClick={() => { sdApi.requestModuleList("test_path") }}>requestModuleList</button>
-            <button onClick={() => { sdApi.requestModule("test_filename") }}>requestModuleFile</button>
-            <div>buttonSettings: {JSON.stringify(buttonSettings)}</div>
-            <div>globalSettings: {JSON.stringify(globalSettings)}</div>
+            <button id="setSettings" onClick={() => { sdApi.commFns.setSettings(exampleButtonSettings) }}>setSettings</button>
+            <button onClick={() => { sdApi.commFns.setGlobalSettings(exampleGlobalSettings) }}>setGlobalSettings</button>
+            <button onClick={() => { sdApi.commFns.logMessage("test log message") }}>logMessage</button>
+            <button onClick={() => { sdApi.commFns.sendToPlugin("test_action", { test_key: "test_value" }) }}>sendToPlugin</button>
+            <button onClick={() => { sdApi.commFns.requestModuleList("test_path") }}>requestModuleList</button>
+            <button onClick={() => { sdApi.commFns.requestModule("test_filename") }}>requestModuleFile</button>
+            <div>buttonSettings: {JSON.stringify(sdApi.buttonSettings)}</div>
+            <div>globalSettings: {JSON.stringify(sdApi.globalSettings)}</div>
         </div>
     )
 }

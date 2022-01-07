@@ -6,7 +6,7 @@ interface Props {
   onClick: MouseEventHandler,
 }
 
-function Modal({ controlData, onClick }: Props) {
+function Modal({ controlData, onClick }: Props): JSX.Element {
   return (
     <div className="modal">
       <h3>

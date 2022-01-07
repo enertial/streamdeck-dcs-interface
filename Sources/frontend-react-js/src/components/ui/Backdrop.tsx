@@ -4,7 +4,7 @@ interface Props {
   onClick: MouseEventHandler,
 }
 
-function Backdrop(props: Props) {
+function Backdrop(props: Props): JSX.Element {
   return <div className="backdrop" onClick={props.onClick} />;
 }
 
