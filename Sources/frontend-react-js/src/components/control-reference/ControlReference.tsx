@@ -21,7 +21,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
    ** Internal State
    */
   const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), []);
-  const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs);
+  const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
