@@ -4,8 +4,6 @@
 
 #include "Utilities/StringUtilities.h"
 
-#include <iostream>
-
 DcsBiosProtocol::DcsBiosProtocol(const SimulatorConnectionSettings &settings) : SimulatorInterface(settings)
 {
     // Send a reset command on initialization by default.
