@@ -13,6 +13,7 @@ function App(): JSX.Element {
   return (
     <div>
       <ButtonSettings sdApi={sdApi} />
+      <p>Test</p>
     </div>
   );
 }
