@@ -89,7 +89,7 @@ class SimulatorInterface
 
     std::optional<Decimal> get_decimal_of_simulator_object_state(const int address) const // Convenience overload.
     {
-        return get_value_of_simulator_object_state(SimulatorAddress(address));
+        return get_decimal_of_simulator_object_state(SimulatorAddress(address));
     }
 
     /**
