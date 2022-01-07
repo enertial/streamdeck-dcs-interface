@@ -25,13 +25,27 @@ class DcsBiosStreamParser
 
     /**
      * @brief Processes a single byte from the export stream at a time, populating data by address.
-     * @param Single byte of DCS BIOS export stream.
-     * @param Map to populate data by address as full address contents are received.
-     * @return End of frame flag, true if address 0xFFFE is received.
+     * @param [in] c Single byte of DCS BIOS export stream.
+     * @param [in,out] data_by_address Map to populate data by address as full address contents are received.
      */
-    bool processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address);
+    void processByte(uint8_t c, std::unordered_map<unsigned int, unsigned int> &data_by_address);
+
+    /**
+     * @brief Returns true if most recently processed byte was the end of frame.
+     */
+    bool at_end_of_frame() { return _at_end_of_frame; };
+
+    /**
+     * @brief Get a list of addresses updated this frame.
+     */
+    std::unordered_map<unsigned int, unsigned int> get_data_by_address_updated_this_frame()
+    {
+        return _data_by_address_in_current_frame;
+    };
 
   private:
+    void fill_data_by_address(std::unordered_map<unsigned int, unsigned int> &data_by_address);
+
     // State machine states for parsing protocol.
     enum class DcsBiosState { WAIT_FOR_SYNC, ADDRESS_LOW, ADDRESS_HIGH, COUNT_LOW, COUNT_HIGH, DATA_LOW, DATA_HIGH };
     DcsBiosState _state;
@@ -39,4 +53,8 @@ class DcsBiosStreamParser
     unsigned int _count;
     unsigned int _data;
     unsigned char _sync_byte_count;
+    bool _at_end_of_frame = false;
+
+    std::unordered_map<unsigned int, unsigned int> _data_by_address_in_current_frame;
+    const size_t MAX_NUM_ADDRESSES_STORED_PER_FRAME = 1024;
 };

@@ -4,6 +4,16 @@
 
 #include "Utilities/StringUtilities.h"
 
+SimulatorAddress::SimulatorAddress(unsigned int address) : type(AddressType::ADDRESS_ONLY), address(address) {}
+SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int mask, uint8_t shift)
+    : type(AddressType::INTEGER), address(address), mask(mask), shift(shift)
+{
+}
+SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int max_length)
+    : type(AddressType::STRING), address(address), max_length(max_length)
+{
+}
+
 SimulatorInterface::SimulatorInterface(const SimulatorConnectionSettings &settings)
     : simulator_socket_(settings.ip_address, settings.rx_port, settings.tx_port, settings.multicast_address),
       connection_settings_(settings)
@@ -18,30 +28,3 @@ bool SimulatorInterface::connection_settings_match(const SimulatorConnectionSett
 }
 
 std::string SimulatorInterface::get_current_simulator_module() const { return current_game_module_; }
-
-std::optional<std::string> SimulatorInterface::get_value_of_simulator_object_state(const int object_id) const
-{
-    if (current_game_state_.count(object_id) > 0) {
-        if (!current_game_state_.at(object_id).empty()) {
-            return current_game_state_.at(object_id);
-        }
-    }
-    return std::nullopt;
-}
-
-std::optional<Decimal> SimulatorInterface::get_decimal_of_simulator_object_state(const int object_id) const
-{
-    if (current_game_state_.count(object_id) > 0) {
-        if (is_number(current_game_state_.at(object_id))) {
-            return current_game_state_.at(object_id);
-        }
-    }
-    return std::nullopt;
-}
-
-void SimulatorInterface::clear_game_state() { current_game_state_.clear(); }
-
-std::unordered_map<int, std::string> SimulatorInterface::debug_get_current_game_state() const
-{
-    return current_game_state_;
-}

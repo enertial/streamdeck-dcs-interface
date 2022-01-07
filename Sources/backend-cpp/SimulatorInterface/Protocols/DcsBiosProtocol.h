@@ -2,6 +2,7 @@
 
 #pragma once
 
+#include "SimulatorInterface/Protocols/DcsBiosStreamParser.h"
 #include "SimulatorInterface/SimulatorInterface.h"
 
 class DcsBiosProtocol : public SimulatorInterface
@@ -9,31 +10,32 @@ class DcsBiosProtocol : public SimulatorInterface
   public:
     DcsBiosProtocol(const SimulatorConnectionSettings &settings);
 
-    /**
-     * @brief Receives simulator state broadcasts, updating internal current game state.
-     *
-     */
     void update_simulator_state();
 
-    /**
-     * @brief Sends a message to simulator to command a change of an object's value.
-     *
-     * @param address Object name to set value of.
-     * @param value   Value to set the button to.
-     */
-    void send_simulator_command(const std::string &address, const std::string &value);
+    void send_simulator_command(const std::string &control_reference, const std::string &value);
 
-    /**
-     * @brief Sends a reset command to simulator to signify a request for a resend of data.
-     *
-     */
     void send_simulator_reset_command();
+
+    std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const;
+
+    std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const;
+
+    void clear_game_state();
+
+    json debug_get_current_game_state() const;
 
   private:
     /**
-     * @brief Processes received data of simulator updates.
-     *
-     * @param message Buffer of data receieved from DCS BIOS UDP socket.
+     * @brief Monitors and sets the current game module (aircraft name) from received data
      */
-    void handle_received_message(const unsigned char *message);
+    void monitor_for_module_change();
+
+    DcsBiosStreamParser protocol_parser_;
+
+    // Maps received data to associated addresses.
+    std::unordered_map<unsigned int, unsigned int> current_game_state_by_address_;
+    std::vector<unsigned int> addresses_read_in_most_recent_frame_;
+
+    // Default location of ACFT_NAME defined by MetaDataStart category of DCS BIOS json files.
+    const SimulatorAddress ACFT_NAME_ADDRESS_{0x0000, 24};
 };

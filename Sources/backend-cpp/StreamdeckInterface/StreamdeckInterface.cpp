@@ -235,12 +235,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                                               {"current_game_state", ""},
                                                               {"error", "SimulatorInterface not connected"}}));
         } else {
-            const std::unordered_map<int, std::string> dcs_id_values =
-                simulator_interface_->debug_get_current_game_state();
-            json current_game_state;
-            for (const auto &[key, value] : dcs_id_values) {
-                current_game_state[std::to_string(key)] = value;
-            }
+            const json current_game_state = simulator_interface_->debug_get_current_game_state();
             mConnectionManager->SendToPropertyInspector(
                 inAction,
                 inContext,
