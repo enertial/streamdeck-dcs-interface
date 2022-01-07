@@ -1,5 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./StreamdeckWebSocket";
+import { defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./StreamdeckWebsocket";
 import WS from "jest-websocket-mock";
 import { defaultGlobalSettings } from "./StreamdeckApi";
 
