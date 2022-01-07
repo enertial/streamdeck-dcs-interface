@@ -1,4 +1,3 @@
-//import { UseState } from "react";
 import { ControlData } from "./ControlReferenceInterface";
 import classes from "./Table.module.css";
 
@@ -13,7 +12,7 @@ interface TableRowContents {
   onClick: (arg: ControlData) => void,
 }
 
-function Table(props: TableContents) {
+function Table(props: TableContents): JSX.Element {
   function TableHeader() {
     return (
       <thead>
@@ -49,7 +48,7 @@ function Table(props: TableContents) {
   }
 }
 
-function TableRow({ controlData, onClick }: TableRowContents) {
+function TableRow({ controlData, onClick }: TableRowContents): JSX.Element {
   /* Each row holds entire set of control reference data,
   even though it only displays four columns worth of it */
   function handleRowClick() {

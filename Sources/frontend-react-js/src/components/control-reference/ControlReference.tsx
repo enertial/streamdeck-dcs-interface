@@ -8,15 +8,14 @@ import { ControlData } from "./ControlReferenceInterface";
 import flattenModuleControlsJson from "./FlattenModuleControlsJson";
 
 import { moduleData } from "../../A-10C";
-import { StreamdeckApi, StreamdeckGlobalSettings } from "../../comms/StreamdeckApi";
+import StreamdeckApi from "../../comms/StreamdeckApi";
 
 interface Props {
-  streamdeckApi: StreamdeckApi;
-  globalSettings: StreamdeckGlobalSettings;
+  sdApi: StreamdeckApi;
   onSelect: (arg: ControlData) => void;
 }
 
-function ControlReference(props: Props) {
+function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   /******* Internal State  *******/
   /*
    ** Internal State
@@ -37,21 +36,20 @@ function ControlReference(props: Props) {
    */
 
   useEffect(() => {
-    setSearchQuery(props.globalSettings.last_search_query);
-  }, [props.globalSettings])
+    setSearchQuery(sdApi.globalSettings.last_search_query);
+  }, [sdApi.globalSettings])
 
   function requestModuleList() {
-    props.streamdeckApi.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
+    sdApi.commFns.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
   }
   function requestModule() {
-    props.streamdeckApi.requestModule("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\FA-18C_hornet.json");
+    sdApi.commFns.requestModule("C:\\Users\\ctytler\\AppData\\Roaming\\DCS-BIOS\\control-reference-json\\FA-18C_hornet.json");
   }
 
   function updateStoredSearchQuery(query: string) {
     setSearchQuery(query);
-    let globalSettingsMutable = { ...props.globalSettings };
-    globalSettingsMutable.last_search_query = query;
-    props.streamdeckApi.setGlobalSettings(globalSettingsMutable);
+    const updatedGlobalSettings = Object.assign({}, sdApi.globalSettings, { last_search_query: query });
+    sdApi.commFns.setGlobalSettings(updatedGlobalSettings);
   }
   const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
     const query = event.currentTarget.value.toUpperCase();
@@ -59,10 +57,10 @@ function ControlReference(props: Props) {
   };
   function handleSearchQueryClear() {
     updateStoredSearchQuery("");
-  };
+  }
 
   const handleTableRowClick = (tableRowData: ControlData) => {
-    props.onSelect(tableRowData);
+    onSelect(tableRowData);
   };
 
   /*

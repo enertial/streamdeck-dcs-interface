@@ -5,17 +5,14 @@ import ButtonSettings from "./pages/ButtonSettings";
 // Augment the Window type for known variable in opening window.
 interface Window { socketSettings: StreamdeckSocketSettings }
 
-function App() {
+function App(): JSX.Element {
   const propInspectorWindow = window.opener as Window;
   const socketSettings = propInspectorWindow ? propInspectorWindow.socketSettings : defaultStreamdeckSocketSettings();
-  const { sdApi, buttonSettings, globalSettings } = useStreamdeckWebsocket(socketSettings);
+  const sdApi = useStreamdeckWebsocket(socketSettings);
 
   return (
     <div>
-      <ButtonSettings
-        streamdeckApi={sdApi}
-        sdButtonSettings={buttonSettings}
-        sdGlobalSettings={globalSettings} />
+      <ButtonSettings sdApi={sdApi} />
     </div>
   );
 }

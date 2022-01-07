@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { StreamdeckApi, defaultButtonSettings, defaultGlobalSettings } from './StreamdeckApi';
+import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
 
 export interface StreamdeckSocketSettings {
     port: number,
     propertyInspectorUUID: string,
     registerEvent: string,
-    info: any, // A large json object that only needs to be gatewayed
+    info: Record<string, unknown>, // A large json object that only needs to be gatewayed
 }
 
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
@@ -17,15 +17,15 @@ export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     };
 }
 
-export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings) {
+export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings): StreamdeckApi {
     const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings());
     const [globalSettings, setGlobalSettings] = useState(defaultGlobalSettings());
     const websocket = useRef<WebSocket | null>(null);
 
     // Definition of the API that is used by other components.
-    const sdApi: StreamdeckApi = useMemo(() => {
+    const commFns: StreamdeckCommFns = useMemo(() => {
         // Protocol to send messages to the Streamdeck application.
-        function send(event: string, payload: object) {
+        function send(event: string, payload: Record<string, unknown>) {
             const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
             websocket.current?.send(JSON.stringify(json));
             console.log("Sent message (", event, "):", json);
@@ -36,23 +36,23 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 send('getSettings', {});
             },
 
-            setSettings: function (payload: object) {
-                send('setSettings', { payload: payload });
+            setSettings: function (settings: StreamdeckButtonSettings) {
+                send('setSettings', { payload: settings });
             },
 
             getGlobalSettings: function () {
                 send('getGlobalSettings', {});
             },
 
-            setGlobalSettings: function (payload: object) {
-                send('setGlobalSettings', { payload: payload });
+            setGlobalSettings: function (settings: StreamdeckGlobalSettings) {
+                send('setGlobalSettings', { payload: settings });
             },
 
             logMessage: function (message: string) {
                 send('logMessage', { payload: { message: message } });
             },
 
-            sendToPlugin: function (action: string, payload: object) {
+            sendToPlugin: function (action: string, payload: Record<string, unknown>) {
                 send('sendToPlugin',
                     {
                         action: action,
@@ -76,17 +76,17 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         websocket.current.onopen = () => {
             console.log("Connected to Streamdeck Websocket.");
             registerPropertyInspector();
-            sdApi.getGlobalSettings();
+            commFns.getGlobalSettings();
         }
         websocket.current.onmessage = (msg: MessageEvent) => {
             handleReceivedMessage(msg.data);
         }
-        websocket.current.onerror = function (event: any) {
-            console.warn('WEBOCKET ERROR', event, event.data);
+        websocket.current.onerror = function (event: Event) {
+            console.warn('WEBOCKET ERROR', event);
         };
-        websocket.current.onclose = function (event: any) {
+        websocket.current.onclose = function (event: CloseEvent) {
             // Websocket is closed
-            var reason = WEBSOCKETERROR(event);
+            const reason = WEBSOCKETERROR(event);
             console.log('[STREAMDECK]***** WEBOCKET CLOSED **** reason:', reason);
         };
         return function onUnmount() {
@@ -102,15 +102,15 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             };
             websocket.current?.send(JSON.stringify(json));
             console.log("Registered myself according to:", json);
-        };
+        }
 
-        function handleReceivedMessage(msg: any) {
+        function handleReceivedMessage(msg: string) {
             interface SDMessage {
                 event: string,
                 payload: SDMessagePayload
             }
             interface SDMessagePayload {
-                settings?: object
+                settings?: Record<string, string>
             }
 
             let jsonObj: SDMessage;
@@ -121,7 +121,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 console.warn("Error in parsing received message", msg);
                 return;
             }
-            if (jsonObj.hasOwnProperty("event")) {
+            if (Object.prototype.hasOwnProperty.call(jsonObj, "event")) {
                 switch (jsonObj.event) {
                     case "didReceiveSettings":
                         setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, jsonObj.payload.settings));
@@ -138,17 +138,17 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             }
         }
 
-    }, [socketSettings, sdApi]);
+    }, [socketSettings, commFns]);
 
-    return { sdApi, buttonSettings, globalSettings };
+    return { commFns, buttonSettings, globalSettings } as const;
 }
 
 /**
  * Additional error-handling log messages.
  */
-function WEBSOCKETERROR(evt: any) {
+function WEBSOCKETERROR(evt: CloseEvent) {
     // Websocket is closed
-    var reason = '';
+    let reason = '';
     if (evt.code === 1000) {
         reason = 'Normal Closure. The purpose for which the connection was established has been fulfilled.';
     } else if (evt.code === 1001) {

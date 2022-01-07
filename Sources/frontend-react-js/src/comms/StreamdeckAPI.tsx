@@ -5,7 +5,13 @@
  * 
  */
 
-export interface StreamdeckApi {
+export default interface StreamdeckApi {
+    commFns: StreamdeckCommFns;
+    buttonSettings: StreamdeckButtonSettings;
+    globalSettings: StreamdeckGlobalSettings;
+}
+
+export interface StreamdeckCommFns {
     // Gets settings for the current Streamdeck button.
     getSettings: () => void;
     // Sets settings for the current Streamdeck button.
@@ -17,7 +23,7 @@ export interface StreamdeckApi {
     // Logs a message to the Elgato Streamdeck error log.
     logMessage(message: string): void;
     // Sends a message to the C++ plugin executable.
-    sendToPlugin(action: string, payload: object): void,
+    sendToPlugin(action: string, payload: Record<string, unknown>): void,
     // ~~~ The below are wrappers around sendToPlugin() ~~~
     // Request a list of modules installed for the Simulator.
     requestModuleList(path: string): void,

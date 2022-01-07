@@ -3,7 +3,7 @@
 import { ControlData, ModuleControlsJson } from "./ControlReferenceInterface";
 
 function flattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlData[] {
-  let controls: ControlData[] = [];
+  const controls: ControlData[] = [];
 
   Object.keys(moduleControls).forEach((category) =>
     Object.keys(moduleControls[category]).forEach((control) => {

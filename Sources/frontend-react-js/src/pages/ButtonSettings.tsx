@@ -5,17 +5,14 @@ import Backdrop from "../components/ui/Backdrop";
 import Modal from "../components/ui/Modal";
 
 import { ControlData } from "../components/control-reference/ControlReferenceInterface"
-import { StreamdeckApi, StreamdeckButtonSettings, StreamdeckGlobalSettings } from "../comms/StreamdeckApi";
+import StreamdeckApi from "../comms/StreamdeckApi";
 
 interface Props {
-  streamdeckApi: StreamdeckApi,
-  sdButtonSettings: StreamdeckButtonSettings,
-  sdGlobalSettings: StreamdeckGlobalSettings,
+  sdApi: StreamdeckApi
 }
 
-function ButtonSettings({ streamdeckApi, sdButtonSettings, sdGlobalSettings }: Props) {
+function ButtonSettings({ sdApi }: Props): JSX.Element {
   const [selectedControlReference, setSelectedControlReference] = useState<ControlData | null>(null);
-  const isSelection: boolean = (selectedControlReference != null);
 
   function handleControlReferenceSelect(controlData: ControlData) {
     setSelectedControlReference(controlData);
@@ -26,17 +23,21 @@ function ButtonSettings({ streamdeckApi, sdButtonSettings, sdGlobalSettings }: P
     setSelectedControlReference(null);
   }
 
+  let modal = null
+  if (selectedControlReference) {
+    modal = <div>
+      <Modal controlData={selectedControlReference} onClick={clearSelection} />
+      <Backdrop onClick={clearSelection} />
+    </div>;
+  }
+
   return (
     <div>
       <ControlReference
+        sdApi={sdApi}
         onSelect={handleControlReferenceSelect}
-        streamdeckApi={streamdeckApi}
-        globalSettings={sdGlobalSettings}
       />
-      {isSelection && (
-        <Modal controlData={selectedControlReference!} onClick={clearSelection} />
-      )}
-      {isSelection && <Backdrop onClick={clearSelection} />}
+      {modal}
     </div>
   );
 }
