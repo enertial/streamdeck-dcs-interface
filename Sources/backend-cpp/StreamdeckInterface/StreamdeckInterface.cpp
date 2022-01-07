@@ -119,8 +119,10 @@ void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
     // settings to be used before binding socket to default port values.
     if (!simulator_interface_) {
         try {
-            simulator_interface_ = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
-            mConnectionManager->LogMessage("Successfully connected to Simulator Interface UDP port");
+            simulator_interface_ = SimulatorInterfaceFactory(connection_settings, "DCS-BIOS");
+            if (simulator_interface_) {
+                mConnectionManager->LogMessage("Successfully connected to Simulator Interface UDP port");
+            }
         } catch (const std::exception &e) {
             mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
         }
@@ -210,6 +212,7 @@ void StreamdeckInterface::DeviceDidConnect(const std::string &inDeviceID, const 
     // Request global settings from Streamdeck.
     if (mConnectionManager != nullptr) {
         mConnectionManager->GetGlobalSettings();
+        mConnectionManager->LogMessage("Streamdeck Device Connected");
     }
 }
 
@@ -224,6 +227,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                        const std::string &inDeviceID)
 {
     const std::string event = EPLJSONUtils::GetStringByName(inPayload, "event");
+    mConnectionManager->LogMessage("Received SendToPlugin event: " + event + " Payload: " + inPayload.dump());
 
     if (event == "SettingsUpdate") {
         // Update settings for the specified context -- triggered by Property Inspector detecting a change.

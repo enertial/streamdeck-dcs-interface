@@ -6,6 +6,7 @@ import Modal from "../components/ui/Modal";
 
 import { ControlData } from "../components/control-reference/ControlReferenceInterface"
 import StreamdeckApi from "../comms/StreamdeckApi";
+import UserInput from "./UserInput";
 
 interface Props {
   sdApi: StreamdeckApi
@@ -27,8 +28,8 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
   if (selectedControlReference) {
     modal = <div>
       <Modal controlData={selectedControlReference} onClick={clearSelection} />
-      <Backdrop onClick={clearSelection} />
     </div>;
+    // <Backdrop onClick={clearSelection} />
   }
 
   return (
@@ -38,6 +39,7 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
         onSelect={handleControlReferenceSelect}
       />
       {modal}
+      <UserInput sdApi={sdApi} />
     </div>
   );
 }
