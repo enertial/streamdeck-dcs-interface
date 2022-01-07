@@ -1,0 +1,9 @@
+coverage:
+  status:
+    default_rules:
+      if_ci_failed: error
+    project:
+      default:
+        flags:
+          - Cpp
+          - ReactJS
