@@ -8,3 +8,5 @@ coverage:
         flags:
           - Cpp
           - ReactJS
+comment:
+    after_n_builds: 2
