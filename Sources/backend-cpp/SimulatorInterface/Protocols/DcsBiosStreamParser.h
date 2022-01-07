@@ -56,5 +56,5 @@ class DcsBiosStreamParser
     bool _at_end_of_frame = false;
 
     std::unordered_map<unsigned int, unsigned int> _data_by_address_in_current_frame;
-    const size_t MAX_NUM_ADDRESSES_STORED_PER_FRAME = 100;
+    const size_t MAX_NUM_ADDRESSES_STORED_PER_FRAME = 1024;
 };
