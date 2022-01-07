@@ -1,7 +1,7 @@
 coverage:
   status:
     default_rules:
-      if_ci_failed: error
+      if_ci_failed: success
       flag_coverage_not_uploaded_behavior: exclude
     project:
       default:
