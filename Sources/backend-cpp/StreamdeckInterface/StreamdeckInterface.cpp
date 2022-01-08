@@ -120,6 +120,7 @@ void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
     if (!simulator_interface_) {
         try {
             simulator_interface_ = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+            mConnectionManager->LogMessage("Successfully connected to Simulator Interface UDP port");
         } catch (const std::exception &e) {
             mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
         }
@@ -180,7 +181,13 @@ void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
     mVisibleContextsMutex.lock();
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-    mVisibleContexts[inContext] = streamdeck_context_factory.create(inAction, inContext, settings);
+    auto newContext = streamdeck_context_factory.create(inAction, inContext, settings);
+    if (newContext) {
+        mVisibleContexts[inContext] = std::move(newContext);
+    } else {
+        mConnectionManager->LogMessage("Unable to handle button of type: " + inAction + " context: " + inContext +
+                                       " with Settings: " + settings.dump());
+    }
     if (simulator_interface_) {
         mVisibleContexts[inContext]->forceSendState(mConnectionManager);
     }
