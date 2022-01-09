@@ -21,7 +21,7 @@ int main()
 {
     signal(SIGINT, signalInteruptHandler);
 
-    UdpSocket socket("0.0.0.0", "5010", "7778", "239.255.50.10");
+    UdpSocket socket("127.0.0.1", "5010", "7778", "239.255.50.10");
     std::ofstream log_file;
     log_file.open("./socket_dump.log");
 
