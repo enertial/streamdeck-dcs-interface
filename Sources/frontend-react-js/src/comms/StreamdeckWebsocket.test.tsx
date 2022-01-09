@@ -19,6 +19,8 @@ function UserOfStreamdeckWebsocket() {
             <button id="setSettings" onClick={() => { sdApi.commFns.setSettings(exampleButtonSettings) }}>setSettings</button>
             <button onClick={() => { sdApi.commFns.setGlobalSettings(exampleGlobalSettings) }}>setGlobalSettings</button>
             <button onClick={() => { sdApi.commFns.logMessage("test log message") }}>logMessage</button>
+            <button onClick={() => { sdApi.commFns.sendSettingsToPlugin(exampleButtonSettings) }}>sendSettingsToPlugin</button>
+            <button onClick={() => { sdApi.commFns.requestSimulationState() }}>requestSimulationState</button>
             <button onClick={() => { sdApi.commFns.requestModuleList("test_path") }}>requestModuleList</button>
             <button onClick={() => { sdApi.commFns.requestModule("test_filename") }}>requestModuleFile</button>
             <div>buttonSettings: {JSON.stringify(sdApi.buttonSettings)}</div>
@@ -52,10 +54,12 @@ test("connect to Streamdeck websocket and onopen publishes registerPropertyInspe
 test("send setSettings", async () => {
     // Setup
     const expectedMessage = JSON.stringify({ event: "setSettings", context: socketSettings.propertyInspectorUUID, payload: exampleButtonSettings });
+    const expectedMessageToPlugin = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "SettingsUpdate", settings: exampleButtonSettings } });
     // Action
     fireEvent.click(screen.getByText(/setSettings/i));
     // Verification
     await expect(mockServer).toReceiveMessage(expectedMessage);
+    await expect(mockServer).toReceiveMessage(expectedMessageToPlugin);
 });
 
 test("send setGlobalSettings", async () => {
@@ -72,6 +76,24 @@ test("send logMessage", async () => {
     const expectedMessage = JSON.stringify({ event: "logMessage", context: socketSettings.propertyInspectorUUID, payload: { message: "test log message" } });
     // Action
     fireEvent.click(screen.getByText(/logMessage/i));
+    // Verification
+    await expect(mockServer).toReceiveMessage(expectedMessage);
+});
+
+test("send sendSettingsToPlugin", async () => {
+    // Setup
+    const expectedMessage = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "SettingsUpdate", settings: exampleButtonSettings } });
+    // Action
+    fireEvent.click(screen.getByText(/sendSettingsToPlugin/i));
+    // Verification
+    await expect(mockServer).toReceiveMessage(expectedMessage);
+});
+
+test("send requestSimulationState", async () => {
+    // Setup
+    const expectedMessage = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "RequestDcsStateUpdate" } });
+    // Action
+    fireEvent.click(screen.getByText(/requestSimulationState/i));
     // Verification
     await expect(mockServer).toReceiveMessage(expectedMessage);
 });

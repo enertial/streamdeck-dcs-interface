@@ -25,6 +25,10 @@ export interface StreamdeckCommFns {
     logMessage(message: string): void;
 
     // Messages sent to the C++ plugin:
+    // Send button settings to plugin.
+    sendSettingsToPlugin(settings: StreamdeckButtonSettings): void,
+    // Request the full state of the simulation in memory.
+    requestSimulationState(): void,
     // Request a list of modules installed for the Simulator.
     requestModuleList(path: string): void,
     // Request reference data for an individual module.

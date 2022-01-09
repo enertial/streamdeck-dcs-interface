@@ -50,6 +50,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
 
             setSettings: function (settings: StreamdeckButtonSettings) {
                 send('setSettings', { payload: settings });
+                this.sendSettingsToPlugin(settings)
             },
 
             getGlobalSettings: function () {
@@ -62,6 +63,14 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
 
             logMessage: function (message: string) {
                 send('logMessage', { payload: { message: message } });
+            },
+
+            sendSettingsToPlugin: function (settings: StreamdeckButtonSettings) {
+                sendToPlugin({ event: "SettingsUpdate", settings: settings });
+            },
+
+            requestSimulationState: function () {
+                sendToPlugin({ event: "RequestDcsStateUpdate" });
             },
 
             requestModuleList: function (path: string) {
