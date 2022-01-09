@@ -29,6 +29,19 @@ TEST(UdpSocketTest, multicast_port_builds)
     UdpSocket multicast_subscriber_socket("0.0.0.0", "5010", "7778", "239.255.50.10");
 }
 
+TEST(UdpSocketTest, send_on_localhost_and_receive_multicast)
+{
+    UdpSocket multicast_subscriber_socket("127.0.0.1", "5010", "7778", "239.255.50.10");
+    // Test that no errors occur when connecting to multicast group.
+    UdpSocket server_socket("127.0.0.1", "7778", "7779", "");
+    const std::string expected_message = "test_message";
+    const int num_bytes_sent = multicast_subscriber_socket.send_string(expected_message);
+
+    std::stringstream ss_received = server_socket.receive_stream();
+    EXPECT_EQ(num_bytes_sent, expected_message.length());
+    EXPECT_EQ(ss_received.str(), expected_message);
+}
+
 class UdpSocketTestFixture : public ::testing::Test
 {
   public:

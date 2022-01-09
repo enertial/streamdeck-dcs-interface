@@ -39,7 +39,8 @@ UdpSocket::UdpSocket(const std::string &ip_address,
 
     // Define local receive port.
     addrinfo *local_port;
-    auto result = getaddrinfo(ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
+    const auto receive_ip_address = multicast_addr.empty() ? ip_address : "0.0.0.0";
+    auto result = getaddrinfo(receive_ip_address.c_str(), rx_port.c_str(), &hints, &local_port);
     if (result != 0) {
         const std::string error_msg = "Could not get valid address info from requested IP: " + ip_address +
                                       " Rx_Port: " + rx_port + " Tx_Port: " + tx_port +
@@ -78,7 +79,7 @@ UdpSocket::UdpSocket(const std::string &ip_address,
         ip_mreq mreq;
         const std::wstring multicast_addr_L = std::wstring(multicast_addr.begin(), multicast_addr.end());
         InetPton(AF_INET, multicast_addr_L.c_str(), &mreq.imr_multiaddr.s_addr);
-        mreq.imr_interface.s_addr = htonl(std::stoi(ip_address));
+        mreq.imr_interface.s_addr = htonl(std::stoi(receive_ip_address));
         result = setsockopt(socket_id_, IPPROTO_IP, IP_ADD_MEMBERSHIP, (char *)&mreq, sizeof(mreq));
         if (result != 0) {
             const std::string error_msg = "Failure in setting Multicast membership in socket options -- WSA Error: " +
