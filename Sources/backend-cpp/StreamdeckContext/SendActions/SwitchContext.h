@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "StreamdeckContext/StreamdeckContext.h"
+#include "StreamdeckContext/SendActions/SendActionInterface.h"
 
 #include <optional>
 #include <string>
 
-class SwitchContext : public StreamdeckContext
+class SwitchContext : public SendActionInterface
 {
   public:
-    using StreamdeckContext::StreamdeckContext;
+    SwitchContext() { delay_send_state_ = true; }
 
     /**
      * @brief Sends simulator commands according to button type and settings received during Key Pressed and Released
@@ -27,6 +27,4 @@ class SwitchContext : public StreamdeckContext
     void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                    ESDConnectionManager *mConnectionManager,
                                    const json &inPayload);
-
-    const int num_frames_delay_forced_state_update_ = 3; // Kept public for unit testing.
 };

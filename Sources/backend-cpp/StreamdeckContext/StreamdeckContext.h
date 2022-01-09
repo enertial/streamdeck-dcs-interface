@@ -7,6 +7,7 @@
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
+#include "StreamdeckContext/SendActions/SendActionInterface.h"
 #include "Utilities/StringUtilities.h"
 
 #include <memory>
@@ -17,8 +18,10 @@ class StreamdeckContext
 {
   public:
     StreamdeckContext() = default;
-    StreamdeckContext(const std::string &context);
-    StreamdeckContext(const std::string &context, const json &settings);
+    StreamdeckContext(const std::string &action, const std::string &context, const json &settings);
+
+    // Detect if constructed context is valid.
+    bool is_valid();
 
     /**
      * @brief Queries the simulator_interface for updates to the Context's monitored DCS IDs.
@@ -60,28 +63,29 @@ class StreamdeckContext
      * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                          ESDConnectionManager *mConnectionManager,
-                                          const json &inPayload){};
+    void handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                  ESDConnectionManager *mConnectionManager,
+                                  const json &inPayload);
 
-    virtual void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                           ESDConnectionManager *mConnectionManager,
-                                           const json &inPayload){};
+    void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                   ESDConnectionManager *mConnectionManager,
+                                   const json &inPayload);
+
+    static const int NUM_FRAMES_DELAY_FORCED_STATE_UPDATE = 3; // Kept public for unit testing.
+
+  private:
+    std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
+    // Mutable context state.
+    int current_state_ = 0;          // Stored state of the context.
+    std::string current_title_ = ""; // Stored title of the context.
 
     // Monitors.
     ImageStateMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.
     TitleMonitor title_monitor_{};           // Monitors DCS ID to determine the title text of Streamdeck context.
-    IncrementMonitor increment_monitor_{};   // Monitors DCS ID to determine the state of an incremental switch.
-
-  private:
-    std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
+    // SendAction.
+    std::unique_ptr<SendActionInterface> send_action_{}; // Holds the actions to take on Button Pressed/Released events.
 
     // Optional settings.
     std::optional<int> delay_for_force_send_state_; // When populated, requests a force send of state to Streamdeck
                                                     // after counting down the stored delay value.
-
-    // Context state.
-    int current_state_ = 0;              // Stored state of the context.
-    std::string current_title_ = "";     // Stored title of the context.
-    bool disable_release_value_ = false; // Flag set by user settings for momentary button types.
 };

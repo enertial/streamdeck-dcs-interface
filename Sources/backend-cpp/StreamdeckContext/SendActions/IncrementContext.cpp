@@ -2,15 +2,22 @@
 
 #include "IncrementContext.h"
 
+#include "Utilities/StringUtilities.h"
+
 #include "ElgatoSD/EPLJSONUtils.h"
 
 void IncrementContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {
-    const auto send_address = EPLJSONUtils::GetStringByName(inPayload["settings"], "send_address");
+    const auto settings = inPayload["settings"];
+    const auto send_address = EPLJSONUtils::GetStringByName(settings, "send_address");
 
-    const auto send_command = determineSendValue(inPayload["settings"]);
+    // TODO: simplify increment monitor interface as this is currently the only user.
+    increment_monitor_.update_settings(settings);
+    increment_monitor_.update(simulator_interface);
+
+    const auto send_command = determineSendValue(settings);
     if (send_command) {
         simulator_interface->send_simulator_command(send_address, send_command.value());
     }
@@ -20,10 +27,6 @@ void IncrementContext::handleButtonReleasedEvent(const std::unique_ptr<Simulator
                                                  ESDConnectionManager *mConnectionManager,
                                                  const json &inPayload)
 {
-    // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
-    // context's state will keep the button state in sync with the plugin.
-    forceSendState(mConnectionManager);
-
     // Nothing sent to DCS on release.
 }
 

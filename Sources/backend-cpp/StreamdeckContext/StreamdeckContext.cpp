@@ -2,14 +2,17 @@
 
 #include "StreamdeckContext.h"
 
+#include "StreamdeckContext/SendActions/SendActionFactory.h"
+
 #include "ElgatoSD/EPLJSONUtils.h"
 
-StreamdeckContext::StreamdeckContext(const std::string &context) : context_{context} {};
-
-StreamdeckContext::StreamdeckContext(const std::string &context, const json &settings) : context_{context}
+StreamdeckContext::StreamdeckContext(const std::string &action, const std::string &context, const json &settings)
+    : context_{context}, send_action_(SendActionFactory().create(action))
 {
     updateContextSettings(settings);
 }
+
+bool StreamdeckContext::is_valid() { return (send_action_ != nullptr); }
 
 void StreamdeckContext::updateContextState(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                            ESDConnectionManager *mConnectionManager)
@@ -17,7 +20,6 @@ void StreamdeckContext::updateContextState(const std::unique_ptr<SimulatorInterf
 
     const auto updated_state = comparison_monitor_.determineContextState(simulator_interface);
     const auto updated_title = title_monitor_.determineTitle(simulator_interface);
-    increment_monitor_.update(simulator_interface);
 
     if (updated_state != current_state_) {
         current_state_ = updated_state;
@@ -50,5 +52,26 @@ void StreamdeckContext::updateContextSettings(const json &settings)
 {
     comparison_monitor_.update_settings(settings);
     title_monitor_.update_settings(settings);
-    increment_monitor_.update_settings(settings);
+}
+
+void StreamdeckContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                                 ESDConnectionManager *mConnectionManager,
+                                                 const json &inPayload)
+{
+    send_action_->handleButtonPressedEvent(simulator_interface, mConnectionManager, inPayload);
+}
+
+void StreamdeckContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                                  ESDConnectionManager *mConnectionManager,
+                                                  const json &inPayload)
+{
+    send_action_->handleButtonReleasedEvent(simulator_interface, mConnectionManager, inPayload);
+
+    // The Streamdeck will by default change a context's state after a KeyUp event, so a force send of the current
+    // context's state will keep the button state in sync with the plugin.
+    if (send_action_->delay_send_state()) {
+        forceSendStateAfterDelay(NUM_FRAMES_DELAY_FORCED_STATE_UPDATE);
+    } else {
+        forceSendState(mConnectionManager);
+    }
 }

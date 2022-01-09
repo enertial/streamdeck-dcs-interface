@@ -140,7 +140,7 @@ void StreamdeckInterface::UpdateFromGameState()
         if (mConnectionManager != nullptr) {
             mVisibleContextsMutex.lock();
             for (auto &elem : mVisibleContexts) {
-                elem.second->updateContextState(simulator_interface_, mConnectionManager);
+                elem.second.updateContextState(simulator_interface_, mConnectionManager);
             }
             mVisibleContextsMutex.unlock();
         }
@@ -154,7 +154,7 @@ void StreamdeckInterface::KeyDownForAction(const std::string &inAction,
 {
     if (simulator_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext]->handleButtonPressedEvent(simulator_interface_, mConnectionManager, inPayload);
+        mVisibleContexts[inContext].handleButtonPressedEvent(simulator_interface_, mConnectionManager, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -167,7 +167,7 @@ void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
 
     if (simulator_interface_) {
         mVisibleContextsMutex.lock();
-        mVisibleContexts[inContext]->handleButtonReleasedEvent(simulator_interface_, mConnectionManager, inPayload);
+        mVisibleContexts[inContext].handleButtonReleasedEvent(simulator_interface_, mConnectionManager, inPayload);
         mVisibleContextsMutex.unlock();
     }
 }
@@ -177,21 +177,21 @@ void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
                                               const json &inPayload,
                                               const std::string &inDeviceID)
 {
-    // Remember the context.
-    mVisibleContextsMutex.lock();
-    json settings;
-    EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-    auto newContext = streamdeck_context_factory.create(inAction, inContext, settings);
-    if (newContext) {
+    const auto settings = inPayload["settings"];
+    auto newContext = StreamdeckContext(inAction, inContext, settings);
+
+    if (newContext.is_valid()) {
+        mVisibleContextsMutex.lock();
+        // Remember the context.
         mVisibleContexts[inContext] = std::move(newContext);
+        if (simulator_interface_) {
+            mVisibleContexts[inContext].forceSendState(mConnectionManager);
+        }
+        mVisibleContextsMutex.unlock();
     } else {
         mConnectionManager->LogMessage("Unable to handle button of type: " + inAction + " context: " + inContext +
                                        " with Settings: " + settings.dump());
     }
-    if (simulator_interface_) {
-        mVisibleContexts[inContext]->forceSendState(mConnectionManager);
-    }
-    mVisibleContextsMutex.unlock();
 }
 
 void StreamdeckInterface::WillDisappearForAction(const std::string &inAction,
@@ -229,7 +229,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         // Update settings for the specified context -- triggered by Property Inspector detecting a change.
         mVisibleContextsMutex.lock();
         if (mVisibleContexts.count(inContext) > 0) {
-            mVisibleContexts[inContext]->updateContextSettings(inPayload["settings"]);
+            mVisibleContexts[inContext].updateContextSettings(inPayload["settings"]);
         }
         mVisibleContextsMutex.unlock();
     }

@@ -16,7 +16,6 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     IncrementContextKeyPressTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
-          fixture_context(fixture_context_id),
           // Create default json payload.
           payload({{"state", 0},
                    {"settings",
@@ -30,13 +29,11 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
         simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive_stream();
-        fixture_context.updateContextSettings(payload["settings"]);
     }
     SimulatorConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
     UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
     std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    std::string fixture_context_id = "abc123";
     IncrementContext fixture_context;
 
     std::string send_address = "23,2";
@@ -63,7 +60,6 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     std::string mock_dcs_message = "header*" + dcs_id_increment_monitor + "=" + external_increment_start;
     mock_dcs.send_string(mock_dcs_message);
     simulator_interface->update_simulator_state();
-    fixture_context.updateContextState(simulator_interface, &esd_connection_manager);
 
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();
@@ -80,13 +76,4 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keyup_increment)
     std::string expected_command = "";
     EXPECT_EQ(expected_command, ss_received.str());
 }
-
-TEST_F(IncrementContextKeyPressTestFixture, handle_keyup_force_state_update_called)
-{
-    fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
-    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
-    fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
-    EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 1);
-}
-
 } // namespace test

@@ -2,15 +2,15 @@
 
 #pragma once
 
-#include "StreamdeckContext/StreamdeckContext.h"
+#include "StreamdeckContext/SendActions/SendActionInterface.h"
 
 #include <optional>
 #include <string>
 
-class MomentaryContext : public StreamdeckContext
+class MomentaryContext : public SendActionInterface
 {
   public:
-    using StreamdeckContext::StreamdeckContext;
+    MomentaryContext() = default;
 
     /**
      * @brief Sends simulator commands according to button type and settings received during Key Down/Up event.
