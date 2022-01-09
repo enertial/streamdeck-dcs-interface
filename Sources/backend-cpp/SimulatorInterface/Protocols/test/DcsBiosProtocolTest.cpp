@@ -16,7 +16,7 @@ TEST(DcsBiosProtocolTest, invalid_connection_port_settings)
 
 TEST(DcsBiosProtocolTest, dcs_reset_command_on_construction)
 {
-    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", ""};
+    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1", "239.255.50.11"};
     UdpSocket mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port);
     DcsBiosProtocol simulator_interface(connection_settings);
 
@@ -74,21 +74,56 @@ TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module)
     EXPECT_EQ("AV8BNA", simulator_interface.get_current_simulator_module());
 }
 
-TEST_F(DcsBiosProtocolTestFixture, get_integer_and_string_values)
+TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_empty)
+{
+    // Test that nothing is returned when no state has been received yet.
+    simulator_interface.update_simulator_state();
+    EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 8)));
+    EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x5678, 0xFFFF, 0)));
+}
+
+TEST_F(DcsBiosProtocolTestFixture, get_integer_value)
 {
     // clang-format off
     const char mock_dcs_start_message[] = {0x55, 0x55, 0x55, 0x55,                          // Sync frame
-                                           0x34, 0x12, 0x08, 0x00,                          // Addr 0x1234 (8 bytes)
-                                           'T', 'e', 's', 't', 'S', 't', 'r', '\0',         // String contents
                                            0x78, 0x56, 0x02, 0x00, 0x07, 0x00,              // Addr 0x5678 (2 bytes)
                                            (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
     // clang-format on
     mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_EQ("TestStr", simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 8)));
     EXPECT_TRUE(Decimal(7, 0) ==
                 simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x5678, 0xFFFF, 0)));
+}
+
+TEST_F(DcsBiosProtocolTestFixture, get_string_value_max_length)
+{
+    constexpr int MAX_STRING_LEN = 8;
+    // clang-format off
+    const char mock_dcs_start_message[] = {0x55, 0x55, 0x55, 0x55,                          // Sync frame
+                                           0x34, 0x12, MAX_STRING_LEN, 0x00,                // Addr 0x1234 (8 bytes)
+                                           'T', 'e', 's', 't', 'S', 't', 'r', '!',          // String contents
+                                           (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    // clang-format on
+    mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
+    simulator_interface.update_simulator_state();
+
+    EXPECT_EQ("TestStr!",
+              simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, MAX_STRING_LEN)));
+}
+
+TEST_F(DcsBiosProtocolTestFixture, get_string_value_null_terminated)
+{
+    // clang-format off
+    const char mock_dcs_start_message[] = {0x55, 0x55, 0x55, 0x55,                          // Sync frame
+                                           0x34, 0x12, 0x08, 0x00,                          // Addr 0x1234 (8 bytes)
+                                           'T', 'e', 's', 't', 'S', 't', 'r', '\0',         // String contents
+                                           (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    // clang-format on
+    mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
+    simulator_interface.update_simulator_state();
+
+    EXPECT_EQ("TestStr", simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 8)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrites_values)

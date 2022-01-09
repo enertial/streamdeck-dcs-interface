@@ -16,7 +16,7 @@ void DcsBiosProtocol::update_simulator_state()
     char message_buffer[MAX_UDP_MSG_SIZE];
     const int message_size = simulator_socket_.receive_bytes(message_buffer, MAX_UDP_MSG_SIZE);
     // Read byte by byte.
-    for (size_t i = 0; i < message_size; i++) {
+    for (int i = 0; i < message_size; i++) {
         protocol_parser_.processByte(message_buffer[i], current_game_state_by_address_);
         if (protocol_parser_.at_end_of_frame()) {
             monitor_for_module_change();
@@ -34,17 +34,18 @@ void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send_st
 
 std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(const SimulatorAddress &address) const
 {
-    if (address.type != AddressType::STRING) {
+    const bool data_exists_at_start_address = current_game_state_by_address_.count(address.address) > 0;
+    if (address.type != AddressType::STRING || !data_exists_at_start_address) {
         return std::nullopt;
     }
 
     std::string assembled_string = "";
     for (unsigned int loc = address.address; loc < address.address + address.max_length; loc += 2) {
-        if (current_game_state_by_address_.count(address.address) > 0) {
+        if (current_game_state_by_address_.count(loc) > 0) {
             // Convert 16-bit data at current location to 2 characters.
             char characters[2];
             memcpy(characters, &current_game_state_by_address_.at(loc), sizeof(characters));
-            // Append characters to string, returning once encountering a null character.
+            // Append characters to string, returning early if encountering a null character.
             for (char character : characters) {
                 if (character == '\0') {
                     return assembled_string;
@@ -54,7 +55,7 @@ std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(
             }
         }
     }
-    return std::nullopt;
+    return assembled_string;
 }
 
 std::optional<Decimal> DcsBiosProtocol::get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
