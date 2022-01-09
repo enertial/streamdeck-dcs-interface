@@ -2,17 +2,17 @@
 
 #include "gtest/gtest.h"
 
-#include "StreamdeckContext/SendActions/SwitchContext.h"
+#include "StreamdeckContext/SendActions/SwitchAction.h"
 
 #include "SimulatorInterface/SimulatorInterfaceFactory.h"
 #include "Test/MockESDConnectionManager.h"
 namespace test
 {
 
-class SwitchContextKeyPressTestFixture : public ::testing::Test
+class SwitchActionKeyPressTestFixture : public ::testing::Test
 {
   public:
-    SwitchContextKeyPressTestFixture()
+    SwitchActionKeyPressTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           // Create default json payload.
@@ -31,7 +31,7 @@ class SwitchContextKeyPressTestFixture : public ::testing::Test
     UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
     std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    SwitchContext fixture_context;
+    SwitchAction fixture_context;
 
     std::string send_address = "23,2";
     std::string send_when_first_state_value = "6";
@@ -39,7 +39,7 @@ class SwitchContextKeyPressTestFixture : public ::testing::Test
     json payload;
 };
 
-TEST_F(SwitchContextKeyPressTestFixture, handle_keyup_switch_in_first_state)
+TEST_F(SwitchActionKeyPressTestFixture, handle_keyup_switch_in_first_state)
 {
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();
@@ -47,7 +47,7 @@ TEST_F(SwitchContextKeyPressTestFixture, handle_keyup_switch_in_first_state)
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(SwitchContextKeyPressTestFixture, handle_keyup_switch_in_second_state)
+TEST_F(SwitchActionKeyPressTestFixture, handle_keyup_switch_in_second_state)
 {
     payload["state"] = 1;
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
@@ -56,7 +56,7 @@ TEST_F(SwitchContextKeyPressTestFixture, handle_keyup_switch_in_second_state)
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(SwitchContextKeyPressTestFixture, handle_keydown_switch)
+TEST_F(SwitchActionKeyPressTestFixture, handle_keydown_switch)
 {
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();
@@ -65,7 +65,7 @@ TEST_F(SwitchContextKeyPressTestFixture, handle_keydown_switch)
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(SwitchContextKeyPressTestFixture, handle_keyup_switch_empty_value)
+TEST_F(SwitchActionKeyPressTestFixture, handle_keyup_switch_empty_value)
 {
     payload["settings"]["send_when_first_state_value"] = "";
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);

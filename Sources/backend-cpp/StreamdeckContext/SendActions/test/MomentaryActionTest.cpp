@@ -3,17 +3,17 @@
 #include "gtest/gtest.h"
 
 #include "SimulatorInterface/SimulatorInterfaceFactory.h"
-#include "StreamdeckContext/SendActions/MomentaryContext.h"
+#include "StreamdeckContext/SendActions/MomentaryAction.h"
 
 #include "Test/MockESDConnectionManager.h"
 
 namespace test
 {
 
-class MomentaryContextKeyPressTestFixture : public ::testing::Test
+class MomentaryActionKeyPressTestFixture : public ::testing::Test
 {
   public:
-    MomentaryContextKeyPressTestFixture()
+    MomentaryActionKeyPressTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           // Create default json payload.
@@ -32,7 +32,7 @@ class MomentaryContextKeyPressTestFixture : public ::testing::Test
     UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
     std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    MomentaryContext fixture_context;
+    MomentaryAction fixture_context;
 
     std::string send_address = "23,2";
     std::string press_value = "4";
@@ -40,7 +40,7 @@ class MomentaryContextKeyPressTestFixture : public ::testing::Test
     json payload;
 };
 
-TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary)
+TEST_F(MomentaryActionKeyPressTestFixture, handle_keydown_momentary)
 {
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();
@@ -48,7 +48,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary)
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary)
+TEST_F(MomentaryActionKeyPressTestFixture, handle_keyup_momentary)
 {
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();
@@ -56,7 +56,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary)
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary_release_send_disabled)
+TEST_F(MomentaryActionKeyPressTestFixture, handle_keyup_momentary_release_send_disabled)
 {
     payload["settings"]["disable_release_check"] = true;
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
@@ -65,7 +65,7 @@ TEST_F(MomentaryContextKeyPressTestFixture, handle_keyup_momentary_release_send_
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(MomentaryContextKeyPressTestFixture, handle_keydown_momentary_empty_value)
+TEST_F(MomentaryActionKeyPressTestFixture, handle_keydown_momentary_empty_value)
 {
     payload["settings"]["press_value"] = "";
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);

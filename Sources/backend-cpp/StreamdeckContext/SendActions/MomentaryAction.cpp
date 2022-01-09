@@ -1,12 +1,12 @@
 // Copyright 2021 Charles Tytler
 
-#include "MomentaryContext.h"
+#include "MomentaryAction.h"
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void MomentaryContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                                ESDConnectionManager *mConnectionManager,
-                                                const json &inPayload)
+void MomentaryAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                               ESDConnectionManager *mConnectionManager,
+                                               const json &inPayload)
 {
     const auto send_address = EPLJSONUtils::GetStringByName(inPayload["settings"], "send_address");
     const auto send_command = EPLJSONUtils::GetStringByName(inPayload["settings"], "press_value");
@@ -16,9 +16,9 @@ void MomentaryContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorI
     }
 }
 
-void MomentaryContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                                 ESDConnectionManager *mConnectionManager,
-                                                 const json &inPayload)
+void MomentaryAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                                ESDConnectionManager *mConnectionManager,
+                                                const json &inPayload)
 {
     const auto send_address = EPLJSONUtils::GetStringByName(inPayload["settings"], "send_address");
     const auto send_command = EPLJSONUtils::GetStringByName(inPayload["settings"], "release_value");

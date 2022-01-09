@@ -3,17 +3,17 @@
 #include "gtest/gtest.h"
 
 #include "SimulatorInterface/SimulatorInterfaceFactory.h"
-#include "StreamdeckContext/SendActions/IncrementContext.h"
+#include "StreamdeckContext/SendActions/IncrementAction.h"
 
 #include "Test/MockESDConnectionManager.h"
 
 namespace test
 {
 
-class IncrementContextKeyPressTestFixture : public ::testing::Test
+class IncrementActionKeyPressTestFixture : public ::testing::Test
 {
   public:
-    IncrementContextKeyPressTestFixture()
+    IncrementActionKeyPressTestFixture()
         : // Mock DCS socket uses the reverse rx and tx ports of simulator_interface so it can communicate with it.
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           // Create default json payload.
@@ -34,7 +34,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
     std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
     MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    IncrementContext fixture_context;
+    IncrementAction fixture_context;
 
     std::string send_address = "23,2";
     std::string dcs_id_increment_monitor = "321";
@@ -44,7 +44,7 @@ class IncrementContextKeyPressTestFixture : public ::testing::Test
     json payload;
 };
 
-TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment)
+TEST_F(IncrementActionKeyPressTestFixture, handle_keydown_increment)
 {
     fixture_context.handleButtonPressedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();
@@ -52,7 +52,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment)
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_external_increment_change)
+TEST_F(IncrementActionKeyPressTestFixture, handle_keydown_increment_after_external_increment_change)
 {
     // Receive a value update from DCS game state for increment monitor.
     const std::string external_increment_start = "0.5";
@@ -68,7 +68,7 @@ TEST_F(IncrementContextKeyPressTestFixture, handle_keydown_increment_after_exter
     EXPECT_EQ(expected_command, ss_received.str());
 }
 
-TEST_F(IncrementContextKeyPressTestFixture, handle_keyup_increment)
+TEST_F(IncrementActionKeyPressTestFixture, handle_keyup_increment)
 {
     fixture_context.handleButtonReleasedEvent(simulator_interface, &esd_connection_manager, payload);
     const std::stringstream ss_received = mock_dcs.receive_stream();

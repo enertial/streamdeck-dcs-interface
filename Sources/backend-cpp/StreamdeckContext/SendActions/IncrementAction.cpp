@@ -1,14 +1,14 @@
 // Copyright 2021 Charles Tytler
 
-#include "IncrementContext.h"
+#include "IncrementAction.h"
 
 #include "Utilities/StringUtilities.h"
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void IncrementContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                                ESDConnectionManager *mConnectionManager,
-                                                const json &inPayload)
+void IncrementAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                               ESDConnectionManager *mConnectionManager,
+                                               const json &inPayload)
 {
     const auto settings = inPayload["settings"];
     const auto send_address = EPLJSONUtils::GetStringByName(settings, "send_address");
@@ -23,14 +23,14 @@ void IncrementContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorI
     }
 }
 
-void IncrementContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                                 ESDConnectionManager *mConnectionManager,
-                                                 const json &inPayload)
+void IncrementAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                                ESDConnectionManager *mConnectionManager,
+                                                const json &inPayload)
 {
     // Nothing sent to DCS on release.
 }
 
-std::optional<std::string> IncrementContext::determineSendValue(const json &settings)
+std::optional<std::string> IncrementAction::determineSendValue(const json &settings)
 {
     const auto increment_cmd_value_str = EPLJSONUtils::GetStringByName(settings, "increment_value");
     const auto increment_min_str = EPLJSONUtils::GetStringByName(settings, "increment_min");

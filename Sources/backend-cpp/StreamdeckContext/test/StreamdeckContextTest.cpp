@@ -8,9 +8,9 @@
 #include "StreamdeckContext/StreamdeckContext.h"
 
 #include "SimulatorInterface/SimulatorInterfaceFactory.h"
-#include "StreamdeckContext/SendActions/IncrementContext.h"
-#include "StreamdeckContext/SendActions/MomentaryContext.h"
-#include "StreamdeckContext/SendActions/SwitchContext.h"
+#include "StreamdeckContext/SendActions/IncrementAction.h"
+#include "StreamdeckContext/SendActions/MomentaryAction.h"
+#include "StreamdeckContext/SendActions/SwitchAction.h"
 
 namespace test
 {

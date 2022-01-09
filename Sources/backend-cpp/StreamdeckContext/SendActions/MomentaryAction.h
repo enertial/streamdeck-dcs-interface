@@ -7,10 +7,10 @@
 #include <optional>
 #include <string>
 
-class MomentaryContext : public SendActionInterface
+class MomentaryAction : public SendActionInterface
 {
   public:
-    MomentaryContext() = default;
+    MomentaryAction() = default;
 
     /**
      * @brief Sends simulator commands according to button type and settings received during Key Down/Up event.

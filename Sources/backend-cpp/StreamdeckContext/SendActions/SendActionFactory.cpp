@@ -2,9 +2,9 @@
 
 #include "SendActionFactory.h"
 
-#include "StreamdeckContext/SendActions/IncrementContext.h"
-#include "StreamdeckContext/SendActions/MomentaryContext.h"
-#include "StreamdeckContext/SendActions/SwitchContext.h"
+#include "StreamdeckContext/SendActions/IncrementAction.h"
+#include "StreamdeckContext/SendActions/MomentaryAction.h"
+#include "StreamdeckContext/SendActions/SwitchAction.h"
 
 SendActionFactory::SendActionFactory()
 {
@@ -22,11 +22,11 @@ std::unique_ptr<SendActionInterface> SendActionFactory::create(const std::string
 {
     switch (button_action_from_uuid_[action_uuid]) {
     case ButtonAction::MOMENTARY:
-        return std::make_unique<MomentaryContext>();
+        return std::make_unique<MomentaryAction>();
     case ButtonAction::INCREMENT:
-        return std::make_unique<IncrementContext>();
+        return std::make_unique<IncrementAction>();
     case ButtonAction::SWITCH:
-        return std::make_unique<SwitchContext>();
+        return std::make_unique<SwitchAction>();
     default:
         return nullptr;
     }

@@ -1,19 +1,19 @@
 // Copyright 2021 Charles Tytler
 
-#include "SwitchContext.h"
+#include "SwitchAction.h"
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void SwitchContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                             ESDConnectionManager *mConnectionManager,
-                                             const json &inPayload)
+void SwitchAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                            ESDConnectionManager *mConnectionManager,
+                                            const json &inPayload)
 {
     // Nothing sent to DCS on press.
 }
 
-void SwitchContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
-                                              ESDConnectionManager *mConnectionManager,
-                                              const json &inPayload)
+void SwitchAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+                                             ESDConnectionManager *mConnectionManager,
+                                             const json &inPayload)
 {
     const auto send_address = EPLJSONUtils::GetStringByName(inPayload["settings"], "send_address");
     const auto send_when_first_state_value =

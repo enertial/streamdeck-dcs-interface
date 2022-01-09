@@ -2,16 +2,15 @@
 
 #pragma once
 
-#include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 #include "StreamdeckContext/SendActions/SendActionInterface.h"
 
 #include <optional>
 #include <string>
 
-class IncrementContext : public SendActionInterface
+class SwitchAction : public SendActionInterface
 {
   public:
-    IncrementContext() = default;
+    SwitchAction() { delay_send_state_ = true; }
 
     /**
      * @brief Sends simulator commands according to button type and settings received during Key Pressed and Released
@@ -28,15 +27,4 @@ class IncrementContext : public SendActionInterface
     void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
                                    ESDConnectionManager *mConnectionManager,
                                    const json &inPayload);
-
-  private:
-    IncrementMonitor increment_monitor_{}; // Monitors DCS ID to determine the state of an incremental switch.
-
-    /**
-     * @brief Determines the send value for the type of button for KeyDown and KeyUp events.
-     *
-     * @param settings Settings for context.
-     * @return (Optional) Value to be sent to Button ID if it exists.
-     */
-    std::optional<std::string> determineSendValue(const json &settings);
 };
