@@ -12,6 +12,7 @@ export default interface StreamdeckApi {
 }
 
 export interface StreamdeckCommFns {
+    // Messages sent to the Streamdeck Application:
     // Gets settings for the current Streamdeck button.
     getSettings: () => void;
     // Sets settings for the current Streamdeck button.
@@ -22,9 +23,8 @@ export interface StreamdeckCommFns {
     setGlobalSettings(payload: StreamdeckGlobalSettings): void;
     // Logs a message to the Elgato Streamdeck error log.
     logMessage(message: string): void;
-    // Sends a message to the C++ plugin executable.
-    sendToPlugin(action: string, payload: Record<string, unknown>): void,
-    // ~~~ The below are wrappers around sendToPlugin() ~~~
+
+    // Messages sent to the C++ plugin:
     // Request a list of modules installed for the Simulator.
     requestModuleList(path: string): void,
     // Request reference data for an individual module.
@@ -32,11 +32,31 @@ export interface StreamdeckCommFns {
 }
 
 export interface StreamdeckButtonSettings {
-    send_value: string;
+    // Simulator command settings
+    send_address: string;
+    press_value: string;
+    release_value: string;
+    disable_release_check: boolean;
+    // Title Monitor settings
+    dcs_id_string_monitor: string;
+    string_monitor_max_string_length: number;
+    string_monitor_vertical_spacing: string;
+    string_monitor_passthrough_check: boolean;
+    string_monitor_mapping: string;
 }
 
 export function defaultButtonSettings(): StreamdeckButtonSettings {
-    return { send_value: "" };
+    return {
+        send_address: "",
+        press_value: "",
+        release_value: "",
+        disable_release_check: false,
+        dcs_id_string_monitor: "",
+        string_monitor_max_string_length: 0,
+        string_monitor_vertical_spacing: "0",
+        string_monitor_passthrough_check: true,
+        string_monitor_mapping: "",
+    };
 }
 
 export interface StreamdeckGlobalSettings {

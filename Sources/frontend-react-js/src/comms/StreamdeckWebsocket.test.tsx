@@ -19,7 +19,6 @@ function UserOfStreamdeckWebsocket() {
             <button id="setSettings" onClick={() => { sdApi.commFns.setSettings(exampleButtonSettings) }}>setSettings</button>
             <button onClick={() => { sdApi.commFns.setGlobalSettings(exampleGlobalSettings) }}>setGlobalSettings</button>
             <button onClick={() => { sdApi.commFns.logMessage("test log message") }}>logMessage</button>
-            <button onClick={() => { sdApi.commFns.sendToPlugin("test_action", { test_key: "test_value" }) }}>sendToPlugin</button>
             <button onClick={() => { sdApi.commFns.requestModuleList("test_path") }}>requestModuleList</button>
             <button onClick={() => { sdApi.commFns.requestModule("test_filename") }}>requestModuleFile</button>
             <div>buttonSettings: {JSON.stringify(sdApi.buttonSettings)}</div>
@@ -32,7 +31,7 @@ beforeEach(async () => {
     render(<UserOfStreamdeckWebsocket />);
     await mockServer.connected;
     // StreamdeckWebsocket is expected to publish 2 messages on open.
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
         await mockServer.nextMessage;
     }
 })
@@ -45,8 +44,9 @@ test("connect to Streamdeck websocket and onopen publishes registerPropertyInspe
     // Messages expected on opening of websocket.
     const expectedRegistrationMessage = JSON.stringify({ event: "registerPropertyInspector", uuid: socketSettings.propertyInspectorUUID });
     const expectedGlobalSettingsUpdateRequest = JSON.stringify({ event: "getGlobalSettings", context: socketSettings.propertyInspectorUUID });
+    const expectedButtonSettingsUpdateRequest = JSON.stringify({ event: "getSettings", context: socketSettings.propertyInspectorUUID });
 
-    expect(mockServer).toHaveReceivedMessages([expectedRegistrationMessage, expectedGlobalSettingsUpdateRequest]);
+    expect(mockServer).toHaveReceivedMessages([expectedRegistrationMessage, expectedGlobalSettingsUpdateRequest, expectedButtonSettingsUpdateRequest]);
 });
 
 test("send setSettings", async () => {
@@ -76,18 +76,9 @@ test("send logMessage", async () => {
     await expect(mockServer).toReceiveMessage(expectedMessage);
 });
 
-test("send sendToPlugin", async () => {
-    // Setup
-    const expectedMessage = JSON.stringify({ event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, action: "test_action", payload: { test_key: "test_value" } });
-    // Action
-    fireEvent.click(screen.getByText(/sendToPlugin/i));
-    // Verification
-    await expect(mockServer).toReceiveMessage(expectedMessage);
-});
-
 test("send requestModuleList", async () => {
     // Setup
-    const expectedMessage = JSON.stringify({ event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, action: "", payload: { event: "requestModuleList", path: "test_path" } });
+    const expectedMessage = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "requestModuleList", path: "test_path" } });
     // Action
     fireEvent.click(screen.getByText(/requestModuleList/i));
     // Verification
@@ -96,7 +87,7 @@ test("send requestModuleList", async () => {
 
 test("send requestModule", async () => {
     // Setup
-    const expectedMessage = JSON.stringify({ event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, action: "", payload: { event: "requestControlReferenceJson", filename: "test_filename" } });
+    const expectedMessage = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "requestControlReferenceJson", filename: "test_filename" } });
     // Action
     fireEvent.click(screen.getByText(/requestModuleFile/i));
     // Verification

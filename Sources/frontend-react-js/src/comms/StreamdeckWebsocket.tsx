@@ -18,6 +18,7 @@ export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
 }
 
 export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings): StreamdeckApi {
+    const [buttonAction, setButtonAction] = useState("");
     const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings());
     const [globalSettings, setGlobalSettings] = useState(defaultGlobalSettings());
     const websocket = useRef<WebSocket | null>(null);
@@ -29,6 +30,17 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
             websocket.current?.send(JSON.stringify(json));
             console.log("Sent message (", event, "):", json);
+        }
+
+        // Sends a message to the C++ plugin executable.
+        function sendToPlugin(payload: Record<string, unknown>) {
+            const json = {
+                action: buttonAction,
+                event: "sendToPlugin",
+                context: socketSettings.propertyInspectorUUID,
+                payload: payload,
+            };
+            websocket.current?.send(JSON.stringify(json));
         }
 
         return {
@@ -52,23 +64,15 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 send('logMessage', { payload: { message: message } });
             },
 
-            sendToPlugin: function (action: string, payload: Record<string, unknown>) {
-                send('sendToPlugin',
-                    {
-                        action: action,
-                        payload: payload || {}
-                    });
-            },
-
             requestModuleList: function (path: string) {
-                this.sendToPlugin("", { event: "requestModuleList", path: path });
+                sendToPlugin({ event: "requestModuleList", path: path });
             },
 
             requestModule: function (filename: string) {
-                this.sendToPlugin("", { event: "requestControlReferenceJson", filename: filename });
+                sendToPlugin({ event: "requestControlReferenceJson", filename: filename });
             },
         };
-    }, [socketSettings]);
+    }, [socketSettings, buttonAction]);
 
     // Websocket connect and shutdown setup.
     useEffect(() => {
@@ -77,9 +81,10 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             console.log("Connected to Streamdeck Websocket.");
             registerPropertyInspector();
             commFns.getGlobalSettings();
+            commFns.getSettings();
         }
         websocket.current.onmessage = (msg: MessageEvent) => {
-            handleReceivedMessage(msg.data);
+            onReceivedMessage(msg.data);
         }
         websocket.current.onerror = function (event: Event) {
             console.warn('WEBOCKET ERROR', event);
@@ -104,15 +109,16 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             console.log("Registered myself according to:", json);
         }
 
-        function handleReceivedMessage(msg: string) {
-            interface SDMessage {
-                event: string,
-                payload: SDMessagePayload
-            }
-            interface SDMessagePayload {
-                settings?: Record<string, string>
-            }
+        interface SDMessage {
+            action?: string,
+            event: string,
+            payload: SDMessagePayload
+        }
+        interface SDMessagePayload {
+            settings?: Record<string, string>
+        }
 
+        function onReceivedMessage(msg: string) {
             let jsonObj: SDMessage;
             try {
                 jsonObj = JSON.parse(msg);
@@ -122,20 +128,25 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 return;
             }
             if (Object.prototype.hasOwnProperty.call(jsonObj, "event")) {
-                switch (jsonObj.event) {
-                    case "didReceiveSettings":
-                        setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, jsonObj.payload.settings));
-                        console.log("Received Button Settings", jsonObj.payload.settings);
-                        break;
-                    case "didReceiveGlobalSettings":
-                        setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, jsonObj.payload.settings));
-                        console.log("Received Global Settings", jsonObj.payload.settings);
-                        break;
-                    default:
-                        console.log("Message Handler not defined for Event: ", jsonObj.event);
-                }
-
+                handleReceivedMessageEvent(jsonObj.event, jsonObj);
             }
+        }
+
+        function handleReceivedMessageEvent(event: string, msg: SDMessage) {
+            switch (event) {
+                case "didReceiveSettings":
+                    if (msg.action) { setButtonAction(msg.action); }
+                    setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, msg.payload.settings));
+                    console.log("Received Button Settings", msg.payload.settings);
+                    break;
+                case "didReceiveGlobalSettings":
+                    setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
+                    console.log("Received Global Settings", msg.payload.settings);
+                    break;
+                default:
+                    console.log("Message Handler not defined for Event: ", event);
+            }
+
         }
 
     }, [socketSettings, commFns]);
