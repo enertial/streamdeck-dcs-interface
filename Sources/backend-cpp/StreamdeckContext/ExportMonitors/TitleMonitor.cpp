@@ -19,7 +19,11 @@ void TitleMonitor::update_settings(const json &settings)
     string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
 
     if (string_monitor_is_set_) {
-        dcs_id_string_monitor_ = std::stoi(dcs_id_string_monitor_raw);
+        const auto addr = std::stoi(dcs_id_string_monitor_raw);
+        dcs_id_string_monitor_ = settings.contains("string_monitor_max_string_length")
+                                     ? SimulatorAddress(addr, settings["string_monitor_max_string_length"])
+                                     : SimulatorAddress(addr);
+
         if (is_integer(string_monitor_vertical_spacing_raw)) {
             string_monitor_vertical_spacing_ = std::stoi(string_monitor_vertical_spacing_raw);
         }
