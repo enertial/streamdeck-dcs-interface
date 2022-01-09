@@ -2,15 +2,16 @@
 
 #pragma once
 
-#include "StreamdeckContext/StreamdeckContext.h"
+#include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
+#include "StreamdeckContext/SendActions/SendActionInterface.h"
 
 #include <optional>
 #include <string>
 
-class IncrementContext : public StreamdeckContext
+class IncrementContext : public SendActionInterface
 {
   public:
-    using StreamdeckContext::StreamdeckContext;
+    IncrementContext() = default;
 
     /**
      * @brief Sends simulator commands according to button type and settings received during Key Pressed and Released
@@ -29,6 +30,8 @@ class IncrementContext : public StreamdeckContext
                                    const json &inPayload);
 
   private:
+    IncrementMonitor increment_monitor_{}; // Monitors DCS ID to determine the state of an incremental switch.
+
     /**
      * @brief Determines the send value for the type of button for KeyDown and KeyUp events.
      *

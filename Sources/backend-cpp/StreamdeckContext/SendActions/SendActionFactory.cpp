@@ -1,12 +1,12 @@
-// Copyright 2021 Charles Tytler
+// Copyright 2022 Charles Tytler
 
-#include "StreamdeckContextFactory.h"
+#include "SendActionFactory.h"
 
 #include "StreamdeckContext/SendActions/IncrementContext.h"
 #include "StreamdeckContext/SendActions/MomentaryContext.h"
 #include "StreamdeckContext/SendActions/SwitchContext.h"
 
-StreamdeckContextFactory::StreamdeckContextFactory()
+SendActionFactory::SendActionFactory()
 {
     // Register UUID string values to corresponding Button Action types.
     button_action_from_uuid_["com.ctytler.dcs.dcs-bios"] = ButtonAction::MOMENTARY;
@@ -18,17 +18,16 @@ StreamdeckContextFactory::StreamdeckContextFactory()
     button_action_from_uuid_["com.ctytler.dcs.up-down.switch.two-state"] = ButtonAction::SWITCH;
 }
 
-std::unique_ptr<StreamdeckContext>
-StreamdeckContextFactory::create(const std::string &action_uuid, const std::string &context, const json &settings)
+std::unique_ptr<SendActionInterface> SendActionFactory::create(const std::string &action_uuid)
 {
     switch (button_action_from_uuid_[action_uuid]) {
     case ButtonAction::MOMENTARY:
-        return std::make_unique<MomentaryContext>(context, settings);
+        return std::make_unique<MomentaryContext>();
     case ButtonAction::INCREMENT:
-        return std::make_unique<IncrementContext>(context, settings);
+        return std::make_unique<IncrementContext>();
     case ButtonAction::SWITCH:
-        return std::make_unique<SwitchContext>(context, settings);
+        return std::make_unique<SwitchContext>();
     default:
-        return NULL;
+        return nullptr;
     }
 }
