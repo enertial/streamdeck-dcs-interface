@@ -1,10 +1,10 @@
 coverage:
   status:
     default_rules:
-      if_ci_failed: success
-      flag_coverage_not_uploaded_behavior: exclude
     project:
       default:
+        target: auto
+        threshold: 1%
         flags:
           - Cpp
           - ReactJS
