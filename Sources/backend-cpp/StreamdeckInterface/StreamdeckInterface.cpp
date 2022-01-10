@@ -294,7 +294,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         }
     }
 
-    if (event == "requestJsonFile") {
+    if (event == "requestControlReferenceJson") {
         const std::string filename = EPLJSONUtils::GetStringByName(inPayload, "filename");
         const auto maybe_json = read_json_file(filename);
         if (maybe_json) {

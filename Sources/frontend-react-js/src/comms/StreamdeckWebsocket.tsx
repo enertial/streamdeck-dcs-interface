@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
 import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
+import { ControlData, ModuleControlsJson } from '../components/control-reference/ControlReferenceInterface';
 
 export interface StreamdeckSocketSettings {
     port: number,
@@ -21,6 +22,8 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     const [buttonAction, setButtonAction] = useState("");
     const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings());
     const [globalSettings, setGlobalSettings] = useState(defaultGlobalSettings());
+    const [moduleList, setModuleList] = useState<string[]>(["No modules found..."]);
+    const [moduleControlRefs, setModuleControlRefs] = useState<ModuleControlsJson>();
     const websocket = useRef<WebSocket | null>(null);
 
     // Definition of the API that is used by other components.
@@ -124,7 +127,10 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             payload: SDMessagePayload
         }
         interface SDMessagePayload {
-            settings?: Record<string, string>
+            event?: string,
+            settings?: Record<string, string>,
+            moduleList?: string[],
+            jsonFile?: ModuleControlsJson,
         }
 
         function onReceivedMessage(msg: string) {
@@ -152,6 +158,19 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                     setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
                     console.log("Received Global Settings", msg.payload.settings);
                     break;
+                case "sendToPropertyInspector":
+                    switch (msg.payload.event) {
+                        case "ModuleList":
+                            if (msg.payload.moduleList) { console.log("ModuleList Recieved"); setModuleList(msg.payload.moduleList); }
+                            break;
+                        case "JsonFile":
+                            if (msg.payload.jsonFile) { setModuleControlRefs(msg.payload.jsonFile); }
+                            break;
+                        case "DebugDcsGameState":
+                            // Do Nothing.
+                            break;
+                    }
+                    break;
                 default:
                     console.log("Message Handler not defined for Event: ", event);
             }
@@ -160,7 +179,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
 
     }, [socketSettings, commFns]);
 
-    return { commFns, buttonSettings, globalSettings } as const;
+    return { commFns, buttonSettings, globalSettings, moduleList, moduleControlRefs } as const;
 }
 
 /**

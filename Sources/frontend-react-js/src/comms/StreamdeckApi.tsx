@@ -5,10 +5,14 @@
  * 
  */
 
+import { ModuleControlsJson } from "../components/control-reference/ControlReferenceInterface";
+
 export default interface StreamdeckApi {
     commFns: StreamdeckCommFns;
     buttonSettings: StreamdeckButtonSettings;
     globalSettings: StreamdeckGlobalSettings;
+    moduleList: string[];
+    moduleControlRefs: ModuleControlsJson | undefined;
 }
 
 export interface StreamdeckCommFns {
