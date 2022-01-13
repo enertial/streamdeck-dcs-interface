@@ -51,7 +51,7 @@ test("renders table with sample control set", () => {
 test("renders table with sample control set", () => {
   let clickOutput: ControlData;
   const testClickFunction = (retData: ControlData) => { clickOutput = retData };
-  render(<Table tableData={sampleControlSet} isDataLoaded={true} onClick={testClickFunction} />);
+  render(<Table tableData={sampleControlSet} isDataLoaded={true} getSelectedControlData={testClickFunction} />);
   fireEvent.click(screen.getByText('control1'));
 
   // Expect that data that does not show up in table (additional_data) is still returned onClick.
