@@ -17,7 +17,7 @@ function UserOfStreamdeckWebsocket() {
     return (
         <div>
             <button id="setSettings" onClick={() => { sdApi.commFns.setSettings(exampleButtonSettings) }}>setSettings</button>
-            <button onClick={() => { sdApi.commFns.setGlobalSettings(exampleGlobalSettings) }}>setGlobalSettings</button>
+            <button onClick={() => { sdApi.commFns.setGlobalSettings("last_search_query", "query") }}>setGlobalSettings</button>
             <button onClick={() => { sdApi.commFns.logMessage("test log message") }}>logMessage</button>
             <button onClick={() => { sdApi.commFns.sendSettingsToPlugin(exampleButtonSettings) }}>sendSettingsToPlugin</button>
             <button onClick={() => { sdApi.commFns.requestSimulationState() }}>requestSimulationState</button>
@@ -33,7 +33,7 @@ beforeEach(async () => {
     render(<UserOfStreamdeckWebsocket />);
     await mockServer.connected;
     // StreamdeckWebsocket is expected to publish 2 messages on open.
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < 4; i++) {
         await mockServer.nextMessage;
     }
 })
@@ -47,8 +47,13 @@ test("connect to Streamdeck websocket and onopen publishes registerPropertyInspe
     const expectedRegistrationMessage = JSON.stringify({ event: "registerPropertyInspector", uuid: socketSettings.propertyInspectorUUID });
     const expectedGlobalSettingsUpdateRequest = JSON.stringify({ event: "getGlobalSettings", context: socketSettings.propertyInspectorUUID });
     const expectedButtonSettingsUpdateRequest = JSON.stringify({ event: "getSettings", context: socketSettings.propertyInspectorUUID });
+    const expectedRequestModuleListRequest = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "requestModuleList", path: "" } });
 
-    expect(mockServer).toHaveReceivedMessages([expectedRegistrationMessage, expectedGlobalSettingsUpdateRequest, expectedButtonSettingsUpdateRequest]);
+    expect(mockServer).toHaveReceivedMessages([expectedRegistrationMessage,
+        expectedGlobalSettingsUpdateRequest,
+        expectedButtonSettingsUpdateRequest,
+        expectedRequestModuleListRequest
+    ]);
 });
 
 test("send setSettings", async () => {
@@ -64,7 +69,9 @@ test("send setSettings", async () => {
 
 test("send setGlobalSettings", async () => {
     // Setup
-    const expectedMessage = JSON.stringify({ event: "setGlobalSettings", context: socketSettings.propertyInspectorUUID, payload: exampleGlobalSettings });
+    const expectedGlobalSettings = exampleGlobalSettings;
+    expectedGlobalSettings["last_search_query"] = "query"; // as defined in the onClick function.
+    const expectedMessage = JSON.stringify({ event: "setGlobalSettings", context: socketSettings.propertyInspectorUUID, payload: expectedGlobalSettings });
     // Action
     fireEvent.click(screen.getByText(/setGlobalSettings/i));
     // Verification
