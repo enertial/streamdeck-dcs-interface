@@ -28,8 +28,8 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
   if (selectedControlReference) {
     modal = <div>
       <Modal controlData={selectedControlReference} onClick={clearSelection} />
+      <Backdrop onClick={clearSelection} />
     </div>;
-    // <Backdrop onClick={clearSelection} />
   }
 
   return (
