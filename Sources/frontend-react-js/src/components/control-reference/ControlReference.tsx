@@ -1,4 +1,4 @@
-import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 
 import classes from "./ControlReference.module.css";
 
@@ -21,7 +21,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
    ** Internal State
    */
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState<ControlData[]>([]); // eslint-disable-line @typescript-eslint/no-unused-vars
-  const [selectedModule, setSelectedModule] = useState(sdApi.moduleList[0]);
+  const [selectedModule, setSelectedModule] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
@@ -36,17 +36,22 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
    */
 
   useEffect(() => {
+    sdApi.commFns.requestModuleList(sdApi.globalSettings.dcs_bios_install_path);
+  }, [sdApi.globalSettings.dcs_bios_install_path])
+
+  useEffect(() => {
+    setSelectedModule(sdApi.globalSettings.last_selected_module)
+  }, [sdApi.moduleList])
+
+  useEffect(() => {
     sdApi.commFns.requestModule(selectedModule);
   }, [selectedModule])
 
   useEffect(() => {
-    if (sdApi.moduleControlRefs) { setFullModuleControlRefs(flattenModuleControlsJson(sdApi.moduleControlRefs)); }
+    if (sdApi.moduleControlRefs) {
+      setFullModuleControlRefs(flattenModuleControlsJson(sdApi.moduleControlRefs));
+    }
   }, [sdApi.moduleControlRefs])
-
-  useEffect(() => {
-    sdApi.commFns.requestModuleList(sdApi.globalSettings.dcs_bios_install_path);
-    console.log("Got Global Settings Request Module List");
-  }, [sdApi.globalSettings.dcs_bios_install_path])
 
 
   function setDcsBiosInstallPath() {

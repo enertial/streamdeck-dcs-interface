@@ -11,6 +11,7 @@ function ModuleSelect({ selectedModule, setSelectedModule, sdApi }: Props): JSX.
 
     function handleSelection(event: ChangeEvent<HTMLSelectElement>) {
         setSelectedModule(event.target.value);
+        sdApi.commFns.setGlobalSettings("last_selected_module", event.target.value);
     }
 
     function stripPathAndExtension(filename: string) {

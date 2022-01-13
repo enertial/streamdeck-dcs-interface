@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
-import { ControlData, ModuleControlsJson } from '../components/control-reference/ControlReferenceInterface';
+import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
+import { ModuleControlsJson } from '../components/control-reference/ControlReferenceInterface';
 
 export interface StreamdeckSocketSettings {
     port: number,
@@ -21,7 +21,7 @@ export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
 export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings): StreamdeckApi {
     const [buttonAction, setButtonAction] = useState("");
     const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings());
-    const [globalSettings, setGlobalSettings] = useState(defaultGlobalSettings());
+    const [globalSettings, setGlobalSettingsState] = useState(defaultGlobalSettings());
     const [moduleList, setModuleList] = useState<string[]>(["No modules found..."]);
     const [moduleControlRefs, setModuleControlRefs] = useState<ModuleControlsJson>();
     const websocket = useRef<WebSocket | null>(null);
@@ -63,6 +63,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
 
             setGlobalSettings: function (setting: string, value: string) {
                 const updatedGlobalSettings = Object.assign({}, globalSettings, { [setting]: value });
+                setGlobalSettingsState(updatedGlobalSettings);
                 send('setGlobalSettings', { payload: updatedGlobalSettings });
             },
 
@@ -133,9 +134,8 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 console.debug("Received Button Settings", msg.payload.settings);
                 break;
             case "didReceiveGlobalSettings":
-                setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
+                setGlobalSettingsState(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
                 console.debug("Received Global Settings", msg.payload.settings);
-                console.debug("Current Global Settings", globalSettings);
                 break;
             case "sendToPropertyInspector":
                 switch (msg.payload.event) {

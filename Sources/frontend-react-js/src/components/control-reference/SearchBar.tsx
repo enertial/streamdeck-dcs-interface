@@ -1,4 +1,4 @@
-import { ChangeEvent, ChangeEventHandler, useEffect } from "react";
+import { ChangeEvent, useEffect } from "react";
 import StreamdeckApi from "../../comms/StreamdeckApi";
 import classes from "./SearchBar.module.css";
 
