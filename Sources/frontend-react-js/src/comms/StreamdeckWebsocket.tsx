@@ -11,8 +11,8 @@ export interface StreamdeckSocketSettings {
 
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
-        port: 8000,
-        propertyInspectorUUID: "123",
+        port: 28196,
+        propertyInspectorUUID: "476A6B827FE6F31B825E5812F6FE7F17",
         registerEvent: "registerPropertyInspector",
         info: {}
     };
@@ -32,18 +32,18 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         function send(event: string, payload: Record<string, unknown>) {
             const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
             websocket.current?.send(JSON.stringify(json));
-            console.log("Sent message (", event, "):", json);
+            console.debug("Sent message (", event, "):", json);
         }
 
         // Sends a message to the C++ plugin executable.
-        function sendToPlugin(payload: Record<string, unknown>) {
+        async function sendToPlugin(payload: Record<string, unknown>) {
             const json = {
                 action: buttonAction,
                 event: "sendToPlugin",
                 context: socketSettings.propertyInspectorUUID,
                 payload: payload,
             };
-            websocket.current?.send(JSON.stringify(json));
+            await websocket.current?.send(JSON.stringify(json));
         }
 
         return {
@@ -86,11 +86,78 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         };
     }, [socketSettings, buttonAction]);
 
+    // This message registers this Websocket binding as the Property Inspector
+    // for the selected button in the Streamdeck GUI.
+    function registerPropertyInspector() {
+        const json = {
+            event: socketSettings.registerEvent,
+            uuid: socketSettings.propertyInspectorUUID
+        };
+        websocket.current?.send(JSON.stringify(json));
+        console.debug("Registered myself according to:", json);
+    }
+
+    interface SDMessage {
+        action?: string,
+        event: string,
+        payload: SDMessagePayload
+    }
+    interface SDMessagePayload {
+        event?: string,
+        settings?: Record<string, string>,
+        moduleList?: string[],
+        jsonFile?: ModuleControlsJson,
+    }
+
+    function onReceivedMessage(msg: string) {
+        let jsonObj: SDMessage;
+        try {
+            jsonObj = JSON.parse(msg);
+            console.debug("Received message:", jsonObj);
+        } catch (e) {
+            console.warn("Error in parsing received message", msg);
+            return;
+        }
+        if (Object.prototype.hasOwnProperty.call(jsonObj, "event")) {
+            handleReceivedMessageEvent(jsonObj.event, jsonObj);
+        }
+    }
+
+    function handleReceivedMessageEvent(event: string, msg: SDMessage) {
+        switch (event) {
+            case "didReceiveSettings":
+                if (msg.action) { setButtonAction(msg.action); }
+                setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, msg.payload.settings));
+                console.debug("Received Button Settings", msg.payload.settings);
+                break;
+            case "didReceiveGlobalSettings":
+                setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
+                console.debug("Received Global Settings", msg.payload.settings);
+                break;
+            case "sendToPropertyInspector":
+                switch (msg.payload.event) {
+                    case "ModuleList":
+                        if (msg.payload.moduleList) { console.log("ModuleList Recieved"); setModuleList(msg.payload.moduleList); }
+                        break;
+                    case "JsonFile":
+                        if (msg.payload.jsonFile) { setModuleControlRefs(msg.payload.jsonFile); }
+                        break;
+                    case "DebugDcsGameState":
+                        // Do Nothing.
+                        break;
+                }
+                break;
+            default:
+                console.warn("Message Handler not defined for Event: ", event);
+        }
+
+    }
+
     // Websocket connect and shutdown setup.
     useEffect(() => {
         websocket.current = new WebSocket("ws://127.0.0.1:" + socketSettings.port)
         websocket.current.onopen = () => {
-            console.log("Connected to Streamdeck Websocket.");
+            console.debug("Connected to Streamdeck Websocket.");
             registerPropertyInspector();
             commFns.getGlobalSettings();
             commFns.getSettings();
@@ -107,77 +174,12 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             console.log('[STREAMDECK]***** WEBOCKET CLOSED **** reason:', reason);
         };
         return function onUnmount() {
+            console.log("Closing websocket");
             websocket.current?.close();
         }
+    }, []);
 
-        // This message registers this Websocket binding as the Property Inspector
-        // for the selected button in the Streamdeck GUI.
-        function registerPropertyInspector() {
-            const json = {
-                event: socketSettings.registerEvent,
-                uuid: socketSettings.propertyInspectorUUID
-            };
-            websocket.current?.send(JSON.stringify(json));
-            console.log("Registered myself according to:", json);
-        }
-
-        interface SDMessage {
-            action?: string,
-            event: string,
-            payload: SDMessagePayload
-        }
-        interface SDMessagePayload {
-            event?: string,
-            settings?: Record<string, string>,
-            moduleList?: string[],
-            jsonFile?: ModuleControlsJson,
-        }
-
-        function onReceivedMessage(msg: string) {
-            let jsonObj: SDMessage;
-            try {
-                jsonObj = JSON.parse(msg);
-                console.log("Received message:", jsonObj);
-            } catch (e) {
-                console.warn("Error in parsing received message", msg);
-                return;
-            }
-            if (Object.prototype.hasOwnProperty.call(jsonObj, "event")) {
-                handleReceivedMessageEvent(jsonObj.event, jsonObj);
-            }
-        }
-
-        function handleReceivedMessageEvent(event: string, msg: SDMessage) {
-            switch (event) {
-                case "didReceiveSettings":
-                    if (msg.action) { setButtonAction(msg.action); }
-                    setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, msg.payload.settings));
-                    console.log("Received Button Settings", msg.payload.settings);
-                    break;
-                case "didReceiveGlobalSettings":
-                    setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
-                    console.log("Received Global Settings", msg.payload.settings);
-                    break;
-                case "sendToPropertyInspector":
-                    switch (msg.payload.event) {
-                        case "ModuleList":
-                            if (msg.payload.moduleList) { console.log("ModuleList Recieved"); setModuleList(msg.payload.moduleList); }
-                            break;
-                        case "JsonFile":
-                            if (msg.payload.jsonFile) { setModuleControlRefs(msg.payload.jsonFile); }
-                            break;
-                        case "DebugDcsGameState":
-                            // Do Nothing.
-                            break;
-                    }
-                    break;
-                default:
-                    console.log("Message Handler not defined for Event: ", event);
-            }
-
-        }
-
-    }, [socketSettings, commFns]);
+    console.log("render");
 
     return { commFns, buttonSettings, globalSettings, moduleList, moduleControlRefs } as const;
 }

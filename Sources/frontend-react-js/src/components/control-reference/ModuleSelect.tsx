@@ -20,7 +20,7 @@ function ModuleSelect({ moduleList, selectedModule, handleSelection }: Props): J
                 onChange={handleSelection}
             >
                 {moduleList.map((module) => (
-                    <option value={module}>
+                    <option key={module} value={module}>
                         {stripPathAndExtension(module)}
                     </option>
                 ))}

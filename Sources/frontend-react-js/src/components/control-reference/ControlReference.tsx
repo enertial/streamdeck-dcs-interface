@@ -24,22 +24,17 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), []);
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [selectedModule, setSelectedModule] = useState(sdApi.moduleList[0]);
-  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
-      control.category.toUpperCase().includes(searchQuery) ||
-      control.identifier.toUpperCase().includes(searchQuery) ||
-      control.description.toUpperCase().includes(searchQuery)
+      control.category.toUpperCase().includes(sdApi.globalSettings.last_search_query) ||
+      control.identifier.toUpperCase().includes(sdApi.globalSettings.last_search_query) ||
+      control.description.toUpperCase().includes(sdApi.globalSettings.last_search_query)
   );
 
   /*
    ** Handlers
    */
-
-  useEffect(() => {
-    sdApi.commFns.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
-  }, [])
 
   useEffect(() => {
     sdApi.commFns.requestModule(selectedModule);
@@ -50,11 +45,17 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   }, [sdApi.moduleControlRefs])
 
   useEffect(() => {
-    setSearchQuery(sdApi.globalSettings.last_search_query);
-  }, [sdApi.globalSettings])
+    sdApi.commFns.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
+    console.log("Got Global Settings Request Module List");
+  }, [sdApi.globalSettings.dcs_bios_install_path])
+
+  useEffect(() => {
+    console.log("Query!");
+  }, [sdApi.globalSettings.last_search_query])
 
   function requestModuleList() {
     sdApi.commFns.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
+    console.log("Request Module List");
   }
   function requestModule() {
     sdApi.commFns.requestModule("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS\\doc\\json\\FA-18C_hornet.json");
@@ -64,18 +65,6 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
     setSelectedModule(event.target.value);
   }
 
-  function updateStoredSearchQuery(query: string) {
-    setSearchQuery(query);
-    const updatedGlobalSettings = Object.assign({}, sdApi.globalSettings, { last_search_query: query });
-    sdApi.commFns.setGlobalSettings(updatedGlobalSettings);
-  }
-  const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const query = event.currentTarget.value.toUpperCase();
-    updateStoredSearchQuery(query);
-  };
-  function handleSearchQueryClear() {
-    updateStoredSearchQuery("");
-  }
 
   const handleTableRowClick = (tableRowData: ControlData) => {
     onSelect(tableRowData);
@@ -92,9 +81,8 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
         handleSelection={handleModuleSelection}
       />
       <SearchBar
-        value={searchQuery}
-        onChange={handleSearchQueryChange}
-        onClickClear={handleSearchQueryClear}
+        query={sdApi.globalSettings.last_search_query}
+        sdApi={sdApi}
       />
       <Table
         tableData={filteredControlRefs}

@@ -76,6 +76,7 @@ export interface StreamdeckGlobalSettings {
     last_search_query: string,
     last_selected_module: string,
     dcs_install_path: string,
+    dcs_bios_install_path: string,
 }
 
 export function defaultGlobalSettings(): StreamdeckGlobalSettings {
@@ -85,7 +86,8 @@ export function defaultGlobalSettings(): StreamdeckGlobalSettings {
         send_port: "",
         last_search_query: "",
         last_selected_module: "",
-        dcs_install_path: ""
+        dcs_install_path: "",
+        dcs_bios_install_path: ""
     };
 }
 
