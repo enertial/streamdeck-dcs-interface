@@ -1,31 +1,29 @@
-import { ChangeEvent, useEffect } from "react";
+import { ChangeEvent, ChangeEventHandler, useEffect } from "react";
 import StreamdeckApi from "../../comms/StreamdeckApi";
 import classes from "./SearchBar.module.css";
 
 interface Props {
-  query: string;
+  searchQuery: string;
+  setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   sdApi: StreamdeckApi;
 }
 
+function SearchBar({ searchQuery, setSearchQuery, sdApi }: Props): JSX.Element {
 
-
-function SearchBar({ query, sdApi }: Props): JSX.Element {
-  // const [searchQuery, setSearchQuery] = useState("");
-
+  // Restore previous session search query.
   useEffect(() => {
-    console.log(query);
+    setSearchQuery(sdApi.globalSettings.last_search_query);
   }, [sdApi.globalSettings.last_search_query])
 
   function updateStoredSearchQuery(query: string) {
-    // setSearchQuery(query);
+    setSearchQuery(query);
     const updatedGlobalSettings = Object.assign({}, sdApi.globalSettings, { last_search_query: query });
     sdApi.commFns.setGlobalSettings(updatedGlobalSettings);
-    sdApi.commFns.getGlobalSettings();
   }
 
   const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const updatedQuery = event.currentTarget.value.toUpperCase();
-    updateStoredSearchQuery(updatedQuery);
+    const query = event.currentTarget.value.toUpperCase();
+    updateStoredSearchQuery(query);
   };
 
   function handleSearchQueryClear() {
@@ -36,18 +34,17 @@ function SearchBar({ query, sdApi }: Props): JSX.Element {
     <div className={classes.searchBar}>
       <span className={classes.searchTitle}>Search Control References: </span>
       <input
-        id="table_search"
         className={classes.searchInput}
         type="text"
         placeholder="Query.."
-        value={query}
+        value={searchQuery}
         onChange={handleSearchQueryChange}
       />
       <span> </span>
       <button
         className={classes.button}
         onClick={handleSearchQueryClear}
-        disabled={!query}
+        disabled={!searchQuery}
       >
         Clear
       </button>

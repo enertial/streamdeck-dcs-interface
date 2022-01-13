@@ -12,7 +12,7 @@ export interface StreamdeckSocketSettings {
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
         port: 28196,
-        propertyInspectorUUID: "476A6B827FE6F31B825E5812F6FE7F17",
+        propertyInspectorUUID: "A9B10EF2759B4A1198991AA541F26EAA",
         registerEvent: "registerPropertyInspector",
         info: {}
     };
@@ -133,6 +133,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             case "didReceiveGlobalSettings":
                 setGlobalSettings(prevGlobalSettings => Object.assign(prevGlobalSettings, msg.payload.settings));
                 console.debug("Received Global Settings", msg.payload.settings);
+                console.debug("Current Global Settings", globalSettings);
                 break;
             case "sendToPropertyInspector":
                 switch (msg.payload.event) {
@@ -161,6 +162,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             registerPropertyInspector();
             commFns.getGlobalSettings();
             commFns.getSettings();
+            commFns.requestModuleList(globalSettings.dcs_bios_install_path);
         }
         websocket.current.onmessage = (msg: MessageEvent) => {
             onReceivedMessage(msg.data);

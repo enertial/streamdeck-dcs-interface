@@ -87,7 +87,7 @@ export function defaultGlobalSettings(): StreamdeckGlobalSettings {
         last_search_query: "",
         last_selected_module: "",
         dcs_install_path: "",
-        dcs_bios_install_path: ""
+        dcs_bios_install_path: "C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS"
     };
 }
 

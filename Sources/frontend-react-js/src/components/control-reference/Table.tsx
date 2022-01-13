@@ -4,12 +4,7 @@ import classes from "./Table.module.css";
 interface TableContents {
   tableData: ControlData[],
   isDataLoaded: boolean,
-  onClick: (arg: ControlData) => void,
-}
-
-interface TableRowContents {
-  controlData: ControlData,
-  onClick: (arg: ControlData) => void,
+  getSelectedControlData: (arg: ControlData) => void,
 }
 
 function Table(props: TableContents): JSX.Element {
@@ -36,7 +31,7 @@ function Table(props: TableContents): JSX.Element {
               <TableRow
                 key={control.identifier}
                 controlData={control}
-                onClick={props.onClick}
+                getControlData={props.getSelectedControlData}
               />
             ))}
           </tbody>
@@ -48,11 +43,16 @@ function Table(props: TableContents): JSX.Element {
   }
 }
 
-function TableRow({ controlData, onClick }: TableRowContents): JSX.Element {
+interface TableRowContents {
+  controlData: ControlData,
+  getControlData: (arg: ControlData) => void,
+}
+
+function TableRow({ controlData, getControlData }: TableRowContents): JSX.Element {
   /* Each row holds entire set of control reference data,
   even though it only displays four columns worth of it */
   function handleRowClick() {
-    onClick(controlData);
+    getControlData(controlData);
   }
 
   return (

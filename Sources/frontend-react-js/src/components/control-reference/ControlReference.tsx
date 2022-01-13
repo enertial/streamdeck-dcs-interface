@@ -24,12 +24,13 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), []);
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [selectedModule, setSelectedModule] = useState(sdApi.moduleList[0]);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
-      control.category.toUpperCase().includes(sdApi.globalSettings.last_search_query) ||
-      control.identifier.toUpperCase().includes(sdApi.globalSettings.last_search_query) ||
-      control.description.toUpperCase().includes(sdApi.globalSettings.last_search_query)
+      control.category.toUpperCase().includes(searchQuery) ||
+      control.identifier.toUpperCase().includes(searchQuery) ||
+      control.description.toUpperCase().includes(searchQuery)
   );
 
   /*
@@ -45,30 +46,14 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   }, [sdApi.moduleControlRefs])
 
   useEffect(() => {
-    sdApi.commFns.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
+    sdApi.commFns.requestModuleList(sdApi.globalSettings.dcs_bios_install_path);
     console.log("Got Global Settings Request Module List");
   }, [sdApi.globalSettings.dcs_bios_install_path])
 
-  useEffect(() => {
-    console.log("Query!");
-  }, [sdApi.globalSettings.last_search_query])
 
-  function requestModuleList() {
-    sdApi.commFns.requestModuleList("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
-    console.log("Request Module List");
-  }
   function requestModule() {
     sdApi.commFns.requestModule("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS\\doc\\json\\FA-18C_hornet.json");
   }
-
-  function handleModuleSelection(event: ChangeEvent<HTMLSelectElement>) {
-    setSelectedModule(event.target.value);
-  }
-
-
-  const handleTableRowClick = (tableRowData: ControlData) => {
-    onSelect(tableRowData);
-  };
 
   /*
    ** Render
@@ -76,20 +61,21 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   return (
     <div className={classes.main}>
       <ModuleSelect
-        moduleList={sdApi.moduleList}
         selectedModule={selectedModule}
-        handleSelection={handleModuleSelection}
+        setSelectedModule={setSelectedModule}
+        sdApi={sdApi}
       />
       <SearchBar
-        query={sdApi.globalSettings.last_search_query}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
         sdApi={sdApi}
       />
       <Table
         tableData={filteredControlRefs}
+        // Still show empty table if filtered set is empty, but full set is not.
         isDataLoaded={fullModuleControlRefs.length > 0}
-        onClick={handleTableRowClick}
+        getSelectedControlData={onSelect}
       />
-      <button onClick={requestModuleList}>Modules Update</button>
       <button onClick={requestModule}>Request F/A-18</button>
     </div>
   );

@@ -1,13 +1,17 @@
-import { ChangeEventHandler } from "react";
+import { ChangeEvent } from "react";
+import StreamdeckApi from "../../comms/StreamdeckApi";
 
 interface Props {
-    moduleList: string[];
     selectedModule: string;
-    handleSelection: ChangeEventHandler<HTMLSelectElement>;
+    setSelectedModule: React.Dispatch<React.SetStateAction<string>>;
+    sdApi: StreamdeckApi;
 }
 
+function ModuleSelect({ selectedModule, setSelectedModule, sdApi }: Props): JSX.Element {
 
-function ModuleSelect({ moduleList, selectedModule, handleSelection }: Props): JSX.Element {
+    function handleSelection(event: ChangeEvent<HTMLSelectElement>) {
+        setSelectedModule(event.target.value);
+    }
 
     function stripPathAndExtension(filename: string) {
         return filename.split('\\').pop()?.split('/').pop()?.split('.json')[0];
@@ -19,7 +23,7 @@ function ModuleSelect({ moduleList, selectedModule, handleSelection }: Props): J
                 value={selectedModule}
                 onChange={handleSelection}
             >
-                {moduleList.map((module) => (
+                {sdApi.moduleList.map((module) => (
                     <option key={module} value={module}>
                         {stripPathAndExtension(module)}
                     </option>
