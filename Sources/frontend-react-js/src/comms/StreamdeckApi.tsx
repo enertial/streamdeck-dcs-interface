@@ -24,7 +24,7 @@ export interface StreamdeckCommFns {
     // Gets global settings for all buttons of the Streamdeck plugin.
     getGlobalSettings(): void;
     // Sets global settings for all buttons of the Streamdeck plugin.
-    setGlobalSettings(payload: StreamdeckGlobalSettings): void;
+    setGlobalSettings(setting: string, value: string): void;
     // Logs a message to the Elgato Streamdeck error log.
     logMessage(message: string): void;
 
@@ -87,7 +87,7 @@ export function defaultGlobalSettings(): StreamdeckGlobalSettings {
         last_search_query: "",
         last_selected_module: "",
         dcs_install_path: "",
-        dcs_bios_install_path: "C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS"
+        dcs_bios_install_path: ""
     };
 }
 

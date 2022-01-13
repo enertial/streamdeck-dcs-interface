@@ -43,7 +43,8 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 context: socketSettings.propertyInspectorUUID,
                 payload: payload,
             };
-            await websocket.current?.send(JSON.stringify(json));
+            websocket.current?.send(JSON.stringify(json));
+            console.debug("Sent message: ", payload);
         }
 
         return {
@@ -60,8 +61,9 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 send('getGlobalSettings', {});
             },
 
-            setGlobalSettings: function (settings: StreamdeckGlobalSettings) {
-                send('setGlobalSettings', { payload: settings });
+            setGlobalSettings: function (setting: string, value: string) {
+                const updatedGlobalSettings = Object.assign({}, globalSettings, { [setting]: value });
+                send('setGlobalSettings', { payload: updatedGlobalSettings });
             },
 
             logMessage: function (message: string) {

@@ -7,7 +7,6 @@ import SearchBar from "./SearchBar";
 import { ControlData } from "./ControlReferenceInterface";
 import flattenModuleControlsJson from "./FlattenModuleControlsJson";
 
-import { moduleData } from "../../A-10C";
 import StreamdeckApi from "../../comms/StreamdeckApi";
 import ModuleSelect from "./ModuleSelect";
 
@@ -21,8 +20,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   /*
    ** Internal State
    */
-  const initialFullModuleControlRefs = useMemo(() => flattenModuleControlsJson(moduleData), []);
-  const [fullModuleControlRefs, setFullModuleControlRefs] = useState(initialFullModuleControlRefs); // eslint-disable-line @typescript-eslint/no-unused-vars
+  const [fullModuleControlRefs, setFullModuleControlRefs] = useState<ControlData[]>([]); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [selectedModule, setSelectedModule] = useState(sdApi.moduleList[0]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -51,8 +49,8 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   }, [sdApi.globalSettings.dcs_bios_install_path])
 
 
-  function requestModule() {
-    sdApi.commFns.requestModule("C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS\\doc\\json\\FA-18C_hornet.json");
+  function setDcsBiosInstallPath() {
+    sdApi.commFns.setGlobalSettings("dcs_bios_install_path", "C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
   }
 
   /*
@@ -76,7 +74,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
         isDataLoaded={fullModuleControlRefs.length > 0}
         getSelectedControlData={onSelect}
       />
-      <button onClick={requestModule}>Request F/A-18</button>
+      <button onClick={setDcsBiosInstallPath}>Set DCS BIOS Install Path</button>
     </div>
   );
 }

@@ -17,8 +17,7 @@ function SearchBar({ searchQuery, setSearchQuery, sdApi }: Props): JSX.Element {
 
   function updateStoredSearchQuery(query: string) {
     setSearchQuery(query);
-    const updatedGlobalSettings = Object.assign({}, sdApi.globalSettings, { last_search_query: query });
-    sdApi.commFns.setGlobalSettings(updatedGlobalSettings);
+    sdApi.commFns.setGlobalSettings("last_search_query", query);
   }
 
   const handleSearchQueryChange = (event: ChangeEvent<HTMLInputElement>) => {
