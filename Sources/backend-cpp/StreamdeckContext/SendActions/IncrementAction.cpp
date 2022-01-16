@@ -6,7 +6,7 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void IncrementAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void IncrementAction::handleButtonPressedEvent(SimulatorInterface *simulator_interface,
                                                ESDConnectionManager *mConnectionManager,
                                                const json &inPayload)
 {
@@ -23,7 +23,7 @@ void IncrementAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorIn
     }
 }
 
-void IncrementAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void IncrementAction::handleButtonReleasedEvent(SimulatorInterface *simulator_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {

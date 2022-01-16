@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/SimulatorInterfaceFactory.h"
+#include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 
 namespace test
@@ -24,7 +24,8 @@ class ImageStateMonitorTestFixture : public ::testing::Test
                                      {"dcs_id_comparison_value", std::to_string(comparison_value)}}),
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port)
     {
-        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+        sim_connection_manager.connect_to_protocol(Protocol::DCS_ExportScript, connection_settings);
+        simulator_interface = sim_connection_manager.get_interface(Protocol::DCS_ExportScript);
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive_stream();
     }
@@ -40,8 +41,10 @@ class ImageStateMonitorTestFixture : public ::testing::Test
     ImageStateMonitor context_with_less_than;
     ImageStateMonitor context_with_greater_than;
     SimulatorConnectionSettings connection_settings{"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
-    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
+    UdpSocket mock_dcs;                      // A socket that will mock Send/Receive messages from DCS.
+    SimulatorInterface *simulator_interface; // Simulator Interface to test.
+  private:
+    SimConnectionManager sim_connection_manager;
 };
 
 TEST_F(ImageStateMonitorTestFixture, CompareToZero)

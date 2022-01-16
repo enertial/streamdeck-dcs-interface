@@ -14,7 +14,7 @@ StreamdeckContext::StreamdeckContext(const std::string &action, const std::strin
 
 bool StreamdeckContext::is_valid() { return (send_action_ != nullptr); }
 
-void StreamdeckContext::updateContextState(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void StreamdeckContext::updateContextState(SimulatorInterface *simulator_interface,
                                            ESDConnectionManager *mConnectionManager)
 {
 
@@ -54,14 +54,14 @@ void StreamdeckContext::updateContextSettings(const json &settings)
     title_monitor_.update_settings(settings);
 }
 
-void StreamdeckContext::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void StreamdeckContext::handleButtonPressedEvent(SimulatorInterface *simulator_interface,
                                                  ESDConnectionManager *mConnectionManager,
                                                  const json &inPayload)
 {
     send_action_->handleButtonPressedEvent(simulator_interface, mConnectionManager, inPayload);
 }
 
-void StreamdeckContext::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void StreamdeckContext::handleButtonReleasedEvent(SimulatorInterface *simulator_interface,
                                                   ESDConnectionManager *mConnectionManager,
                                                   const json &inPayload)
 {

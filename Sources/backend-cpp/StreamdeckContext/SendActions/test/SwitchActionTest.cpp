@@ -4,7 +4,7 @@
 
 #include "StreamdeckContext/SendActions/SwitchAction.h"
 
-#include "SimulatorInterface/SimulatorInterfaceFactory.h"
+#include "SimulatorInterface/SimConnectionManager.h"
 #include "Test/MockESDConnectionManager.h"
 namespace test
 {
@@ -22,21 +22,24 @@ class SwitchActionKeyPressTestFixture : public ::testing::Test
                      {"send_when_first_state_value", send_when_first_state_value},
                      {"send_when_second_state_value", send_when_second_state_value}}}})
     {
-        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+        sim_connection_manager.connect_to_protocol(Protocol::DCS_ExportScript, connection_settings);
+        simulator_interface = sim_connection_manager.get_interface(Protocol::DCS_ExportScript);
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive_stream();
     }
-
-    SimulatorConnectionSettings connection_settings = {"1948", "1949", "127.0.0.1"};
-    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
-    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
-    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    SwitchAction fixture_context;
 
     std::string send_address = "23,2";
     std::string send_when_first_state_value = "6";
     std::string send_when_second_state_value = "7";
     json payload;
+
+    SimulatorConnectionSettings connection_settings = {"1948", "1949", "127.0.0.1"};
+    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
+    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
+    SwitchAction fixture_context;
+    SimulatorInterface *simulator_interface; // Simulator Interface to test.
+  private:
+    SimConnectionManager sim_connection_manager;
 };
 
 TEST_F(SwitchActionKeyPressTestFixture, handle_keyup_switch_in_first_state)

@@ -4,14 +4,14 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void SwitchAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void SwitchAction::handleButtonPressedEvent(SimulatorInterface *simulator_interface,
                                             ESDConnectionManager *mConnectionManager,
                                             const json &inPayload)
 {
     // Nothing sent to DCS on press.
 }
 
-void SwitchAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void SwitchAction::handleButtonReleasedEvent(SimulatorInterface *simulator_interface,
                                              ESDConnectionManager *mConnectionManager,
                                              const json &inPayload)
 {

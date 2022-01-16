@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/SimulatorInterfaceFactory.h"
+#include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/SendActions/IncrementAction.h"
 
 #include "Test/MockESDConnectionManager.h"
@@ -26,15 +26,11 @@ class IncrementActionKeyPressTestFixture : public ::testing::Test
                      {"increment_max", increment_max},
                      {"increment_cycle_allowed_check", false}}}})
     {
-        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+        sim_connection_manager.connect_to_protocol(Protocol::DCS_ExportScript, connection_settings);
+        simulator_interface = sim_connection_manager.get_interface(Protocol::DCS_ExportScript);
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive_stream();
     }
-    SimulatorConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
-    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
-    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
-    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    IncrementAction fixture_context;
 
     std::string send_address = "23,2";
     std::string dcs_id_increment_monitor = "321";
@@ -42,6 +38,14 @@ class IncrementActionKeyPressTestFixture : public ::testing::Test
     std::string increment_min = "0";
     std::string increment_max = "1";
     json payload;
+
+    SimulatorConnectionSettings connection_settings = {"1938", "1939", "127.0.0.1"};
+    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
+    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
+    IncrementAction fixture_context;
+    SimulatorInterface *simulator_interface; // Simulator Interface to test.
+  private:
+    SimConnectionManager sim_connection_manager;
 };
 
 TEST_F(IncrementActionKeyPressTestFixture, handle_keydown_increment)

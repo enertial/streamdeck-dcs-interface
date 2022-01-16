@@ -26,7 +26,7 @@ class ImageStateMonitor
      * @param simulator_interface Interface to request current game state from.
      * @return The Streamdeck context should be set to if all settings are filled.
      */
-    int determineContextState(const std::unique_ptr<SimulatorInterface> &simulator_interface) const;
+    int determineContextState(SimulatorInterface *simulator_interface) const;
 
   private:
     enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };

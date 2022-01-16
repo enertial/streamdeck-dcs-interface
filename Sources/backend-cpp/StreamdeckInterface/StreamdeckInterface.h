@@ -11,7 +11,7 @@
 //==============================================================================
 
 #include "ElgatoSD/ESDBasePlugin.h"
-#include "SimulatorInterface/SimulatorInterface.h"
+#include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/StreamdeckContext.h"
 
 #include <memory>
@@ -76,7 +76,7 @@ class StreamdeckInterface : public ESDBasePlugin
 
     std::mutex mVisibleContextsMutex;
     std::unordered_map<std::string, StreamdeckContext> mVisibleContexts = {};
+    SimConnectionManager simConnectionManager_;
 
     CallBackTimer *mTimer;
-    std::unique_ptr<SimulatorInterface> simulator_interface_;
 };

@@ -31,7 +31,7 @@ void ImageStateMonitor::update_settings(const json &settings)
     }
 }
 
-int ImageStateMonitor::determineContextState(const std::unique_ptr<SimulatorInterface> &simulator_interface) const
+int ImageStateMonitor::determineContextState(SimulatorInterface *simulator_interface) const
 {
     if (settings_are_filled_) {
         const auto maybe_current_game_value = simulator_interface->get_value_at_addr(dcs_id_compare_monitor_);

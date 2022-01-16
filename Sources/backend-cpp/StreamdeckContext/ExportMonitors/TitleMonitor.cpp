@@ -37,7 +37,7 @@ void TitleMonitor::update_settings(const json &settings)
     }
 }
 
-std::string TitleMonitor::determineTitle(const std::unique_ptr<SimulatorInterface> &simulator_interface)
+std::string TitleMonitor::determineTitle(SimulatorInterface *simulator_interface)
 {
     std::string updated_title = "";
 
