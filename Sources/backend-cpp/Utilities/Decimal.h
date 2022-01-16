@@ -6,7 +6,7 @@
 
 /**
  * @brief Provides a type for decimal values which can be converted to/from string representation and supports
- * summation and comparison while maintaining precision.
+ * basic arithmetic operations (except division) and comparison while maintaining precision.
  *
  * @throws Exception if string cannot be converted to a decimal representation.
  *
@@ -16,21 +16,25 @@ class Decimal
   public:
     Decimal();
     Decimal(std::string number);
-    Decimal(int significant_digits, int exponent);
+    Decimal(int integer);
 
     /**
      * @brief Returns a string representation of the decimal value.
-     *
      */
     std::string str() const;
 
     /**
+     * @brief Returns a double representation of the decimal value.
+     */
+    double as_double() const;
+
+    /**
      * @brief Overloaded summation operators allow add and subtract while maintaining precision of highest-exponent
      * Decimal.
-     *
      */
     friend Decimal operator+(const Decimal &lhs, const Decimal &rhs);
     friend Decimal operator-(const Decimal &lhs, const Decimal &rhs);
+    friend Decimal operator*(const Decimal &lhs, const Decimal &rhs);
     inline Decimal &operator+=(const Decimal &rhs)
     {
         *this = *this + rhs;
@@ -39,6 +43,11 @@ class Decimal
     inline Decimal &operator-=(const Decimal &rhs)
     {
         *this = *this - rhs;
+        return *this;
+    }
+    inline Decimal &operator*=(const Decimal &rhs)
+    {
+        *this = *this * rhs;
         return *this;
     }
 
@@ -51,8 +60,11 @@ class Decimal
     friend inline bool operator!=(const Decimal &lhs, const Decimal &rhs) { return !(lhs == rhs); }
 
   private:
+    // Private constructor can directly set the exponent value.
+    Decimal(int significant_digits, unsigned int exponent);
+
     int significant_digits_; // The significant digits of the decimal value.
-    int exponent_;           // Exponent such that the numeric value = significant_digits * 10 ^ (exponent).
+    unsigned int exponent_;  // Exponent such that the numeric value = significant_digits * 10 ^ -(exponent).
 
     /**
      * @brief Converts a string to a Decimal represtentation (significant_digits and exponent).

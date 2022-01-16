@@ -92,7 +92,7 @@ TEST_F(DcsBiosProtocolTestFixture, get_integer_value)
     mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_TRUE(Decimal(7, 0) ==
+    EXPECT_TRUE(Decimal(7) ==
                 simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x5678, 0xFFFF, 0)));
 }
 
@@ -142,7 +142,7 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrites_values)
     // Query for ID updates.
     const auto address_0x740C = SimulatorAddress{0x740C, 0xFFFF, 0};
     auto data_at_0x740C = simulator_interface.get_decimal_of_simulator_object_state(address_0x740C);
-    EXPECT_TRUE(data_at_0x740C.value() == Decimal(0x0200, 0));
+    EXPECT_TRUE(data_at_0x740C.value() == Decimal(0x0200));
 
     // TEST 2 - Received values will overwrite their previous values.
     // Send a new message with one ID value updated.
@@ -152,7 +152,7 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrites_values)
 
     // Query for ID updates - Test that only the value for address x740C has changed.
     data_at_0x740C = simulator_interface.get_decimal_of_simulator_object_state(address_0x740C);
-    EXPECT_TRUE(data_at_0x740C.value() == Decimal(0x0022, 0));
+    EXPECT_TRUE(data_at_0x740C.value() == Decimal(0x0022));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_incomplete_message)
@@ -168,7 +168,7 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_incomplete_mess
     // Query for ID updates.
     const auto data_at_0x0008 =
         simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x0008, 0xFFFF, 0));
-    EXPECT_TRUE(data_at_0x0008.value() == Decimal(0x726F, 0));
+    EXPECT_TRUE(data_at_0x0008.value() == Decimal(0x726F));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_change_of_module)

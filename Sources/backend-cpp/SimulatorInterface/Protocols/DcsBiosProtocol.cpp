@@ -61,7 +61,7 @@ std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(
 std::optional<Decimal> DcsBiosProtocol::get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
 {
     if (address.type == AddressType::INTEGER && current_game_state_by_address_.count(address.address) > 0) {
-        return Decimal((current_game_state_by_address_.at(address.address) & address.mask) >> address.shift, 0);
+        return Decimal((current_game_state_by_address_.at(address.address) & address.mask) >> address.shift);
     }
     return std::nullopt;
 }
