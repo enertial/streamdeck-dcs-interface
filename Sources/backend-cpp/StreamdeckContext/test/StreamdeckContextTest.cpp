@@ -3,11 +3,10 @@
 #include "gtest/gtest.h"
 #include <unordered_map>
 
-#include "Test/MockESDConnectionManager.h"
-
-#include "StreamdeckContext/StreamdeckContext.h"
+#include "Test/MockESDConnectionManager.h" // Must be called before other includes
 
 #include "SimulatorInterface/SimConnectionManager.h"
+#include "StreamdeckContext/StreamdeckContext.h"
 
 namespace test
 {
@@ -41,6 +40,18 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
     // Expect no state or title change as default context state and title values have not changed.
     EXPECT_EQ(esd_connection_manager.context_, "");
     EXPECT_EQ(esd_connection_manager.num_calls_to_SetState, 0);
+}
+
+TEST(StreamdeckContextTest, protocol_is_set)
+{
+    const auto dcs_bios_action = "com.ctytler.dcs.dcs-bios";
+    const auto dcs_exportscript_action = "com.ctytler.dcs.up-down.switch.two-state";
+
+    StreamdeckContext dcs_bios_context(dcs_bios_action, "", {});
+    StreamdeckContext dcs_exportscript_context(dcs_exportscript_action, "", {});
+
+    EXPECT_EQ(dcs_bios_context.protocol(), Protocol::DCS_BIOS);
+    EXPECT_EQ(dcs_exportscript_context.protocol(), Protocol::DCS_ExportScript);
 }
 
 class StreamdeckContextTestFixture : public ::testing::Test

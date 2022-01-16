@@ -9,10 +9,13 @@
 StreamdeckContext::StreamdeckContext(const std::string &action, const std::string &context, const json &settings)
     : context_{context}, send_action_(SendActionFactory().create(action))
 {
+    protocol_ = (action == "com.ctytler.dcs.dcs-bios") ? Protocol::DCS_BIOS : Protocol::DCS_ExportScript;
     updateContextSettings(settings);
 }
 
 bool StreamdeckContext::is_valid() { return (send_action_ != nullptr); }
+
+Protocol StreamdeckContext::protocol() { return protocol_; }
 
 void StreamdeckContext::updateContextState(SimulatorInterface *simulator_interface,
                                            ESDConnectionManager *mConnectionManager)

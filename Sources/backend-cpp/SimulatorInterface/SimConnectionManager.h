@@ -3,10 +3,9 @@
 #pragma once
 
 #include "SimulatorInterface/SimulatorInterface.h"
+#include "SimulatorInterface/SimulatorProtocolTypes.h"
 
 #include <unordered_map>
-
-enum class Protocol { DCS_BIOS, DCS_ExportScript };
 
 class SimConnectionManager
 {

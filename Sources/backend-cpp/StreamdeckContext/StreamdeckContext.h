@@ -4,6 +4,7 @@
 
 #include "ElgatoSD/ESDConnectionManager.h"
 #include "SimulatorInterface/SimulatorInterface.h"
+#include "SimulatorInterface/SimulatorProtocolTypes.h"
 #include "StreamdeckContext/ExportMonitors/ImageStateMonitor.h"
 #include "StreamdeckContext/ExportMonitors/IncrementMonitor.h"
 #include "StreamdeckContext/ExportMonitors/TitleMonitor.h"
@@ -22,6 +23,9 @@ class StreamdeckContext
 
     // Detect if constructed context is valid.
     bool is_valid();
+
+    // Simulation interface protocol to use for this context.
+    Protocol protocol();
 
     /**
      * @brief Queries the simulator_interface for updates to the Context's monitored DCS IDs.
@@ -74,6 +78,8 @@ class StreamdeckContext
 
   private:
     std::string context_; // Unique context ID used by Streamdeck to refer to instances of buttons.
+    Protocol protocol_;   // Simulation interface protocol this instance will communicate with.
+
     // Mutable context state.
     int current_state_ = 0;          // Stored state of the context.
     std::string current_title_ = ""; // Stored title of the context.

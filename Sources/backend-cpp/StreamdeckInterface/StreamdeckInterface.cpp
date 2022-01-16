@@ -107,16 +107,23 @@ void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
 {
     json settings;
     EPLJSONUtils::GetObjectByName(inPayload, "settings", settings);
-    SimulatorConnectionSettings connection_settings = get_connection_settings(settings);
+    // SimulatorConnectionSettings connection_settings = get_connection_settings(settings);
+
+    // TODO: read these in from global settings, always connect to both for now.
+    std::unordered_map<Protocol, SimulatorConnectionSettings> connection_settings;
+    connection_settings[Protocol::DCS_BIOS] = {"5010", "7778", "127.0.0.1", "239.255.50.10"};
+    connection_settings[Protocol::DCS_ExportScript] = {"1725", "26027", "127.0.0.1", ""};
 
     // Create first instance of Simulator Interface only done under DidReceiveGlobalSettings to allow for any stored
     // settings to be used before binding socket to default port values.
-    if (!simConnectionManager_.is_connected_with_settings(Protocol::DCS_BIOS, connection_settings)) {
-        try {
-            simConnectionManager_.connect_to_protocol(Protocol::DCS_BIOS, connection_settings);
-            mConnectionManager->LogMessage("Successfully connected to Simulator Interface UDP port");
-        } catch (const std::exception &e) {
-            mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
+    for (const auto &protocol : connection_settings) {
+        if (!simConnectionManager_.is_connected_with_settings(protocol.first, protocol.second)) {
+            try {
+                simConnectionManager_.connect_to_protocol(protocol.first, protocol.second);
+                mConnectionManager->LogMessage("Successfully connected to Simulator Interface UDP port");
+            } catch (const std::exception &e) {
+                mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
+            }
         }
     }
 }
@@ -132,10 +139,10 @@ void StreamdeckInterface::UpdateFromGameState()
 
     if (mConnectionManager != nullptr) {
         mVisibleContextsMutex.lock();
-        for (auto &elem : mVisibleContexts) {
-            if (simConnectionManager_.is_connected(Protocol::DCS_BIOS)) {
-                elem.second.updateContextState(simConnectionManager_.get_interface(Protocol::DCS_BIOS),
-                                               mConnectionManager);
+        for (auto &context : mVisibleContexts) {
+            const auto protocol = context.second.protocol();
+            if (simConnectionManager_.is_connected(protocol)) {
+                context.second.updateContextState(simConnectionManager_.get_interface(protocol), mConnectionManager);
             }
         }
         mVisibleContextsMutex.unlock();
@@ -147,12 +154,13 @@ void StreamdeckInterface::KeyDownForAction(const std::string &inAction,
                                            const json &inPayload,
                                            const std::string &inDeviceID)
 {
-    if (simConnectionManager_.is_connected(Protocol::DCS_BIOS)) {
-        mVisibleContextsMutex.lock();
+    mVisibleContextsMutex.lock();
+    const auto protocol = mVisibleContexts[inContext].protocol();
+    if (simConnectionManager_.is_connected(protocol)) {
         mVisibleContexts[inContext].handleButtonPressedEvent(
-            simConnectionManager_.get_interface(Protocol::DCS_BIOS), mConnectionManager, inPayload);
-        mVisibleContextsMutex.unlock();
+            simConnectionManager_.get_interface(protocol), mConnectionManager, inPayload);
     }
+    mVisibleContextsMutex.unlock();
 }
 
 void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
@@ -161,12 +169,13 @@ void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
                                          const std::string &inDeviceID)
 {
 
-    if (simConnectionManager_.is_connected(Protocol::DCS_BIOS)) {
-        mVisibleContextsMutex.lock();
+    mVisibleContextsMutex.lock();
+    const auto protocol = mVisibleContexts[inContext].protocol();
+    if (simConnectionManager_.is_connected(protocol)) {
         mVisibleContexts[inContext].handleButtonReleasedEvent(
-            simConnectionManager_.get_interface(Protocol::DCS_BIOS), mConnectionManager, inPayload);
-        mVisibleContextsMutex.unlock();
+            simConnectionManager_.get_interface(protocol), mConnectionManager, inPayload);
     }
+    mVisibleContextsMutex.unlock();
 }
 
 void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
@@ -179,11 +188,9 @@ void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
 
     if (newContext.is_valid()) {
         mVisibleContextsMutex.lock();
-        // Remember the context.
+        // Remember the context and make sure state is synchronized with plugin.
         mVisibleContexts[inContext] = std::move(newContext);
-        if (simConnectionManager_.is_connected(Protocol::DCS_BIOS)) {
-            mVisibleContexts[inContext].forceSendState(mConnectionManager);
-        }
+        mVisibleContexts[inContext].forceSendState(mConnectionManager);
         mVisibleContextsMutex.unlock();
     } else {
         mConnectionManager->LogMessage("Unable to handle button of type: " + inAction + " context: " + inContext +
@@ -234,7 +241,9 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
     }
 
     if (event == "RequestDcsStateUpdate") {
-        if (simConnectionManager_.is_connected(Protocol::DCS_BIOS)) {
+        const auto protocol =
+            (inAction == "com.ctytler.dcs.dcs-bios") ? Protocol::DCS_BIOS : Protocol::DCS_ExportScript;
+        if (!simConnectionManager_.is_connected(Protocol::DCS_ExportScript)) {
             mConnectionManager->SendToPropertyInspector(inAction,
                                                         inContext,
                                                         json({{"event", "DebugDcsGameState"},
@@ -242,7 +251,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                                               {"error", "SimulatorInterface not connected"}}));
         } else {
             const json current_simulator_state =
-                simConnectionManager_.get_interface(Protocol::DCS_BIOS)->get_current_state_as_json();
+                simConnectionManager_.get_interface(Protocol::DCS_ExportScript)->get_current_state_as_json();
             mConnectionManager->SendToPropertyInspector(
                 inAction,
                 inContext,
