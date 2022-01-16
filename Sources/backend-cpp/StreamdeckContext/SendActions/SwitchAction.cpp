@@ -24,6 +24,6 @@ void SwitchAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInte
 
     if (!send_when_first_state_value.empty() && !send_when_second_state_value.empty()) {
         const auto send_value = is_first_state ? send_when_first_state_value : send_when_second_state_value;
-        simulator_interface->send_simulator_command(send_address, send_value);
+        simulator_interface->send_command(send_address, send_value);
     }
 }

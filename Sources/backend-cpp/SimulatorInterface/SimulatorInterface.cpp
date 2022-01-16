@@ -27,4 +27,4 @@ bool SimulatorInterface::connection_settings_match(const SimulatorConnectionSett
             (settings.multicast_address == connection_settings_.multicast_address));
 }
 
-std::string SimulatorInterface::get_current_simulator_module() const { return current_game_module_; }
+std::string SimulatorInterface::get_current_module() const { return current_game_module_; }

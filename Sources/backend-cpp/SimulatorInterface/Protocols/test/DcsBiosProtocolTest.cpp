@@ -42,13 +42,13 @@ class DcsBiosProtocolTestFixture : public ::testing::Test
     DcsBiosProtocol simulator_interface; // Simulator Interface to test.
 };
 
-TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module_init)
+TEST_F(DcsBiosProtocolTestFixture, get_current_module_init)
 {
     // Test that the default value of an empty string is returned after initialization.
-    EXPECT_EQ("", simulator_interface.get_current_simulator_module());
+    EXPECT_EQ("", simulator_interface.get_current_module());
 }
 
-TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module)
+TEST_F(DcsBiosProtocolTestFixture, get_current_module)
 {
     // Test that game module is updated when the ACFT_NAME string is received.
     // clang-format off
@@ -60,7 +60,7 @@ TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module)
     mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_EQ("AV8BNA", simulator_interface.get_current_simulator_module());
+    EXPECT_EQ("AV8BNA", simulator_interface.get_current_module());
 
     // Expect that successive sends with partial strings of Aircraft Name don't interfere with module name.
     // clang-format off
@@ -71,15 +71,15 @@ TEST_F(DcsBiosProtocolTestFixture, get_current_simulator_module)
     mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_EQ("AV8BNA", simulator_interface.get_current_simulator_module());
+    EXPECT_EQ("AV8BNA", simulator_interface.get_current_module());
 }
 
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_empty)
 {
     // Test that nothing is returned when no state has been received yet.
     simulator_interface.update_simulator_state();
-    EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 8)));
-    EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x5678, 0xFFFF, 0)));
+    EXPECT_FALSE(simulator_interface.get_string_at_addr(SimulatorAddress(0x1234, 8)));
+    EXPECT_FALSE(simulator_interface.get_value_at_addr(SimulatorAddress(0x5678, 0xFFFF, 0)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, get_integer_value)
@@ -92,8 +92,7 @@ TEST_F(DcsBiosProtocolTestFixture, get_integer_value)
     mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_TRUE(Decimal(7) ==
-                simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x5678, 0xFFFF, 0)));
+    EXPECT_TRUE(Decimal(7) == simulator_interface.get_value_at_addr(SimulatorAddress(0x5678, 0xFFFF, 0)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, get_string_value_max_length)
@@ -108,8 +107,7 @@ TEST_F(DcsBiosProtocolTestFixture, get_string_value_max_length)
     mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_EQ("TestStr!",
-              simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, MAX_STRING_LEN)));
+    EXPECT_EQ("TestStr!", simulator_interface.get_string_at_addr(SimulatorAddress(0x1234, MAX_STRING_LEN)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, get_string_value_null_terminated)
@@ -123,7 +121,7 @@ TEST_F(DcsBiosProtocolTestFixture, get_string_value_null_terminated)
     mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
     simulator_interface.update_simulator_state();
 
-    EXPECT_EQ("TestStr", simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 8)));
+    EXPECT_EQ("TestStr", simulator_interface.get_string_at_addr(SimulatorAddress(0x1234, 8)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrites_values)
@@ -141,7 +139,7 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrites_values)
 
     // Query for ID updates.
     const auto address_0x740C = SimulatorAddress{0x740C, 0xFFFF, 0};
-    auto data_at_0x740C = simulator_interface.get_decimal_of_simulator_object_state(address_0x740C);
+    auto data_at_0x740C = simulator_interface.get_value_at_addr(address_0x740C);
     EXPECT_TRUE(data_at_0x740C.value() == Decimal(0x0200));
 
     // TEST 2 - Received values will overwrite their previous values.
@@ -151,7 +149,7 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_overwrites_values)
     simulator_interface.update_simulator_state();
 
     // Query for ID updates - Test that only the value for address x740C has changed.
-    data_at_0x740C = simulator_interface.get_decimal_of_simulator_object_state(address_0x740C);
+    data_at_0x740C = simulator_interface.get_value_at_addr(address_0x740C);
     EXPECT_TRUE(data_at_0x740C.value() == Decimal(0x0022));
 }
 
@@ -166,8 +164,7 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_incomplete_mess
     simulator_interface.update_simulator_state();
 
     // Query for ID updates.
-    const auto data_at_0x0008 =
-        simulator_interface.get_decimal_of_simulator_object_state(SimulatorAddress(0x0008, 0xFFFF, 0));
+    const auto data_at_0x0008 = simulator_interface.get_value_at_addr(SimulatorAddress(0x0008, 0xFFFF, 0));
     EXPECT_TRUE(data_at_0x0008.value() == Decimal(0x726F));
 }
 
@@ -183,11 +180,11 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_change_of_modul
     mock_dcs.send_bytes(mock_dcs_message_one, SIZE_OF(mock_dcs_message_one));
     simulator_interface.update_simulator_state();
     // Verify
-    EXPECT_EQ("ACFT", simulator_interface.get_current_simulator_module());
+    EXPECT_EQ("ACFT", simulator_interface.get_current_module());
     const auto address_0x1110 = SimulatorAddress{0x1110, 0xFFFF, 0};
     const auto address_0x1112 = SimulatorAddress{0x1112, 0xFFFF, 0};
-    EXPECT_TRUE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1110));
-    EXPECT_TRUE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1112));
+    EXPECT_TRUE(simulator_interface.get_value_at_addr(address_0x1110));
+    EXPECT_TRUE(simulator_interface.get_value_at_addr(address_0x1112));
 
     // Send a message with a new module, named "MOD".
     const char mock_dcs_message_two[] = {0x55,       0x55,       0x55, 0x55,              //
@@ -198,11 +195,11 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_change_of_modul
     mock_dcs.send_bytes(mock_dcs_message_two, SIZE_OF(mock_dcs_message_two));
     simulator_interface.update_simulator_state();
     // Verify module name changes, and only most recent data frame data is kept.
-    EXPECT_EQ("MOD", simulator_interface.get_current_simulator_module());
-    EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1110));
-    EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1112));
+    EXPECT_EQ("MOD", simulator_interface.get_current_module());
+    EXPECT_FALSE(simulator_interface.get_value_at_addr(address_0x1110));
+    EXPECT_FALSE(simulator_interface.get_value_at_addr(address_0x1112));
     const auto address_0x2110 = SimulatorAddress{0x2110, 0xFFFF, 0};
-    EXPECT_TRUE(simulator_interface.get_decimal_of_simulator_object_state(address_0x2110));
+    EXPECT_TRUE(simulator_interface.get_value_at_addr(address_0x2110));
 
     // Send a message with ACFT_NAME="" (starts with a '\0' character) and No data.
     const char mock_dcs_end_message[] = {0x55,       0x55,       0x55, 0x55, //
@@ -212,34 +209,34 @@ TEST_F(DcsBiosProtocolTestFixture, update_simulator_state_handle_change_of_modul
     mock_dcs.send_bytes(mock_dcs_end_message, SIZE_OF(mock_dcs_end_message));
     simulator_interface.update_simulator_state();
     // Verify
-    EXPECT_EQ("", simulator_interface.get_current_simulator_module());
+    EXPECT_EQ("", simulator_interface.get_current_module());
     // Test that game state is cleared.
-    EXPECT_FALSE(simulator_interface.get_decimal_of_simulator_object_state(address_0x1110));
+    EXPECT_FALSE(simulator_interface.get_value_at_addr(address_0x1110));
 }
 
-TEST_F(DcsBiosProtocolTestFixture, send_simulator_command)
+TEST_F(DcsBiosProtocolTestFixture, send_command)
 {
     const std::string control_reference = "BIOS_HANDLE";
     const std::string value = "1";
     const std::string expected_msg_buffer = "BIOS_HANDLE 1\n";
 
-    simulator_interface.send_simulator_command(control_reference, value);
+    simulator_interface.send_command(control_reference, value);
     std::stringstream ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), expected_msg_buffer);
 }
 
-TEST_F(DcsBiosProtocolTestFixture, send_simulator_reset_command)
+TEST_F(DcsBiosProtocolTestFixture, send_reset_command)
 {
-    simulator_interface.send_simulator_reset_command();
+    simulator_interface.send_reset_command();
     std::stringstream ss_received = mock_dcs.receive_stream();
     EXPECT_EQ(ss_received.str(), "SYNC E\n");
 }
 
-TEST_F(DcsBiosProtocolTestFixture, get_value_of_simulator_object_state_if_nonexistant)
+TEST_F(DcsBiosProtocolTestFixture, get_string_at_addr_if_nonexistant)
 {
-    EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234)));
-    EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 0xFFFF, 0)));
-    EXPECT_FALSE(simulator_interface.get_value_of_simulator_object_state(SimulatorAddress(0x1234, 10)));
+    EXPECT_FALSE(simulator_interface.get_string_at_addr(SimulatorAddress(0x1234)));
+    EXPECT_FALSE(simulator_interface.get_string_at_addr(SimulatorAddress(0x1234, 0xFFFF, 0)));
+    EXPECT_FALSE(simulator_interface.get_string_at_addr(SimulatorAddress(0x1234, 10)));
 }
 
 TEST_F(DcsBiosProtocolTestFixture, clear_game_state)
@@ -252,12 +249,12 @@ TEST_F(DcsBiosProtocolTestFixture, clear_game_state)
     mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
 
-    auto current_game_state = simulator_interface.debug_get_current_game_state();
+    auto current_game_state = simulator_interface.get_current_state_as_json();
     EXPECT_EQ(current_game_state.size(), 4);
 
     // Test that game state is able to be cleared.
     simulator_interface.clear_game_state();
-    current_game_state = simulator_interface.debug_get_current_game_state();
+    current_game_state = simulator_interface.get_current_state_as_json();
     EXPECT_EQ(0, current_game_state.size());
 }
 
@@ -270,7 +267,7 @@ TEST_F(DcsBiosProtocolTestFixture, debug_print_format)
                                      0x0C, 0x74, 0x02, 0x00, 0x00, 0x02};
     mock_dcs.send_bytes(mock_dcs_message, SIZE_OF(mock_dcs_message));
     simulator_interface.update_simulator_state();
-    const auto current_game_state = simulator_interface.debug_get_current_game_state();
+    const auto current_game_state = simulator_interface.get_current_state_as_json();
 
     EXPECT_EQ(current_game_state["8"], 0x726F);
     EXPECT_EQ(current_game_state["1026"], 0x3031);

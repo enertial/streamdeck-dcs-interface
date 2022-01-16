@@ -24,7 +24,7 @@ void IncrementMonitor::update(const std::unique_ptr<SimulatorInterface> &simulat
 {
     if (increment_monitor_is_set_) {
         const std::optional<Decimal> maybe_current_game_value =
-            simulator_interface->get_decimal_of_simulator_object_state(dcs_id_increment_monitor_);
+            simulator_interface->get_value_at_addr(dcs_id_increment_monitor_);
         if (maybe_current_game_value.has_value()) {
             current_increment_value_ = maybe_current_game_value.value();
         }

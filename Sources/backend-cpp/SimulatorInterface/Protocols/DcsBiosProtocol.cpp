@@ -7,7 +7,7 @@
 DcsBiosProtocol::DcsBiosProtocol(const SimulatorConnectionSettings &settings) : SimulatorInterface(settings)
 {
     // Send a reset command on initialization by default.
-    send_simulator_reset_command();
+    send_reset_command();
 }
 
 void DcsBiosProtocol::update_simulator_state()
@@ -24,15 +24,15 @@ void DcsBiosProtocol::update_simulator_state()
     }
 }
 
-void DcsBiosProtocol::send_simulator_command(const std::string &control_reference, const std::string &value)
+void DcsBiosProtocol::send_command(const std::string &control_reference, const std::string &value)
 {
     const std::string message_assembly = control_reference + " " + value + "\n";
     simulator_socket_.send_string(message_assembly);
 }
 
-void DcsBiosProtocol::send_simulator_reset_command() { simulator_socket_.send_string("SYNC E\n"); }
+void DcsBiosProtocol::send_reset_command() { simulator_socket_.send_string("SYNC E\n"); }
 
-std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(const SimulatorAddress &address) const
+std::optional<std::string> DcsBiosProtocol::get_string_at_addr(const SimulatorAddress &address) const
 {
     const bool data_exists_at_start_address = current_game_state_by_address_.count(address.address) > 0;
     if (address.type != AddressType::STRING || !data_exists_at_start_address) {
@@ -58,7 +58,7 @@ std::optional<std::string> DcsBiosProtocol::get_value_of_simulator_object_state(
     return assembled_string;
 }
 
-std::optional<Decimal> DcsBiosProtocol::get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
+std::optional<Decimal> DcsBiosProtocol::get_value_at_addr(const SimulatorAddress &address) const
 {
     if (address.type == AddressType::INTEGER && current_game_state_by_address_.count(address.address) > 0) {
         return Decimal((current_game_state_by_address_.at(address.address) & address.mask) >> address.shift);
@@ -72,7 +72,7 @@ void DcsBiosProtocol::clear_game_state()
     current_game_module_ = "";
 }
 
-json DcsBiosProtocol::debug_get_current_game_state() const
+json DcsBiosProtocol::get_current_state_as_json() const
 {
     json current_game_state_printout;
     for (const auto &[key, value] : current_game_state_by_address_) {
@@ -83,7 +83,7 @@ json DcsBiosProtocol::debug_get_current_game_state() const
 
 void DcsBiosProtocol::monitor_for_module_change()
 {
-    const auto maybe_aircraft_name = get_value_of_simulator_object_state(ACFT_NAME_ADDRESS_);
+    const auto maybe_aircraft_name = get_string_at_addr(ACFT_NAME_ADDRESS_);
     if (maybe_aircraft_name) {
         if (maybe_aircraft_name.value() != current_game_module_) {
             // Clear game state when and reset to only data received in the most recent frame when new active aircraft

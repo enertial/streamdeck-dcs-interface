@@ -246,7 +246,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                                               {"current_game_state", ""},
                                                               {"error", "SimulatorInterface not connected"}}));
         } else {
-            const json current_game_state = simulator_interface_->debug_get_current_game_state();
+            const json current_game_state = simulator_interface_->get_current_state_as_json();
             mConnectionManager->SendToPropertyInspector(
                 inAction,
                 inContext,

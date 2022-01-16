@@ -8,7 +8,7 @@ DcsExportScriptProtocol::DcsExportScriptProtocol(const SimulatorConnectionSettin
     : SimulatorInterface(settings)
 {
     // Send a reset command on initialization by default.
-    send_simulator_reset_command();
+    send_reset_command();
 }
 
 void DcsExportScriptProtocol::update_simulator_state()
@@ -30,7 +30,7 @@ void DcsExportScriptProtocol::update_simulator_state()
     }
 }
 
-void DcsExportScriptProtocol::send_simulator_command(const std::string &address, const std::string &value)
+void DcsExportScriptProtocol::send_command(const std::string &address, const std::string &value)
 {
     // Check that a valid address should be of the form "<device_id>,<button_id>"
     const auto address_as_components = split_pair(address, ',');
@@ -42,10 +42,9 @@ void DcsExportScriptProtocol::send_simulator_command(const std::string &address,
     }
 }
 
-void DcsExportScriptProtocol::send_simulator_reset_command() { simulator_socket_.send_string("R"); }
+void DcsExportScriptProtocol::send_reset_command() { simulator_socket_.send_string("R"); }
 
-std::optional<std::string>
-DcsExportScriptProtocol::get_value_of_simulator_object_state(const SimulatorAddress &address) const
+std::optional<std::string> DcsExportScriptProtocol::get_string_at_addr(const SimulatorAddress &address) const
 {
     if (current_game_state_by_dcs_id_.count(address.address) > 0) {
         if (!current_game_state_by_dcs_id_.at(address.address).empty()) {
@@ -55,8 +54,7 @@ DcsExportScriptProtocol::get_value_of_simulator_object_state(const SimulatorAddr
     return std::nullopt;
 }
 
-std::optional<Decimal>
-DcsExportScriptProtocol::get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
+std::optional<Decimal> DcsExportScriptProtocol::get_value_at_addr(const SimulatorAddress &address) const
 {
     if (current_game_state_by_dcs_id_.count(address.address) > 0) {
         if (is_number(current_game_state_by_dcs_id_.at(address.address))) {
@@ -68,7 +66,7 @@ DcsExportScriptProtocol::get_decimal_of_simulator_object_state(const SimulatorAd
 
 void DcsExportScriptProtocol::clear_game_state() { current_game_state_by_dcs_id_.clear(); }
 
-json DcsExportScriptProtocol::debug_get_current_game_state() const
+json DcsExportScriptProtocol::get_current_state_as_json() const
 {
     json current_game_state_printout;
     for (const auto &[key, value] : current_game_state_by_dcs_id_) {

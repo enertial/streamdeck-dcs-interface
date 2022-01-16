@@ -11,17 +11,17 @@ class DcsExportScriptProtocol : public SimulatorInterface
 
     void update_simulator_state();
 
-    void send_simulator_command(const std::string &address, const std::string &value);
+    void send_command(const std::string &address, const std::string &value);
 
-    void send_simulator_reset_command();
+    void send_reset_command();
 
-    std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const;
+    std::optional<std::string> get_string_at_addr(const SimulatorAddress &address) const;
 
-    std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const;
+    std::optional<Decimal> get_value_at_addr(const SimulatorAddress &address) const;
 
     void clear_game_state();
 
-    json debug_get_current_game_state() const;
+    json get_current_state_as_json() const;
 
   private:
     /**

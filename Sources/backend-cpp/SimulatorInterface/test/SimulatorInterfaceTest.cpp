@@ -12,17 +12,11 @@ class SimulatorInterfaceDerivedClass : public SimulatorInterface
     using SimulatorInterface::SimulatorInterface;
     // Implement pure virtual functions to allow testing of common functions.
     void update_simulator_state(){};
-    void send_simulator_command(const std::string &address, const std::string &value){};
-    void send_simulator_reset_command(){};
-    std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const
-    {
-        return std::nullopt;
-    }
-    std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const
-    {
-        return std::nullopt;
-    }
-    json debug_get_current_game_state() const { return json{}; };
+    void send_command(const std::string &address, const std::string &value){};
+    void send_reset_command(){};
+    std::optional<std::string> get_string_at_addr(const SimulatorAddress &address) const { return std::nullopt; }
+    std::optional<Decimal> get_value_at_addr(const SimulatorAddress &address) const { return std::nullopt; }
+    json get_current_state_as_json() const { return json{}; };
 };
 
 TEST(SimulatorInterfaceTest, invalid_connection_port_settings)
@@ -59,7 +53,7 @@ TEST(SimulatorInterfaceTest, get_current_module_initial_value)
 {
     SimulatorInterfaceDerivedClass simulator_interface(SimulatorConnectionSettings{"1908", "1909", "127.0.0.1", ""});
     // Test that the default value of an empty string is returned after initialization.
-    EXPECT_EQ("", simulator_interface.get_current_simulator_module());
+    EXPECT_EQ("", simulator_interface.get_current_module());
 }
 
 } // namespace test

@@ -43,7 +43,7 @@ std::string TitleMonitor::determineTitle(const std::unique_ptr<SimulatorInterfac
 
     if (string_monitor_is_set_) {
         const std::optional<std::string> maybe_current_game_value =
-            simulator_interface->get_value_of_simulator_object_state(dcs_id_string_monitor_);
+            simulator_interface->get_string_at_addr(dcs_id_string_monitor_);
         if (maybe_current_game_value.has_value()) {
             updated_title = convertGameStateToTitle(maybe_current_game_value.value());
         }

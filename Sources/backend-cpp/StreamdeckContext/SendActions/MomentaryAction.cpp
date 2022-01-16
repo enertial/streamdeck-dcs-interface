@@ -12,7 +12,7 @@ void MomentaryAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorIn
     const auto send_command = EPLJSONUtils::GetStringByName(inPayload["settings"], "press_value");
 
     if (!send_command.empty()) {
-        simulator_interface->send_simulator_command(send_address, send_command);
+        simulator_interface->send_command(send_address, send_command);
     }
 }
 
@@ -26,6 +26,6 @@ void MomentaryAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorI
         EPLJSONUtils::GetBoolByName(inPayload["settings"], "disable_release_check");
 
     if (!send_command.empty() && !send_on_release_is_disabled) {
-        simulator_interface->send_simulator_command(send_address, send_command);
+        simulator_interface->send_command(send_address, send_command);
     }
 }

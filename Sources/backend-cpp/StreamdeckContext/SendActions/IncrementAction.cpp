@@ -19,7 +19,7 @@ void IncrementAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorIn
 
     const auto send_command = determineSendValue(settings);
     if (send_command) {
-        simulator_interface->send_simulator_command(send_address, send_command.value());
+        simulator_interface->send_command(send_address, send_command.value());
     }
 }
 

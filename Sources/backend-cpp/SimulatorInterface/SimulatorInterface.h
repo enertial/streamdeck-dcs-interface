@@ -51,7 +51,7 @@ class SimulatorInterface
      * @brief Get the name of the current simulator module.
      * @return Aircraft module name.
      */
-    std::string get_current_simulator_module() const;
+    std::string get_current_module() const;
 
     /**
      * @brief Receives simulator state broadcasts, updating internal current game state.
@@ -63,40 +63,40 @@ class SimulatorInterface
      * @param address Object name to set value of.
      * @param value   Value to set the button to.
      */
-    virtual void send_simulator_command(const std::string &address, const std::string &value) = 0;
+    virtual void send_command(const std::string &address, const std::string &value) = 0;
 
     /**
      * @brief Sends a reset command to simulator to signify a request for a resend of data.
      */
-    virtual void send_simulator_reset_command() = 0;
+    virtual void send_reset_command() = 0;
 
     /**
-     * @brief Get the value of object from current game state.
+     * @brief Get the string value of object from current game state.
      * @return Optional value of object ID is returned if a value has been logged.
      */
-    virtual std::optional<std::string> get_value_of_simulator_object_state(const SimulatorAddress &address) const = 0;
+    virtual std::optional<std::string> get_string_at_addr(const SimulatorAddress &address) const = 0;
 
-    std::optional<std::string> get_value_of_simulator_object_state(const int address) const // Convenience overload.
+    std::optional<std::string> get_string_at_addr(const int address) const // Convenience overload.
     {
-        return get_value_of_simulator_object_state(SimulatorAddress(address));
+        return get_string_at_addr(SimulatorAddress(address));
     }
 
     /**
      * @brief Get the value as Decimal of object from current game state.
      * @return Optional value of object is returned if a value has been logged that is a Decimal.
      */
-    virtual std::optional<Decimal> get_decimal_of_simulator_object_state(const SimulatorAddress &address) const = 0;
+    virtual std::optional<Decimal> get_value_at_addr(const SimulatorAddress &address) const = 0;
 
-    std::optional<Decimal> get_decimal_of_simulator_object_state(const int address) const // Convenience overload.
+    std::optional<Decimal> get_value_at_addr(const int address) const // Convenience overload.
     {
-        return get_decimal_of_simulator_object_state(SimulatorAddress(address));
+        return get_value_at_addr(SimulatorAddress(address));
     }
 
     /**
      * @brief For debugging purposes, outputs all logged object key value pairs stored in current game state.
      * @return Json representation of object IDs and their values in current game state.
      */
-    virtual json debug_get_current_game_state() const = 0;
+    virtual json get_current_state_as_json() const = 0;
 
   protected:
     UdpSocket simulator_socket_;      // UDP Socket connection for communicating with simulator.
