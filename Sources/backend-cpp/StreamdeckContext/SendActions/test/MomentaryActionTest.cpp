@@ -2,7 +2,7 @@
 
 #include "gtest/gtest.h"
 
-#include "SimulatorInterface/SimulatorInterfaceFactory.h"
+#include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/SendActions/MomentaryAction.h"
 
 #include "Test/MockESDConnectionManager.h"
@@ -24,20 +24,24 @@ class MomentaryActionKeyPressTestFixture : public ::testing::Test
                      {"release_value", release_value},
                      {"disable_release_check", false}}}})
     {
-        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+        sim_connection_manager.connect_to_protocol(Protocol::DCS_ExportScript, connection_settings);
+        simulator_interface = sim_connection_manager.get_interface(Protocol::DCS_ExportScript);
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive_stream();
     }
-    SimulatorConnectionSettings connection_settings = {"1928", "1929", "127.0.0.1"};
-    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
-    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
-    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
-    MomentaryAction fixture_context;
 
     std::string send_address = "23,2";
     std::string press_value = "4";
     std::string release_value = "5";
     json payload;
+
+    SimulatorConnectionSettings connection_settings = {"1928", "1929", "127.0.0.1"};
+    UdpSocket mock_dcs;                              // A socket that will mock Send/Receive messages from DCS.
+    MockESDConnectionManager esd_connection_manager; // Streamdeck connection manager, using mock class definition.
+    MomentaryAction fixture_context;
+    SimulatorInterface *simulator_interface; // Simulator Interface to test.
+  private:
+    SimConnectionManager sim_connection_manager;
 };
 
 TEST_F(MomentaryActionKeyPressTestFixture, handle_keydown_momentary)

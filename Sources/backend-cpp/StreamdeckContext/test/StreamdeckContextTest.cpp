@@ -7,10 +7,7 @@
 
 #include "StreamdeckContext/StreamdeckContext.h"
 
-#include "SimulatorInterface/SimulatorInterfaceFactory.h"
-#include "StreamdeckContext/SendActions/IncrementAction.h"
-#include "StreamdeckContext/SendActions/MomentaryAction.h"
-#include "StreamdeckContext/SendActions/SwitchAction.h"
+#include "SimulatorInterface/SimConnectionManager.h"
 
 namespace test
 {
@@ -33,8 +30,12 @@ TEST(StreamdeckContextTest, update_context_state_when_no_dcs)
     constexpr auto action = "com.ctytler.dcs.dcs-bios";
     constexpr auto context_id = "def456";
     StreamdeckContext test_context(action, context_id, {});
+
     const SimulatorConnectionSettings connection_settings = {"2304", "2305", "127.0.0.1"};
-    const auto simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+    auto sim_connection_manager = SimConnectionManager();
+    sim_connection_manager.connect_to_protocol(Protocol::DCS_ExportScript, connection_settings);
+    auto simulator_interface = sim_connection_manager.get_interface(Protocol::DCS_ExportScript);
+
     MockESDConnectionManager esd_connection_manager{};
     test_context.updateContextState(simulator_interface, &esd_connection_manager);
     // Expect no state or title change as default context state and title values have not changed.
@@ -50,7 +51,8 @@ class StreamdeckContextTestFixture : public ::testing::Test
           mock_dcs(connection_settings.ip_address, connection_settings.tx_port, connection_settings.rx_port),
           fixture_context(action, fixture_context_id, {})
     {
-        simulator_interface = SimulatorInterfaceFactory(connection_settings, "DCS-ExportScript");
+        sim_connection_manager.connect_to_protocol(Protocol::DCS_ExportScript, connection_settings);
+        simulator_interface = sim_connection_manager.get_interface(Protocol::DCS_ExportScript);
         // Consume intial reset command sent to to mock_dcs.
         (void)mock_dcs.receive_stream();
 
@@ -60,16 +62,18 @@ class StreamdeckContextTestFixture : public ::testing::Test
         simulator_interface->update_simulator_state();
     }
 
-    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
-    UdpSocket mock_dcs;                                      // A socket that will mock Send/Receive messages from DCS.
-    std::unique_ptr<SimulatorInterface> simulator_interface; // Simulator Interface to test.
-    MockESDConnectionManager esd_connection_manager{}; // Streamdeck connection manager, using mock class definition.
-
     StreamdeckContext fixture_context;
 
     // Create StreamdeckContext to test without any defined settings.
     static inline std::string action = "com.ctytler.dcs.dcs-bios";
     static inline std::string fixture_context_id = "abc123";
+
+    SimulatorConnectionSettings connection_settings = {"1908", "1909", "127.0.0.1"};
+    UdpSocket mock_dcs;                                // A socket that will mock Send/Receive messages from DCS.
+    MockESDConnectionManager esd_connection_manager{}; // Streamdeck connection manager, using mock class definition.
+    SimulatorInterface *simulator_interface;           // Simulator Interface to test.
+  private:
+    SimConnectionManager sim_connection_manager;
 };
 
 TEST_F(StreamdeckContextTestFixture, UseImageStateMonitor)

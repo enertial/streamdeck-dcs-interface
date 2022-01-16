@@ -4,7 +4,7 @@
 
 #include "ElgatoSD/EPLJSONUtils.h"
 
-void MomentaryAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void MomentaryAction::handleButtonPressedEvent(SimulatorInterface *simulator_interface,
                                                ESDConnectionManager *mConnectionManager,
                                                const json &inPayload)
 {
@@ -16,7 +16,7 @@ void MomentaryAction::handleButtonPressedEvent(const std::unique_ptr<SimulatorIn
     }
 }
 
-void MomentaryAction::handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+void MomentaryAction::handleButtonReleasedEvent(SimulatorInterface *simulator_interface,
                                                 ESDConnectionManager *mConnectionManager,
                                                 const json &inPayload)
 {

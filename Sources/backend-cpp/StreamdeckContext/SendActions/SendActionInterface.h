@@ -19,11 +19,11 @@ class SendActionInterface
      * @param mConnectionManager Interface to StreamDeck.
      * @param payload Json payload received with KeyDown/KeyUp callback.
      */
-    virtual void handleButtonPressedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+    virtual void handleButtonPressedEvent(SimulatorInterface *simulator_interface,
                                           ESDConnectionManager *mConnectionManager,
                                           const json &inPayload) = 0;
 
-    virtual void handleButtonReleasedEvent(const std::unique_ptr<SimulatorInterface> &simulator_interface,
+    virtual void handleButtonReleasedEvent(SimulatorInterface *simulator_interface,
                                            ESDConnectionManager *mConnectionManager,
                                            const json &inPayload) = 0;
 
