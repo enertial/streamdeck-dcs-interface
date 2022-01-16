@@ -99,8 +99,8 @@ class SimulatorInterface
     virtual json get_current_state_as_json() const = 0;
 
   protected:
-    UdpSocket simulator_socket_;      // UDP Socket connection for communicating with simulator.
-    std::string current_game_module_; // Stores the current module name being used in game.
+    UdpSocket simulator_socket_; // UDP Socket connection for communicating with simulator.
+    std::string current_module_; // Stores the current module name being used in simulator.
 
   private:
     SimulatorConnectionSettings connection_settings_; // Stored connection settings used for simulator socket.

@@ -80,12 +80,12 @@ void DcsExportScriptProtocol::handle_received_token(const std::string &key, cons
     if (is_integer(key)) {
         current_game_state_by_dcs_id_.insert_or_assign(std::stoi(key), value);
     } else if (key == "File") {
-        current_game_module_ = value;
+        current_module_ = value;
     } else if (key == "Ikarus" || key == "DAC" || key == "DCS") {
         // Stop is received when user has quit mission -- game state should be cleared.
         if (value == "stop") {
             clear_game_state();
-            current_game_module_ = "";
+            current_module_ = "";
         }
     }
 }

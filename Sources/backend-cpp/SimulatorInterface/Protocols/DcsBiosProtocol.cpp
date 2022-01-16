@@ -69,7 +69,7 @@ std::optional<Decimal> DcsBiosProtocol::get_value_at_addr(const SimulatorAddress
 void DcsBiosProtocol::clear_game_state()
 {
     current_game_state_by_address_.clear();
-    current_game_module_ = "";
+    current_module_ = "";
 }
 
 json DcsBiosProtocol::get_current_state_as_json() const
@@ -85,11 +85,11 @@ void DcsBiosProtocol::monitor_for_module_change()
 {
     const auto maybe_aircraft_name = get_string_at_addr(ACFT_NAME_ADDRESS_);
     if (maybe_aircraft_name) {
-        if (maybe_aircraft_name.value() != current_game_module_) {
+        if (maybe_aircraft_name.value() != current_module_) {
             // Clear game state when and reset to only data received in the most recent frame when new active aircraft
             // module is detected.
             current_game_state_by_address_ = protocol_parser_.get_data_by_address_updated_this_frame();
-            current_game_module_ = maybe_aircraft_name.value();
+            current_module_ = maybe_aircraft_name.value();
         }
     }
 }
