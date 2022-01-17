@@ -6,43 +6,25 @@
 
 TitleMonitor::TitleMonitor(const json &settings) { update_settings(settings); }
 
-void TitleMonitor::update_settings(const json &settings)
+void TitleMonitor::update_settings(const json &title_monitor_settings)
 {
-    const std::string dcs_id_string_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_string_monitor");
-    // Set boolean from checkbox using default false value if it doesn't exist in "settings".
-    const std::string string_monitor_vertical_spacing_raw =
-        EPLJSONUtils::GetStringByName(settings, "string_monitor_vertical_spacing");
-    string_monitor_passthrough_ = EPLJSONUtils::GetBoolByName(settings, "string_monitor_passthrough_check", true);
-    std::stringstream string_monitor_mapping_raw;
-    string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
-
-    string_monitor_is_set_ = !dcs_id_string_monitor_raw.empty();
-
+    string_monitor_is_set_ = title_monitor_settings["is_set"];
     if (string_monitor_is_set_) {
-        if (is_integer(dcs_id_string_monitor_raw)) {
-            dcs_id_string_monitor_ = SimulatorAddress(std::stoi(dcs_id_string_monitor_raw));
-
-        } else {
-            if (dcs_id_string_monitor_raw == "INTEGER") {
-                dcs_id_string_monitor_ = SimulatorAddress(settings["string_monitor_address"],
-                                                          settings["string_monitor_mask"],
-                                                          settings["string_monitor_shift"]);
-            } else if (dcs_id_string_monitor_raw == "STRING") {
-                dcs_id_string_monitor_ =
-                    SimulatorAddress(settings["string_monitor_address"], settings["string_monitor_max_length"]);
-            }
+        SimulatorAddress address;
+        if (title_monitor_settings["monitor_address"]["type"] == "STRING") {
+            address = SimulatorAddress{title_monitor_settings["monitor_address"][0]["address"],
+                                       title_monitor_settings["monitor_address"][0]["max_len"]};
+        } else if (title_monitor_settings["monitor_address"]["type"] == "INTEGER") {
+            address = SimulatorAddress{title_monitor_settings["monitor_address"]["address"],
+                                       title_monitor_settings["monitor_address"]["mask"],
+                                       title_monitor_settings["monitor_address"]["shift"]};
+        } else if (title_monitor_settings["monitor_address"]["type"] == "ADDRESS_ONLY") {
+            address = SimulatorAddress{title_monitor_settings["monitor_address"]["address"]};
         }
 
-        if (is_integer(string_monitor_vertical_spacing_raw)) {
-            string_monitor_vertical_spacing_ = std::stoi(string_monitor_vertical_spacing_raw);
-        }
-        if (!string_monitor_passthrough_) {
-            string_monitor_mapping_.clear();
-            std::optional<std::pair<std::string, std::string>> maybe_token_pair;
-            while (maybe_token_pair = pop_key_and_value(string_monitor_mapping_raw, ',', '=')) {
-                string_monitor_mapping_[maybe_token_pair.value().first] = maybe_token_pair.value().second;
-            }
-        }
+        modify_string_ = false; // TODO: Handle modification of strings
+        vertical_spacing_ =
+            title_monitor_settings.contains("vertical_spacing") ? title_monitor_settings["vertical_spacing"] : 0;
     }
 }
 
@@ -52,7 +34,7 @@ std::string TitleMonitor::determineTitle(SimulatorInterface *simulator_interface
 
     if (string_monitor_is_set_) {
         const std::optional<std::string> maybe_current_game_value =
-            simulator_interface->get_string_at_addr(dcs_id_string_monitor_);
+            simulator_interface->get_string_at_addr(monitor_address_);
         if (maybe_current_game_value.has_value()) {
             updated_title = convertGameStateToTitle(maybe_current_game_value.value());
         }
@@ -64,18 +46,18 @@ std::string TitleMonitor::determineTitle(SimulatorInterface *simulator_interface
 std::string TitleMonitor::convertGameStateToTitle(const std::string &current_game_value)
 {
     std::string title;
-    if (string_monitor_passthrough_) {
-        title = current_game_value;
-    } else {
+    if (modify_string_) {
         title = string_monitor_mapping_[current_game_value];
+    } else {
+        title = current_game_value;
     }
     // Apply vertical spacing.
-    if (string_monitor_vertical_spacing_ < 0) {
-        for (int i = 0; i > string_monitor_vertical_spacing_; --i) {
+    if (vertical_spacing_ < 0) {
+        for (int i = 0; i > vertical_spacing_; --i) {
             title = "\n" + title;
         }
     } else {
-        for (int i = 0; i < string_monitor_vertical_spacing_; ++i) {
+        for (int i = 0; i < vertical_spacing_; ++i) {
             title = title + "\n";
         }
     }

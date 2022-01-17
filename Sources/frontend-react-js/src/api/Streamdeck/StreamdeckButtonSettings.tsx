@@ -8,25 +8,27 @@ export default interface StreamdeckButtonSettings {
 }
 
 export interface StateMonitorSettings {
+    is_set: boolean;
     monitor_address: SimulatorAddress;
-    condition_type: "LT" | "EQ" | "GT";
+    comparison_type: "LT" | "EQ" | "GT";
     comparison_value: string;
 }
 
 export interface TitleMonitorSettings {
+    is_set: boolean;
     monitor_address: SimulatorAddress[];
     modify_string: boolean;
-    string_monitor_vertical_spacing: string;
-    string_monitor_mapping: string;
-    is_set: boolean;
+    vertical_spacing?: number;
+    mapping?: string;
 }
 
 export interface ConstantActionSettings {
+    is_set: boolean;
     on_press: CommandSettings[];
     on_release?: CommandSettings[];
     repeat_ms?: number;
     short_dur_ms?: number;
-    type: "NONE" | "CONST" | "TIMED" | "RPT";
+    type: "CONST" | "TIMED" | "RPT";
 }
 
 export interface StateDependentActionSettings {
@@ -55,7 +57,7 @@ interface SimulatorAddress {
     type: "ADDRESS_ONLY" | "INTEGER" | "STRING";
     mask?: number;
     shift?: number;
-    max_length?: number;
+    max_len?: number;
 }
 
 

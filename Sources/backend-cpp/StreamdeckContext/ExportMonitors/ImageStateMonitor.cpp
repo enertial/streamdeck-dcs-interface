@@ -6,66 +6,71 @@
 
 ImageStateMonitor::ImageStateMonitor(const json &settings) { update_settings(settings); }
 
-void ImageStateMonitor::update_settings(const json &settings)
+void ImageStateMonitor::update_settings(const json &state_monitor_settings)
 {
-    const std::string dcs_id_compare_monitor_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_monitor");
-    const std::string dcs_id_compare_condition_raw =
-        EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
-    const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
+    settings_per_state_.clear();
+    monitor_is_set_ = state_monitor_settings["is_set"];
 
-    const bool compare_monitor_is_populated = !dcs_id_compare_monitor_raw.empty();
-    const bool comparison_value_is_populated = is_number(dcs_id_comparison_value_raw);
-    settings_are_filled_ = compare_monitor_is_populated && comparison_value_is_populated;
-
-    if (settings_are_filled_) {
-        if (is_integer(dcs_id_compare_monitor_raw)) {
-            dcs_id_compare_monitor_ = SimulatorAddress(std::stoi(dcs_id_compare_monitor_raw));
-
-        } else {
-            if (dcs_id_compare_monitor_raw == "INTEGER") {
-                dcs_id_compare_monitor_ = SimulatorAddress(settings["compare_monitor_address"],
-                                                           settings["compare_monitor_mask"],
-                                                           settings["compare_monitor_shift"]);
-            } else if (dcs_id_compare_monitor_raw == "STRING") {
-                dcs_id_compare_monitor_ =
-                    SimulatorAddress(settings["compare_monitor_address"], settings["compare_monitor_max_length"]);
+    if (monitor_is_set_) {
+        for (const auto &state : state_monitor_settings) {
+            SimulatorAddress address;
+            if (state["monitor_address"]["type"] == "INTEGER") {
+                address = SimulatorAddress{state["monitor_address"]["address"],
+                                           state["monitor_address"]["mask"],
+                                           state["monitor_address"]["shift"]};
+            } else if (state["monitor_address"]["type"] == "ADDRESS_ONLY") {
+                address = SimulatorAddress{state["monitor_address"]["address"]};
+            } else {
+                // Unsupported type.
+                break;
             }
-        }
-        dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);
-        if (dcs_id_compare_condition_raw == "EQUAL_TO") {
-            dcs_id_compare_condition_ = Comparison::EQUAL_TO;
-        } else if (dcs_id_compare_condition_raw == "LESS_THAN") {
-            dcs_id_compare_condition_ = Comparison::LESS_THAN;
-        } else // Default in Property Inspector html is GREATER_THAN.
-        {
-            dcs_id_compare_condition_ = Comparison::GREATER_THAN;
+
+            Comparison comp_type;
+            if (state["comparison_type"] == "LT") {
+                comp_type = Comparison::LESS_THAN;
+            } else if (state["comparison_type"] == "GT") {
+                comp_type = Comparison::GREATER_THAN;
+            } else {
+                comp_type = Comparison::EQUAL_TO;
+            }
+            settings_per_state_.push_back(StateMonitorSettings{address, comp_type, Decimal(state["comparison_value"])});
         }
     }
 }
 
 int ImageStateMonitor::determineContextState(SimulatorInterface *simulator_interface) const
 {
-    if (settings_are_filled_) {
-        const auto maybe_current_game_value = simulator_interface->get_value_at_addr(dcs_id_compare_monitor_);
-        if (maybe_current_game_value.has_value()) {
-            return comparison_is_satisfied(maybe_current_game_value.value()) ? 1 : 0;
+    if (monitor_is_set_) {
+        for (int iState = 0; iState < settings_per_state_.size(); ++iState) {
+            const auto maybe_value = simulator_interface->get_value_at_addr(settings_per_state_[iState].address);
+            if (!maybe_value) {
+                return 0; // Return early if not all addresses are readable.
+            }
+            if (maybe_value && comparison_is_satisfied(maybe_value.value())) {
+                return iState;
+            }
         }
+        // If no conditional states are satisfied, then the last state is set.
+        return settings_per_state_.size() + 1;
     }
+    // Default to first state.
     return 0;
 }
 
-bool ImageStateMonitor::comparison_is_satisfied(Decimal current_game_value) const
+bool ImageStateMonitor::comparison_is_satisfied(const Decimal &current_game_value,
+                                                const Comparison &comparison,
+                                                const Decimal &comparison_value) const
 {
     bool comparison_result = false;
-    switch (dcs_id_compare_condition_) {
+    switch (comparison) {
     case Comparison::EQUAL_TO:
-        comparison_result = (current_game_value == dcs_id_comparison_value_);
+        comparison_result = (current_game_value == comparison_value);
         break;
     case Comparison::LESS_THAN:
-        comparison_result = (current_game_value < dcs_id_comparison_value_);
+        comparison_result = (current_game_value < comparison_value);
         break;
     case Comparison::GREATER_THAN:
-        comparison_result = (current_game_value > dcs_id_comparison_value_);
+        comparison_result = (current_game_value > comparison_value);
         break;
     }
     return comparison_result;
