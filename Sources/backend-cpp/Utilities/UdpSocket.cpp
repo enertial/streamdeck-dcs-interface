@@ -7,7 +7,7 @@
 #include <WS2tcpip.h>
 
 // Set default timeout for socket.
-DWORD socket_timeout_ms = 100;
+DWORD socket_timeout_ms = 1;
 
 UdpSocket::UdpSocket(const std::string &ip_address,
                      const std::string &rx_port,
