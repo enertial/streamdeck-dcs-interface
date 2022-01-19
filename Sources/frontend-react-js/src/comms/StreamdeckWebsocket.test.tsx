@@ -1,11 +1,11 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./StreamdeckWebsocket";
 import WS from "jest-websocket-mock";
-import { defaultGlobalSettings } from "./StreamdeckApi";
+import { defaultButtonSettings, defaultGlobalSettings } from "./StreamdeckApi";
 
 // Settings used for unit under test.
 const socketSettings = defaultStreamdeckSocketSettings();
-const exampleButtonSettings = { send_value: "test_send_value" };
+const exampleButtonSettings = defaultButtonSettings();
 const exampleGlobalSettings = defaultGlobalSettings();
 
 // Server that can listen to communications from unit under test.

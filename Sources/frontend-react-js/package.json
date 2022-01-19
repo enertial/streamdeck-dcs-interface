@@ -45,6 +45,6 @@
     "@typescript-eslint/parser": "^5.8.1",
     "jest-websocket-mock": "^2.2.1",
     "mock-socket": "^9.0.8",
-    "react-scripts": "4.0.3"
+    "react-scripts": "5.0.0"
   }
 }
