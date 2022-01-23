@@ -21,7 +21,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
    ** Internal State
    */
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState<ControlData[]>([]); // eslint-disable-line @typescript-eslint/no-unused-vars
-  const [selectedModule, setSelectedModule] = useState("");
+  const [selectedModule, setSelectedModule] = useState(sdApi.globalSettings.last_selected_module);
   const [searchQuery, setSearchQuery] = useState("");
 
   const filteredControlRefs = fullModuleControlRefs.filter(
@@ -40,7 +40,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   }, [sdApi.globalSettings.dcs_bios_install_path])
 
   useEffect(() => {
-    setSelectedModule(sdApi.globalSettings.last_selected_module)
+    setSelectedModule(sdApi.globalSettings.last_selected_module || sdApi.moduleList[0])
   }, [sdApi.moduleList])
 
   useEffect(() => {

@@ -9,7 +9,6 @@ interface Window { socketSettings: StreamdeckSocketSettings }
 function App(): JSX.Element {
   const propInspectorWindow = window.opener as Window;
   const socketSettings = propInspectorWindow ? propInspectorWindow.socketSettings : defaultStreamdeckSocketSettings();
-  console.log("Render App");
   const sdApi = useStreamdeckWebsocket(socketSettings);
 
   return (

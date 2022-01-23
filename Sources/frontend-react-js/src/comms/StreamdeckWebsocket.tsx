@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
 import { ModuleControlsJson } from '../components/control-reference/ControlReferenceInterface';
 
@@ -12,7 +12,7 @@ export interface StreamdeckSocketSettings {
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
         port: 28196,
-        propertyInspectorUUID: "EC904BE464FFF7594DD6008FA3561A18",
+        propertyInspectorUUID: "EB79BD643D0A92DBD76D63F266A1D521",
         registerEvent: "registerPropertyInspector",
         info: {}
     };
@@ -26,68 +26,68 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     const [moduleControlRefs, setModuleControlRefs] = useState<ModuleControlsJson>();
     const websocket = useRef<WebSocket | null>(null);
 
-    // Definition of the API that is used by other components.
-    const commFns: StreamdeckCommFns = useMemo(() => {
-        // Protocol to send messages to the Streamdeck application.
-        function send(event: string, payload: Record<string, unknown>) {
-            const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
-            websocket.current?.send(JSON.stringify(json));
-            console.debug("Sent message (", event, "):", json);
-        }
+    // Protocol to send messages to the Streamdeck application.
+    function send(event: string, payload: Record<string, unknown>) {
+        const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
+        websocket.current?.send(JSON.stringify(json));
+        console.debug("Sent message (", event, "):", json);
+    }
 
-        // Sends a message to the C++ plugin executable.
-        async function sendToPlugin(payload: Record<string, unknown>) {
-            const json = {
-                action: buttonAction,
-                event: "sendToPlugin",
-                context: socketSettings.propertyInspectorUUID,
-                payload: payload,
-            };
-            websocket.current?.send(JSON.stringify(json));
-            console.debug("Sent message: ", payload);
-        }
-
-        return {
-            getSettings: function () {
-                send('getSettings', {});
-            },
-
-            setSettings: function (settings: StreamdeckButtonSettings) {
-                send('setSettings', { payload: settings });
-                this.sendSettingsToPlugin(settings)
-            },
-
-            getGlobalSettings: function () {
-                send('getGlobalSettings', {});
-            },
-
-            setGlobalSettings: function (setting: string, value: string) {
-                const updatedGlobalSettings = Object.assign({}, globalSettings, { [setting]: value });
-                setGlobalSettingsState(updatedGlobalSettings);
-                send('setGlobalSettings', { payload: updatedGlobalSettings });
-            },
-
-            logMessage: function (message: string) {
-                send('logMessage', { payload: { message: message } });
-            },
-
-            sendSettingsToPlugin: function (settings: StreamdeckButtonSettings) {
-                sendToPlugin({ event: "SettingsUpdate", settings: settings });
-            },
-
-            requestSimulationState: function () {
-                sendToPlugin({ event: "RequestDcsStateUpdate" });
-            },
-
-            requestModuleList: function (path: string) {
-                sendToPlugin({ event: "requestModuleList", path: path });
-            },
-
-            requestModule: function (filename: string) {
-                sendToPlugin({ event: "requestControlReferenceJson", filename: filename });
-            },
+    // Sends a message to the C++ plugin executable.
+    async function sendToPlugin(payload: Record<string, unknown>) {
+        const json = {
+            action: buttonAction,
+            event: "sendToPlugin",
+            context: socketSettings.propertyInspectorUUID,
+            payload: payload,
         };
-    }, [socketSettings, buttonAction]);
+        websocket.current?.send(JSON.stringify(json));
+        console.debug("Sent message: ", payload);
+    }
+
+    // Definition of the API that is used by other components.
+    const commFns: StreamdeckCommFns = {
+        getSettings: function () {
+            send('getSettings', {});
+        },
+
+        setSettings: function (settings: StreamdeckButtonSettings) {
+            send('setSettings', { payload: settings });
+            this.sendSettingsToPlugin(settings)
+        },
+
+        getGlobalSettings: function () {
+            send('getGlobalSettings', {});
+        },
+
+        setGlobalSettings: function (setting: string, value: string) {
+            console.debug("Before Global Settings: ", globalSettings);
+            const updatedGlobalSettings = Object.assign({}, globalSettings, { [setting]: value });
+            console.debug("After Global Settings: ", updatedGlobalSettings);
+            setGlobalSettingsState(updatedGlobalSettings);
+            send('setGlobalSettings', { payload: updatedGlobalSettings });
+        },
+
+        logMessage: function (message: string) {
+            send('logMessage', { payload: { message: message } });
+        },
+
+        sendSettingsToPlugin: function (settings: StreamdeckButtonSettings) {
+            sendToPlugin({ event: "SettingsUpdate", settings: settings });
+        },
+
+        requestSimulationState: function () {
+            sendToPlugin({ event: "RequestDcsStateUpdate" });
+        },
+
+        requestModuleList: function (path: string) {
+            sendToPlugin({ event: "requestModuleList", path: path });
+        },
+
+        requestModule: function (filename: string) {
+            sendToPlugin({ event: "requestControlReferenceJson", filename: filename });
+        },
+    };
 
     // This message registers this Websocket binding as the Property Inspector
     // for the selected button in the Streamdeck GUI.
@@ -182,8 +182,6 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             websocket.current?.close();
         }
     }, []);
-
-    console.log("render");
 
     return { commFns, buttonSettings, globalSettings, moduleList, moduleControlRefs } as const;
 }
