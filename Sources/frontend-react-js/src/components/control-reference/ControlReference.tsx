@@ -54,10 +54,6 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   }, [sdApi.moduleControlRefs])
 
 
-  function setDcsBiosInstallPath() {
-    sdApi.commFns.setGlobalSettings("dcs_bios_install_path", "C:\\Users\\ctytler\\Saved Games\\DCS.openbeta\\Scripts\\DCS-BIOS");
-  }
-
   /*
    ** Render
    */
@@ -79,7 +75,6 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
         isDataLoaded={fullModuleControlRefs.length > 0}
         getSelectedControlData={onSelect}
       />
-      <button onClick={setDcsBiosInstallPath}>Set DCS BIOS Install Path</button>
     </div>
   );
 }

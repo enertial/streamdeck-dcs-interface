@@ -18,13 +18,17 @@ function ModuleSelect({ selectedModule, setSelectedModule, sdApi }: Props): JSX.
         return filename.split('\\').pop()?.split('/').pop()?.split('.json')[0];
     }
 
+    const filteredModuleList = sdApi.moduleList.filter(
+        (jsonFilename) => !jsonFilename.includes("manifest.json") && !jsonFilename.includes("CDU.json")
+    );
+
     return (
         <div>
             <select
                 value={selectedModule}
                 onChange={handleSelection}
             >
-                {sdApi.moduleList.map((module) => (
+                {filteredModuleList.map((module) => (
                     <option key={module} value={module}>
                         {stripPathAndExtension(module)}
                     </option>

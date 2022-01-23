@@ -1,5 +1,6 @@
 import { MouseEventHandler } from "react";
 import { ControlData, ControlOutputInteger, ControlOutputString } from "../control-reference/ControlReferenceInterface"
+import classes from "./UI.module.css";
 
 interface Props {
   controlData: ControlData,
@@ -27,7 +28,7 @@ function Modal({ controlData, onClick }: Props): JSX.Element {
 
 
   return (
-    <div className="modal">
+    <div className={classes.modal}>
       <h3>
         [{controlData.category}] {controlData.identifier}
       </h3>

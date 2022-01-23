@@ -1,0 +1,25 @@
+.sidebarContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.sidebarContainer ul {
+    list-style: none;
+    padding: 0;
+    height: 20rem;
+    width: 80%;
+}
+
+.sidebarContainer li {
+  writing-mode:vertical-lr;
+  transform: rotate(180deg);
+  background-color: rgb(221, 221, 221);
+  color: black;
+  box-sizing:border-box;
+  border-radius: 0% 20% 20% 0%;
+  padding: 2em 0% 2em 25%;
+  width: 100%;
+  user-select: none;
+  cursor: pointer;
+}

@@ -2,6 +2,7 @@ import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdec
 import ButtonSettings from "./pages/ButtonSettings";
 import UserInput from "./pages/UserInput";
 import "./App.css"
+import RightSidebar from "./pages/RightSidebar";
 
 // Augment the Window type for known variable in opening window.
 interface Window { socketSettings: StreamdeckSocketSettings }
@@ -18,6 +19,9 @@ function App(): JSX.Element {
       </div>
       <div className="control_reference">
         <ButtonSettings sdApi={sdApi} />
+      </div>
+      <div className="right_sidebar">
+        <RightSidebar sdApi={sdApi} />
       </div>
     </div >
   );
