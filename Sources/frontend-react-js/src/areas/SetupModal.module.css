@@ -3,16 +3,18 @@
   border-radius: 6px;
   background-color: white;
   color: #2d2d2d;
-  padding: 1rem;
+  padding: 2em;
   text-align: center;
-  min-height: 10rem;
-  width: 50rem;
+  box-sizing: border-box;
+  min-height: 20rem;
+  width: 103%;
+  position: absolute;
   z-index: 20;
-  position: fixed;
-  top: 10px;
-  right: 5rem;
+  top: 1rem;
+  left: 0;
+  grid-column: idLookup;
 }
 
 .pathInput {
-  min-width: 30rem;
+  min-width: 75%;
 }

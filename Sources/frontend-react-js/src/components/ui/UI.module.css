@@ -21,3 +21,11 @@
   top: 0;
   left: 0;
 }
+
+.local{
+  position: absolute;
+}
+
+.global{
+  position: fixed;
+}

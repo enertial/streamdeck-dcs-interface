@@ -47,7 +47,6 @@ function UserInput({ sdApi }: Props): JSX.Element {
         <div>
             <p>DCS Command:</p>
             <input
-                id="sendAddress"
                 type="text"
                 placeholder="Enter Control Reference"
                 value={sendAddress}
@@ -55,7 +54,6 @@ function UserInput({ sdApi }: Props): JSX.Element {
             />
             <span> </span>
             <input
-                id="sendValue"
                 type="text"
                 placeholder="Send Value"
                 value={pressValue}
@@ -63,7 +61,6 @@ function UserInput({ sdApi }: Props): JSX.Element {
             />
             <p>DCS Title Monitor:</p>
             <input
-                id="titleMonitorAddress"
                 type="text"
                 placeholder="Enter Control Reference"
                 value={titleMonitorAddress}
@@ -71,7 +68,6 @@ function UserInput({ sdApi }: Props): JSX.Element {
             />
             <span> </span>
             <input
-                id="titleMonitorStrLen"
                 type="text"
                 placeholder="Max Length"
                 value={titleMonitorStrLen}

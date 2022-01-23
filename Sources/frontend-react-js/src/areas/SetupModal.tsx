@@ -1,14 +1,14 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import StreamdeckApi from "../comms/StreamdeckApi";
-import classes from "./SetupOverlay.module.css";
+import classes from "./SetupModal.module.css";
 import Backdrop from "../components/ui/Backdrop";
 
 interface Props {
     sdApi: StreamdeckApi;
-    closeWindow: () => void;
+    hide: () => void;
 }
 
-function SetupOverlay({ sdApi, closeWindow }: Props): JSX.Element {
+function SetupModal({ sdApi, hide }: Props): JSX.Element {
     const [dcsBiosInstallPath, setDcsBiosInstallPath] = useState(sdApi.globalSettings.dcs_bios_install_path);
 
     useEffect(() => {
@@ -26,7 +26,7 @@ function SetupOverlay({ sdApi, closeWindow }: Props): JSX.Element {
     return (
         <div>
             <div className={classes.popupwindow}>
-                <h2>Communications Settings</h2>
+                <h2>Plugin Setup</h2>
                 Installation directory of DCS-BIOS: <br />
                 <input
                     type="text"
@@ -35,10 +35,11 @@ function SetupOverlay({ sdApi, closeWindow }: Props): JSX.Element {
                     onChange={handleDcsBiosPathInputChange}
                 />
                 <button onClick={handleDcsBiosPathButtonPress}>Update</button>
+                <p>If you do not have DCS-BIOS installed you can download it and follow the "Quick Setup Guide" from <a href="https://github.com/DCSFlightpanels/dcs-bios">https://github.com/DCSFlightpanels/dcs-bios</a></p>
             </div>
-            <Backdrop onClick={closeWindow} />
+            <Backdrop onClick={hide} globalScope={true} />
         </div>
     )
 }
 
-export default SetupOverlay;
+export default SetupModal;

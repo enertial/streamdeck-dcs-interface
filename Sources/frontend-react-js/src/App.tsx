@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./comms/StreamdeckWebsocket";
-import ButtonSettings from "./pages/ButtonSettings";
-import UserInput from "./pages/UserInput";
+import IdLookup from "./areas/IdLookup";
+import UserInput from "./areas/UserInput";
+import RightSidebar from "./areas/RightSidebar";
+import SetupModal from "./areas/SetupModal";
+
 import "./App.css"
-import RightSidebar from "./pages/RightSidebar";
 
 // Augment the Window type for known variable in opening window.
 interface Window { socketSettings: StreamdeckSocketSettings }
@@ -12,16 +15,21 @@ function App(): JSX.Element {
   const socketSettings = propInspectorWindow ? propInspectorWindow.socketSettings : defaultStreamdeckSocketSettings();
   const sdApi = useStreamdeckWebsocket(socketSettings);
 
+  const [setupModalVisible, setSetupModalVisible] = useState(false);
+
   return (
     <div className="wrapper">
-      <div className="button_settings">
+      <div className="buttonSettings">
         <UserInput sdApi={sdApi} />
       </div>
-      <div className="control_reference">
-        <ButtonSettings sdApi={sdApi} />
+      <div className="idLookup">
+        <IdLookup sdApi={sdApi} />
+        {setupModalVisible && <SetupModal sdApi={sdApi} hide={() => { setSetupModalVisible(false) }} />}
       </div>
-      <div className="right_sidebar">
-        <RightSidebar sdApi={sdApi} />
+      <div className="rightSidebar">
+        <RightSidebar sdApi={sdApi} showSetupModal={() => { setSetupModalVisible(true) }} />
+      </div>
+      <div className="rightHalf">
       </div>
     </div >
   );

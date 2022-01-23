@@ -1,9 +1,9 @@
-.left_sidebar {
-  grid-area: left-sidebar;
+.leftSidebar {
+  grid-area: leftSidebar;
 }
 
-.button_settings {
-  grid-area: button_settings;
+.buttonSettings {
+  grid-area: buttonSettings;
   background-color: #444;
   color: #fff;
   border-radius: 5px;
@@ -11,20 +11,27 @@
   font-size: 150%;
 }
 
-.control_reference {
-  grid-area: control_reference;
+.idLookup {
+  grid-area: idLookup;
   position: relative;
 }
 
-.right_sidebar {
-  grid-area: right_sidebar;
+.rightSidebar {
+  grid-area: rightSidebar;
   width: 100%;
   justify-self: end;
 }
 
 .wrapper {
   display: grid;
-  grid-template-columns: 100px 600px 800px 60px;
+  grid-template-columns: 70px 500px 700px 60px;
   grid-template-rows: 900px;
-  grid-template-areas: "left_sidebar button_settings control_reference right_sidebar";
+  grid-template-areas: "leftSidebar buttonSettings idLookup rightSidebar";
+  max-width: 1500px;
+  max-height: 1000px;
+}
+
+.rightHalf {
+  grid-column: idLookup-start / rightSidebar-end;
+  grid-row: idLookup-start;
 }

@@ -11,7 +11,7 @@ interface Props {
   sdApi: StreamdeckApi
 }
 
-function ButtonSettings({ sdApi }: Props): JSX.Element {
+function IdLookup({ sdApi }: Props): JSX.Element {
   const [selectedControlReference, setSelectedControlReference] = useState<ControlData | null>(null);
 
   function handleControlReferenceSelect(controlData: ControlData) {
@@ -27,7 +27,7 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
   if (selectedControlReference) {
     modal = <div>
       <Modal controlData={selectedControlReference} onClick={clearSelection} />
-      <Backdrop onClick={clearSelection} />
+      <Backdrop onClick={clearSelection} globalScope={false} />
     </div>;
   }
 
@@ -42,4 +42,4 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
   );
 }
 
-export default ButtonSettings;
+export default IdLookup;
