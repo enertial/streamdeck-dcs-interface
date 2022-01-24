@@ -27,15 +27,15 @@ function doNothing() {
   // do nothing.
 }
 
-test("renders loading message when isDataLoaded is false", () => {
+test("renders setup message when isDataLoaded is false", () => {
   render(<Table tableData={[]} isDataLoaded={false} getSelectedControlData={doNothing} />);
-  screen.getByText(/Loading module data/i);
+  screen.getByText(/DCS-BIOS installation path needs to be specified/i);
   expect(screen.queryByRole("table")).toBeNull();
 });
 
 test("renders loading message when isDataLoaded is false even when data provided", () => {
   render(<Table tableData={sampleControlSet} isDataLoaded={false} getSelectedControlData={doNothing} />);
-  screen.getByText(/Loading module data/i);
+  screen.getByText(/DCS-BIOS installation path needs to be specified/i);
   expect(screen.queryByRole("table")).toBeNull();
 });
 
