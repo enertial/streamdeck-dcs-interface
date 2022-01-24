@@ -7,7 +7,7 @@ import SearchBar from "./SearchBar";
 import { ControlData } from "./ControlReferenceInterface";
 import flattenModuleControlsJson from "./FlattenModuleControlsJson";
 
-import StreamdeckApi from "../../comms/StreamdeckApi";
+import StreamdeckApi from "../../api/StreamdeckApi";
 import ModuleSelect from "./ModuleSelect";
 
 interface Props {

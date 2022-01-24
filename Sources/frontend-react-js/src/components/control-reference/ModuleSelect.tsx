@@ -1,5 +1,5 @@
 import { ChangeEvent } from "react";
-import StreamdeckApi from "../../comms/StreamdeckApi";
+import StreamdeckApi from "../../api/StreamdeckApi";
 
 interface Props {
     selectedModule: string;

@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./comms/StreamdeckWebsocket";
+import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./api/StreamdeckWebsocket";
 import IdLookup from "./areas/IdLookup";
-import UserInput from "./areas/UserInput";
+import ButtonSettings from "./areas/ButtonSettings";
 import RightSidebar from "./areas/RightSidebar";
-import SetupModal from "./areas/SetupModal";
+import PluginSetup from "./modals/PluginSetup";
 
 import "./App.css"
 
@@ -15,21 +15,19 @@ function App(): JSX.Element {
   const socketSettings = propInspectorWindow ? propInspectorWindow.socketSettings : defaultStreamdeckSocketSettings();
   const sdApi = useStreamdeckWebsocket(socketSettings);
 
-  const [setupModalVisible, setSetupModalVisible] = useState(false);
+  const [pluginSetupVisible, setPluginSetupVisible] = useState(false);
 
   return (
     <div className="wrapper">
       <div className="buttonSettings">
-        <UserInput sdApi={sdApi} />
+        <ButtonSettings sdApi={sdApi} />
       </div>
       <div className="idLookup">
         <IdLookup sdApi={sdApi} />
-        {setupModalVisible && <SetupModal sdApi={sdApi} hide={() => { setSetupModalVisible(false) }} />}
+        {pluginSetupVisible && <PluginSetup sdApi={sdApi} hide={() => { setPluginSetupVisible(false) }} />}
       </div>
       <div className="rightSidebar">
-        <RightSidebar sdApi={sdApi} showSetupModal={() => { setSetupModalVisible(true) }} />
-      </div>
-      <div className="rightHalf">
+        <RightSidebar showSetupModal={() => { setPluginSetupVisible(true) }} />
       </div>
     </div >
   );

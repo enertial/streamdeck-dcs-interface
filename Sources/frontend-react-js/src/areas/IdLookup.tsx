@@ -5,7 +5,7 @@ import Backdrop from "../components/ui/Backdrop";
 import Modal from "../components/ui/Modal";
 
 import { ControlData } from "../components/control-reference/ControlReferenceInterface"
-import StreamdeckApi from "../comms/StreamdeckApi";
+import StreamdeckApi from "../api/StreamdeckApi";
 
 interface Props {
   sdApi: StreamdeckApi

@@ -1,13 +1,10 @@
-import { useState } from "react";
-import StreamdeckApi from "../comms/StreamdeckApi";
 import classes from "./RightSidebar.module.css";
 
 interface Props {
-    sdApi: StreamdeckApi
     showSetupModal: () => void;
 }
 
-function RightSidebar({ sdApi, showSetupModal }: Props): JSX.Element {
+function RightSidebar({ showSetupModal }: Props): JSX.Element {
 
     return (
         <div className="rightSidebar">

@@ -51,6 +51,10 @@ export interface StreamdeckButtonSettings {
     string_monitor_vertical_spacing: string;
     string_monitor_passthrough_check: boolean;
     string_monitor_mapping: string;
+    // State Monitor settings
+    dcs_id_compare_monitor: string;
+    dcs_id_compare_condition: "LESS_THAN" | "EQUAL_TO" | "GREATER_THAN";
+    dcs_id_comparison_value: string;
 }
 
 export function defaultButtonSettings(): StreamdeckButtonSettings {
@@ -64,6 +68,9 @@ export function defaultButtonSettings(): StreamdeckButtonSettings {
         string_monitor_vertical_spacing: "0",
         string_monitor_passthrough_check: true,
         string_monitor_mapping: "",
+        dcs_id_compare_monitor: "",
+        dcs_id_compare_condition: "LESS_THAN",
+        dcs_id_comparison_value: ""
     };
 }
 

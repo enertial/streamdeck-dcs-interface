@@ -1,6 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import StreamdeckApi from "../comms/StreamdeckApi";
-import classes from "./SetupModal.module.css";
+import StreamdeckApi from "../api/StreamdeckApi";
+import classes from "./PluginSetup.module.css";
 import Backdrop from "../components/ui/Backdrop";
 
 interface Props {
@@ -8,7 +8,7 @@ interface Props {
     hide: () => void;
 }
 
-function SetupModal({ sdApi, hide }: Props): JSX.Element {
+function PluginSetup({ sdApi, hide }: Props): JSX.Element {
     const [dcsBiosInstallPath, setDcsBiosInstallPath] = useState(sdApi.globalSettings.dcs_bios_install_path);
 
     useEffect(() => {
@@ -35,11 +35,13 @@ function SetupModal({ sdApi, hide }: Props): JSX.Element {
                     onChange={handleDcsBiosPathInputChange}
                 />
                 <button onClick={handleDcsBiosPathButtonPress}>Update</button>
-                <p>If you do not have DCS-BIOS installed you can download it and follow the "Quick Setup Guide" from <a href="https://github.com/DCSFlightpanels/dcs-bios">https://github.com/DCSFlightpanels/dcs-bios</a></p>
+                <p>If you do not have DCS-BIOS installed you can download it and follow the "Quick Setup Guide" from
+                    <a href="https://github.com/DCSFlightpanels/dcs-bios">https://github.com/DCSFlightpanels/dcs-bios</a>
+                </p>
             </div>
             <Backdrop onClick={hide} globalScope={true} />
         </div>
     )
 }
 
-export default SetupModal;
+export default PluginSetup;
