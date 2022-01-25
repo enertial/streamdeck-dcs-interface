@@ -13,12 +13,24 @@ void ImageStateMonitor::update_settings(const json &settings)
         EPLJSONUtils::GetStringByName(settings, "dcs_id_compare_condition");
     const std::string dcs_id_comparison_value_raw = EPLJSONUtils::GetStringByName(settings, "dcs_id_comparison_value");
 
-    const bool compare_monitor_is_populated = is_integer(dcs_id_compare_monitor_raw);
+    const bool compare_monitor_is_populated = !dcs_id_compare_monitor_raw.empty();
     const bool comparison_value_is_populated = is_number(dcs_id_comparison_value_raw);
     settings_are_filled_ = compare_monitor_is_populated && comparison_value_is_populated;
 
     if (settings_are_filled_) {
-        dcs_id_compare_monitor_ = std::stoi(dcs_id_compare_monitor_raw);
+        if (is_integer(dcs_id_compare_monitor_raw)) {
+            dcs_id_compare_monitor_ = SimulatorAddress(std::stoi(dcs_id_compare_monitor_raw));
+
+        } else {
+            if (dcs_id_compare_monitor_raw == "INTEGER") {
+                dcs_id_compare_monitor_ = SimulatorAddress(settings["compare_monitor_address"],
+                                                           settings["compare_monitor_mask"],
+                                                           settings["compare_monitor_shift"]);
+            } else if (dcs_id_compare_monitor_raw == "STRING") {
+                dcs_id_compare_monitor_ =
+                    SimulatorAddress(settings["compare_monitor_address"], settings["compare_monitor_max_length"]);
+            }
+        }
         dcs_id_comparison_value_ = Decimal(dcs_id_comparison_value_raw);
         if (dcs_id_compare_condition_raw == "EQUAL_TO") {
             dcs_id_compare_condition_ = Comparison::EQUAL_TO;

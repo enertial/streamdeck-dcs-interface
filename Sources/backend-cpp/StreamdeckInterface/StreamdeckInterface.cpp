@@ -243,7 +243,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
     if (event == "RequestDcsStateUpdate") {
         const auto protocol =
             (inAction == "com.ctytler.dcs.dcs-bios") ? Protocol::DCS_BIOS : Protocol::DCS_ExportScript;
-        if (!simConnectionManager_.is_connected(Protocol::DCS_ExportScript)) {
+        if (!simConnectionManager_.is_connected(protocol)) {
             mConnectionManager->SendToPropertyInspector(inAction,
                                                         inContext,
                                                         json({{"event", "DebugDcsGameState"},
@@ -251,7 +251,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                                               {"error", "SimulatorInterface not connected"}}));
         } else {
             const json current_simulator_state =
-                simConnectionManager_.get_interface(Protocol::DCS_ExportScript)->get_current_state_as_json();
+                simConnectionManager_.get_interface(protocol)->get_current_state_as_json();
             mConnectionManager->SendToPropertyInspector(
                 inAction,
                 inContext,

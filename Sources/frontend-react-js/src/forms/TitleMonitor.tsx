@@ -3,11 +3,17 @@ import StreamdeckApi from "../api/StreamdeckApi";
 
 export interface TitleMonitorSettings {
     dcs_id_string_monitor: string;
-    string_monitor_max_string_length: number;
+    string_monitor_address: number;
+    string_monitor_mask: number;
+    string_monitor_shift: number;
+    string_monitor_max_length: number;
 }
 export const defaultTitleMonitorSettings: TitleMonitorSettings = {
-    dcs_id_string_monitor: "",
-    string_monitor_max_string_length: 0
+    dcs_id_string_monitor: "NONE",
+    string_monitor_address: 0,
+    string_monitor_mask: 0,
+    string_monitor_shift: 0,
+    string_monitor_max_length: 0
 }
 
 interface Props {
@@ -16,23 +22,25 @@ interface Props {
 }
 
 function TitleMonitor({ sdApi, setSettings }: Props): JSX.Element {
-    const [titleMonitorAddress, setTitleMonitorAddress] = useState(sdApi.buttonSettings.dcs_id_string_monitor);
-    const [titleMonitorStrLen, setTitleMonitorStrLen] = useState(sdApi.buttonSettings.string_monitor_max_string_length);
+    const [titleMonitorAddress, setTitleMonitorAddress] = useState(sdApi.buttonSettings.string_monitor_address);
+    const [titleMonitorStrLen, setTitleMonitorStrLen] = useState(sdApi.buttonSettings.string_monitor_max_length);
 
     function handleTitleMonitorAddressChange(event: ChangeEvent<HTMLInputElement>) {
-        setTitleMonitorAddress(event.currentTarget.value);
+        const maxStringLength: number = parseInt(event.currentTarget.value);
+        !isNaN(maxStringLength) && setTitleMonitorAddress(maxStringLength);
     }
     function handleTitleMonitorStrLenChange(event: ChangeEvent<HTMLInputElement>) {
         const maxStringLength: number = parseInt(event.currentTarget.value);
-        if (!isNaN(maxStringLength)) {
-            setTitleMonitorStrLen(maxStringLength);
-        }
+        !isNaN(maxStringLength) && setTitleMonitorStrLen(maxStringLength);
     }
 
     useEffect(() => {
         const updatedSettings: TitleMonitorSettings = {
-            dcs_id_string_monitor: titleMonitorAddress,
-            string_monitor_max_string_length: titleMonitorStrLen
+            dcs_id_string_monitor: "STRING",
+            string_monitor_address: titleMonitorAddress,
+            string_monitor_mask: 0,
+            string_monitor_shift: 0,
+            string_monitor_max_length: titleMonitorStrLen
         };
         setSettings(updatedSettings);
     }, [titleMonitorAddress, titleMonitorStrLen])

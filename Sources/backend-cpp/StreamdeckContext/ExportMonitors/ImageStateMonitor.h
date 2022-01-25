@@ -42,7 +42,7 @@ class ImageStateMonitor
     bool settings_are_filled_ = false; // True if all DCS ID comparison monitor settings have been set.
 
     // Stored settings extracted from user-filled fields.
-    int dcs_id_compare_monitor_ = 0; // DCS ID to monitor for context state setting according to value comparison.
+    SimulatorAddress dcs_id_compare_monitor_{0};                     // Simulator address to monitor for state change.
     Comparison dcs_id_compare_condition_ = Comparison::GREATER_THAN; // Comparison to use for DCS ID compare monitor.
     Decimal dcs_id_comparison_value_; // Value to compare DCS ID compare monitor value to.
 };

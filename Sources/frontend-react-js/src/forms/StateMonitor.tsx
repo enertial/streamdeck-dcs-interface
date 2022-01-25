@@ -3,11 +3,19 @@ import StreamdeckApi from "../api/StreamdeckApi";
 
 export interface StateMonitorSettings {
     dcs_id_compare_monitor: string;
+    compare_monitor_address: number;
+    compare_monitor_mask: number;
+    compare_monitor_shift: number;
+    compare_monitor_max_length: number;
     dcs_id_compare_condition: string;
     dcs_id_comparison_value: string;
 }
 export const defaultStateMonitorSettings: StateMonitorSettings = {
-    dcs_id_compare_monitor: "",
+    dcs_id_compare_monitor: "NONE",
+    compare_monitor_address: 0,
+    compare_monitor_mask: 0,
+    compare_monitor_shift: 0,
+    compare_monitor_max_length: 0,
     dcs_id_compare_condition: "LESS_THAN",
     dcs_id_comparison_value: ""
 }
@@ -17,14 +25,26 @@ interface Props {
     setSettings: React.Dispatch<React.SetStateAction<StateMonitorSettings>>;
 }
 
-function TitleMonitor({ sdApi, setSettings }: Props): JSX.Element {
-    const [stateMonitorAddress, setStateMonitorAddress] = useState(sdApi.buttonSettings.dcs_id_compare_monitor);
+function StateMonitor({ sdApi, setSettings }: Props): JSX.Element {
+    const [stateMonitorAddress, setStateMonitorAddress] = useState(sdApi.buttonSettings.compare_monitor_address);
+    const [stateMonitorMask, setStateMonitorMask] = useState(sdApi.buttonSettings.compare_monitor_mask);
+    const [stateMonitorShift, setStateMonitorShift] = useState(sdApi.buttonSettings.compare_monitor_shift);
     const [stateCompareCondition, setStateCompareCondition] = useState(sdApi.buttonSettings.dcs_id_compare_condition);
     const [stateComparisonValue, setStateComparisonValue] = useState(sdApi.buttonSettings.dcs_id_comparison_value);
 
     function handleStateMonitorAddressChange(event: ChangeEvent<HTMLInputElement>) {
-        setStateMonitorAddress(event.currentTarget.value);
+        const value: number = parseInt(event.currentTarget.value);
+        !isNaN(value) && setStateMonitorAddress(value);
     }
+    function handleStateMonitorMaskChange(event: ChangeEvent<HTMLInputElement>) {
+        const value: number = parseInt(event.currentTarget.value);
+        !isNaN(value) && setStateMonitorMask(value);
+    }
+    function handleStateMonitorShiftChange(event: ChangeEvent<HTMLInputElement>) {
+        const value: number = parseInt(event.currentTarget.value);
+        !isNaN(value) && setStateMonitorShift(value);
+    }
+
     function handleStateCompareConditionChange(event: ChangeEvent<HTMLSelectElement>) {
         switch (event.target.value) {
             case "GREATER_THAN":
@@ -43,12 +63,16 @@ function TitleMonitor({ sdApi, setSettings }: Props): JSX.Element {
 
     useEffect(() => {
         const updatedSettings: StateMonitorSettings = {
-            dcs_id_compare_monitor: stateMonitorAddress,
+            dcs_id_compare_monitor: "INTEGER",
+            compare_monitor_address: stateMonitorAddress,
+            compare_monitor_mask: stateMonitorMask,
+            compare_monitor_shift: stateMonitorShift,
+            compare_monitor_max_length: 0,
             dcs_id_compare_condition: stateCompareCondition,
             dcs_id_comparison_value: stateComparisonValue
         };
         setSettings(updatedSettings);
-    }, [stateMonitorAddress, stateCompareCondition, stateComparisonValue])
+    }, [stateMonitorAddress, stateMonitorMask, stateMonitorShift, stateCompareCondition, stateComparisonValue])
 
     return (
         <div>
@@ -56,7 +80,7 @@ function TitleMonitor({ sdApi, setSettings }: Props): JSX.Element {
             <p>Change to second image state when:</p>
             <input
                 type="text"
-                placeholder="Enter Control Reference"
+                placeholder="Select from Control Reference Table"
                 value={stateMonitorAddress}
                 onChange={handleStateMonitorAddressChange}
             />
@@ -76,8 +100,22 @@ function TitleMonitor({ sdApi, setSettings }: Props): JSX.Element {
                 value={stateComparisonValue}
                 onChange={handleStateComparisonValueChange}
             />
+            <br />
+            <input
+                type="text"
+                placeholder="Mask"
+                value={stateMonitorMask}
+                onChange={handleStateMonitorMaskChange}
+            />
+            <span />
+            <input
+                type="text"
+                placeholder="Shift"
+                value={stateMonitorShift}
+                onChange={handleStateMonitorShiftChange}
+            />
         </div>
     );
 }
 
-export default TitleMonitor;
+export default StateMonitor;

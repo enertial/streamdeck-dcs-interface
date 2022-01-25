@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./api/StreamdeckWebsocket";
-import IdLookup from "./areas/IdLookup";
 import ButtonSettings from "./areas/ButtonSettings";
+import IdLookup from "./areas/IdLookup";
 import RightSidebar from "./areas/RightSidebar";
 import PluginSetup from "./modals/PluginSetup";
 

@@ -15,7 +15,7 @@ function OutputDisplay({ output }: OutputType): JSX.Element {
   console.log("OUTPUT", output);
   if (output.type === "integer") {
     const outputInteger = output as ControlOutputInteger;
-    return <p><b>Output</b> Address: {outputInteger.address} Mask: {outputInteger.mask}</p>
+    return <p><b>Output</b> Address: {outputInteger.address} Mask: {outputInteger.mask} Shift: {outputInteger.shift_by}</p>
   }
   else {
     const outputString = output as ControlOutputString;

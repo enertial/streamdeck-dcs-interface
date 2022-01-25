@@ -16,13 +16,22 @@ void TitleMonitor::update_settings(const json &settings)
     std::stringstream string_monitor_mapping_raw;
     string_monitor_mapping_raw << EPLJSONUtils::GetStringByName(settings, "string_monitor_mapping");
 
-    string_monitor_is_set_ = is_integer(dcs_id_string_monitor_raw);
+    string_monitor_is_set_ = !dcs_id_string_monitor_raw.empty();
 
     if (string_monitor_is_set_) {
-        const auto addr = std::stoi(dcs_id_string_monitor_raw);
-        dcs_id_string_monitor_ = settings.contains("string_monitor_max_string_length")
-                                     ? SimulatorAddress(addr, settings["string_monitor_max_string_length"])
-                                     : SimulatorAddress(addr);
+        if (is_integer(dcs_id_string_monitor_raw)) {
+            dcs_id_string_monitor_ = SimulatorAddress(std::stoi(dcs_id_string_monitor_raw));
+
+        } else {
+            if (dcs_id_string_monitor_raw == "INTEGER") {
+                dcs_id_string_monitor_ = SimulatorAddress(settings["string_monitor_address"],
+                                                          settings["string_monitor_mask"],
+                                                          settings["string_monitor_shift"]);
+            } else if (dcs_id_string_monitor_raw == "STRING") {
+                dcs_id_string_monitor_ =
+                    SimulatorAddress(settings["string_monitor_address"], settings["string_monitor_max_length"]);
+            }
+        }
 
         if (is_integer(string_monitor_vertical_spacing_raw)) {
             string_monitor_vertical_spacing_ = std::stoi(string_monitor_vertical_spacing_raw);

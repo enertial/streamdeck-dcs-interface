@@ -14,14 +14,21 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
     const [titleMonitorSettings, setTitleMonitorSettings] = useState(defaultTitleMonitorSettings);
     const [stateMonitorSettings, setStateMonitorSettings] = useState(defaultStateMonitorSettings);
 
-    function handleSubmitButtonClick() {
+    function handleApplyButtonClick() {
         const updatedSettings = Object.assign({}, sdApi.buttonSettings, {
             send_address: commandSettings.send_address,
             press_value: commandSettings.press_value,
             release_value: commandSettings.release_value,
             dcs_id_string_monitor: titleMonitorSettings.dcs_id_string_monitor,
-            string_monitor_max_string_length: titleMonitorSettings.string_monitor_max_string_length,
+            string_monitor_address: titleMonitorSettings.string_monitor_address,
+            string_monitor_mask: titleMonitorSettings.string_monitor_mask,
+            string_monitor_shift: titleMonitorSettings.string_monitor_shift,
+            string_monitor_max_length: titleMonitorSettings.string_monitor_max_length,
             dcs_id_compare_monitor: stateMonitorSettings.dcs_id_compare_monitor,
+            compare_monitor_address: stateMonitorSettings.compare_monitor_address,
+            compare_monitor_mask: stateMonitorSettings.compare_monitor_mask,
+            compare_monitor_shift: stateMonitorSettings.compare_monitor_shift,
+            compare_monitor_max_length: stateMonitorSettings.compare_monitor_max_length,
             dcs_id_compare_condition: stateMonitorSettings.dcs_id_compare_condition,
             dcs_id_comparison_value: stateMonitorSettings.dcs_id_comparison_value
         });
@@ -34,7 +41,8 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
             <TitleMonitor sdApi={sdApi} setSettings={setTitleMonitorSettings} />
             <StateMonitor sdApi={sdApi} setSettings={setStateMonitorSettings} />
             <br></br>
-            <button onClick={handleSubmitButtonClick}> Apply Settings </button>
+            <button onClick={handleApplyButtonClick}> Apply Settings </button>
+            <span /><button onClick={() => { sdApi.commFns.requestSimulationState() }}> Debug </button>
         </div>
     );
 }
