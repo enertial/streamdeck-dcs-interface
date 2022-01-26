@@ -1,5 +1,5 @@
 import { render, fireEvent, screen } from "@testing-library/react";
-import { ControlData } from "../ControlReferenceInterface";
+import { ControlData } from "../../api/DcsBios/ControlReferenceInterface";
 import Table from "../Table";
 
 const sampleControlSet: ControlData[] = [

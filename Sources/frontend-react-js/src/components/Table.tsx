@@ -1,4 +1,4 @@
-import { ControlData } from "./ControlReferenceInterface";
+import { ControlData } from "../api/DcsBios/ControlReferenceInterface";
 import classes from "./Table.module.css";
 
 interface TableContents {

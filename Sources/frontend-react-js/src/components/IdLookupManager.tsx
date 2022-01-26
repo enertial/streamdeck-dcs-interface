@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 
-import classes from "./ControlReference.module.css";
+import classes from "./IdLookupManager.module.css";
 
 import Table from "./Table";
 import SearchBar from "./SearchBar";
-import { ControlData } from "./ControlReferenceInterface";
-import flattenModuleControlsJson from "./FlattenModuleControlsJson";
+import { ControlData } from "../api/DcsBios/ControlReferenceInterface";
+import flattenModuleControlsJson from "../api/DcsBios/FlattenModuleControlsJson";
 
-import StreamdeckApi from "../../api/StreamdeckApi";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import ModuleSelect from "./ModuleSelect";
 
 interface Props {

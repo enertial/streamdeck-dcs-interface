@@ -1,6 +1,6 @@
 import { MouseEventHandler } from "react";
-import { ControlData, ControlOutputInteger, ControlOutputString } from "../control-reference/ControlReferenceInterface"
-import classes from "./UI.module.css";
+import { ControlData, ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface"
+import classes from "./SelectedControlRef.module.css";
 
 interface Props {
   controlData: ControlData,
@@ -24,7 +24,7 @@ function OutputDisplay({ output }: OutputType): JSX.Element {
 }
 
 
-function Modal({ controlData, onClick }: Props): JSX.Element {
+function ControlRefDetails({ controlData, onClick }: Props): JSX.Element {
 
 
   return (
@@ -48,4 +48,4 @@ function Modal({ controlData, onClick }: Props): JSX.Element {
   );
 }
 
-export default Modal;
+export default ControlRefDetails;

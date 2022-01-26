@@ -1,7 +1,7 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import StreamdeckApi from "../api/StreamdeckApi";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import classes from "./PluginSetup.module.css";
-import Backdrop from "../components/ui/Backdrop";
+import Backdrop from "./Backdrop";
 
 interface Props {
     sdApi: StreamdeckApi;

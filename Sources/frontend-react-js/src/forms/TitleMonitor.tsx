@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import StreamdeckApi from "../api/StreamdeckApi";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 
 export interface TitleMonitorSettings {
     dcs_id_string_monitor: string;

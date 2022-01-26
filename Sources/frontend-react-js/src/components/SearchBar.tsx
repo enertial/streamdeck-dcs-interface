@@ -1,5 +1,5 @@
 import { ChangeEvent, useEffect } from "react";
-import StreamdeckApi from "../../api/StreamdeckApi";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import classes from "./SearchBar.module.css";
 
 interface Props {

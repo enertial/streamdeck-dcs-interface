@@ -5,7 +5,7 @@
  * 
  */
 
-import { ModuleControlsJson } from "../components/control-reference/ControlReferenceInterface";
+import { ModuleControlsJson } from "../DcsBios/ControlReferenceInterface";
 
 export default interface StreamdeckApi {
     commFns: StreamdeckCommFns;

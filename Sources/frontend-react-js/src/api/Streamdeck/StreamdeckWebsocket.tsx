@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
-import { ModuleControlsJson } from '../components/control-reference/ControlReferenceInterface';
+import { ModuleControlsJson } from '../DcsBios/ControlReferenceInterface';
 
 export interface StreamdeckSocketSettings {
     port: number,

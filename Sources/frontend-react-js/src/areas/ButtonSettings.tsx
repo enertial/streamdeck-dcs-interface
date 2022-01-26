@@ -1,5 +1,5 @@
 import { useState } from "react";
-import StreamdeckApi from "../api/StreamdeckApi";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import SendCommand, { defaultSendCommandSettings } from "../forms/SendCommand";
 import StateMonitor, { defaultStateMonitorSettings } from "../forms/StateMonitor";
 import TitleMonitor, { defaultTitleMonitorSettings } from "../forms/TitleMonitor";
