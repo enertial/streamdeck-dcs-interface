@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { getModuleName } from "../api/DcsBios/Utilities";
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 
 interface Props {
@@ -14,10 +15,6 @@ function ModuleSelect({ selectedModule, setSelectedModule, sdApi }: Props): JSX.
         sdApi.commFns.setGlobalSettings("last_selected_module", event.target.value);
     }
 
-    function stripPathAndExtension(filename: string) {
-        return filename.split('\\').pop()?.split('/').pop()?.split('.json')[0];
-    }
-
     const filteredModuleList = sdApi.moduleList.filter(
         (jsonFilename) => !jsonFilename.includes("manifest.json") && !jsonFilename.includes("CDU.json")
     );
@@ -30,7 +27,7 @@ function ModuleSelect({ selectedModule, setSelectedModule, sdApi }: Props): JSX.
             >
                 {filteredModuleList.map((module) => (
                     <option key={module} value={module}>
-                        {stripPathAndExtension(module)}
+                        {getModuleName(module)}
                     </option>
                 ))}
 

@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import classes from "./Forms.module.css";
 
 export interface StateMonitorSettings {
     dcs_id_compare_monitor: string;
@@ -75,9 +76,12 @@ function StateMonitor({ sdApi, setSettings }: Props): JSX.Element {
     }, [stateMonitorAddress, stateMonitorMask, stateMonitorShift, stateCompareCondition, stateComparisonValue])
 
     return (
-        <div>
-            <h2>DCS State Monitor:</h2>
+        <div className={classes.form}>
+            <h2 className={classes.header}>DCS State Monitor:</h2>
             <p>Change to second image state when:</p>
+            <div className={classes.droppableArea}>
+
+            </div>
             <input
                 type="text"
                 placeholder="Select from Control Reference Table"

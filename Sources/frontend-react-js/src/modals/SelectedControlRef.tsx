@@ -1,80 +1,15 @@
-import { useDrag } from 'react-dnd'
 import { MouseEventHandler, useState } from "react";
-import { ControlData, ControlInput, ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface"
+import { ControlData } from "../api/DcsBios/ControlReferenceInterface"
+import { DragItemCard, DcsBiosDraggableTypes } from '../api/DcsBios/DraggableItems';
 import classes from "./SelectedControlRef.module.css";
 
-interface InputProps {
-  identifier: string;
-  input: ControlInput;
-  onHover: (arg: string) => void;
-  onLeave: () => void;
-}
-const InputCard = ({ identifier, input, onHover, onLeave }: InputProps) => {
-  const [{ isDragging }, dragRef] = useDrag({
-    type: "dcsBiosInput",
-    item: { identifier },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    })
-  })
-
-  function shareDescriptionOnHover() {
-    onHover(input.description);
-  }
-
-
-  return (
-    <div
-      className={classes.draggableCard}
-      ref={dragRef}
-      style={{ opacity: isDragging ? '0.5' : '1' }}
-      onMouseEnter={shareDescriptionOnHover}
-      onMouseLeave={onLeave}
-    >
-      Input.SetValue
-    </div>
-  )
-}
-
-interface OutputProps {
-  identifier: string;
-  output: ControlOutputInteger | ControlOutputString;
-  onHover: (arg: string) => void;
-  onLeave: () => void;
-}
-const OutputCard = ({ identifier, output, onHover, onLeave }: OutputProps) => {
-  const [{ isDragging }, dragRef] = useDrag({
-    type: output.type === "integer" ? "dcsBiosIntegerOutput" : "dcsBiosStringOutput",
-    item: { identifier },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    })
-  })
-
-  function shareDescriptionOnHover() {
-    onHover(output.description);
-  }
-
-  return (
-    <div
-      className={classes.draggableCard}
-      ref={dragRef}
-      style={{ opacity: isDragging ? '0.5' : '1' }}
-      onMouseEnter={shareDescriptionOnHover}
-      onMouseLeave={onLeave}
-    >
-      {output.type === "integer" ? "Output.Integer" : "Output.String"}
-    </div>
-  )
-}
-
-
 interface Props {
+  module: string;
   controlData: ControlData,
   onClick: MouseEventHandler,
 }
 
-function SelectedControlRef({ controlData, onClick }: Props): JSX.Element {
+function SelectedControlRef({ module, controlData, onClick }: Props): JSX.Element {
   const [hoverText, setHoverText] = useState("");
 
   function onHover(description: string) {
@@ -101,15 +36,23 @@ function SelectedControlRef({ controlData, onClick }: Props): JSX.Element {
       <div className={classes.draggableRow}>
         {controlData.inputs.map((input) => (
           input.interface === "set_state" &&
-          <InputCard
+          <DragItemCard
+            key={controlData.identifier + "." + input.interface}
+            className={classes.draggableCard}
+            module={module}
             identifier={controlData.identifier}
+            type={DcsBiosDraggableTypes.INPUT}
             input={input}
             onHover={onHover}
             onLeave={onLeave}
           />))}
         {controlData.outputs.map((output) => (
-          <OutputCard
+          <DragItemCard
+            key={controlData.identifier + "." + output.type}
+            className={classes.draggableCard}
+            module={module}
             identifier={controlData.identifier}
+            type={output.type === "integer" ? DcsBiosDraggableTypes.OUTPUT_INTEGER : DcsBiosDraggableTypes.OUTPUT_STRING}
             output={output}
             onHover={onHover}
             onLeave={onLeave}

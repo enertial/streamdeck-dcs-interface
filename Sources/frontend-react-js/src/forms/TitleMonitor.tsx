@@ -1,5 +1,9 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import { useDrop } from "react-dnd";
+import { ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface";
+import { DcsBiosDraggableItem, DcsBiosDraggableTypes } from "../api/DcsBios/DraggableItems";
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import classes from "./Forms.module.css";
 
 export interface TitleMonitorSettings {
     dcs_id_string_monitor: string;
@@ -22,47 +26,69 @@ interface Props {
 }
 
 function TitleMonitor({ sdApi, setSettings }: Props): JSX.Element {
-    const [titleMonitorAddress, setTitleMonitorAddress] = useState(sdApi.buttonSettings.string_monitor_address);
-    const [titleMonitorStrLen, setTitleMonitorStrLen] = useState(sdApi.buttonSettings.string_monitor_max_length);
+    const [monitorSettings, setMonitorSettings] = useState(defaultTitleMonitorSettings);
+    const [monitorIdentifer, setMonitorIdentifier] = useState("");
+    const [{ isOver, canDrop }, dropRef] = useDrop({
+        accept: [DcsBiosDraggableTypes.OUTPUT_STRING, DcsBiosDraggableTypes.OUTPUT_INTEGER],
+        drop: (item: DcsBiosDraggableItem) => { handleDroppedItem(item) },
+        collect: monitor => ({
+            isOver: monitor.isOver(),
+            canDrop: monitor.canDrop(),
+        })
 
-    function handleTitleMonitorAddressChange(event: ChangeEvent<HTMLInputElement>) {
-        const maxStringLength: number = parseInt(event.currentTarget.value);
-        !isNaN(maxStringLength) && setTitleMonitorAddress(maxStringLength);
-    }
-    function handleTitleMonitorStrLenChange(event: ChangeEvent<HTMLInputElement>) {
-        const maxStringLength: number = parseInt(event.currentTarget.value);
-        !isNaN(maxStringLength) && setTitleMonitorStrLen(maxStringLength);
+    })
+
+    function handleDroppedItem(item: DcsBiosDraggableItem) {
+        console.log(item);
+        setMonitorIdentifier(item.module + "::" + item.identifier);
+        if (item.type === DcsBiosDraggableTypes.OUTPUT_STRING) {
+            const output = item.output as ControlOutputString;
+            setMonitorSettings({
+                ...monitorSettings,
+                dcs_id_string_monitor: "STRING",
+                string_monitor_address: output.address,
+                string_monitor_max_length: output.max_length,
+            });
+        } else if (item.type === DcsBiosDraggableTypes.OUTPUT_INTEGER) {
+            const output = item.output as ControlOutputInteger;
+            setMonitorSettings({
+                ...monitorSettings,
+                dcs_id_string_monitor: "INTEGER",
+                string_monitor_address: output.address,
+                string_monitor_mask: output.mask,
+                string_monitor_shift: output.shift_by
+            });
+        }
     }
 
-    useEffect(() => {
-        const updatedSettings: TitleMonitorSettings = {
-            dcs_id_string_monitor: "STRING",
-            string_monitor_address: titleMonitorAddress,
-            string_monitor_mask: 0,
-            string_monitor_shift: 0,
-            string_monitor_max_length: titleMonitorStrLen
-        };
-        setSettings(updatedSettings);
-    }, [titleMonitorAddress, titleMonitorStrLen])
+    function DropAreaBG() {
+        if (isOver) {
+            return classes.droppableAreaHover;
+        }
+        else if (canDrop) {
+            return classes.droppableAreaCanDrop;
+        }
+        else {
+            return "";
+        }
+    }
+
+    function DisplayMontiorIdentifier() {
+        if (monitorIdentifer) {
+            const bgColor = isOver ? classes.droppedItemReplace : "";
+            return <div className={`${classes.droppedItem} ${bgColor}`}> {monitorIdentifer}</div>;
+        }
+        return null;
+    }
 
     return (
-        <div>
-            <h2>DCS Title Monitor:</h2>
+        <div className={classes.form}>
+            <h2 className={classes.header}>DCS Title Monitor:</h2>
             <p>Set button title to the value of:</p>
-            <input
-                type="text"
-                placeholder="Enter Control Reference"
-                value={titleMonitorAddress}
-                onChange={handleTitleMonitorAddressChange}
-            />
-            <span> </span>
-            <input
-                type="text"
-                placeholder="Max Length"
-                value={titleMonitorStrLen}
-                onChange={handleTitleMonitorStrLenChange}
-            />
-        </div>
+            <div className={`${classes.droppableArea} ${DropAreaBG()}`} ref={dropRef}>
+                <DisplayMontiorIdentifier />
+            </div>
+        </div >
     );
 }
 

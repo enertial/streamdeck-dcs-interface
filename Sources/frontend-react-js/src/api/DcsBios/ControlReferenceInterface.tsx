@@ -31,7 +31,7 @@ interface ControlOutputInteger {
   max_value: number,
   shift_by: number,
   suffix: string,
-  type: string, // Will be "integer"
+  type: "integer",
 }
 
 interface ControlOutputString {
@@ -39,7 +39,7 @@ interface ControlOutputString {
   description: string,
   max_length: number,
   suffix: string,
-  type: string, // Will be "string"
+  type: "string"
 }
 
 export type {

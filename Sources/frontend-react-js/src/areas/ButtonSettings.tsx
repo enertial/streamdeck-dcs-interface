@@ -3,6 +3,7 @@ import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import SendCommand, { defaultSendCommandSettings } from "../forms/SendCommand";
 import StateMonitor, { defaultStateMonitorSettings } from "../forms/StateMonitor";
 import TitleMonitor, { defaultTitleMonitorSettings } from "../forms/TitleMonitor";
+import classes from "./ButtonSettings.module.css";
 
 interface Props {
     sdApi: StreamdeckApi
@@ -36,13 +37,14 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
     }
 
     return (
-        <div>
+        <div className={classes.settings}>
             <SendCommand sdApi={sdApi} setSettings={setCommandSettings} />
             <TitleMonitor sdApi={sdApi} setSettings={setTitleMonitorSettings} />
             <StateMonitor sdApi={sdApi} setSettings={setStateMonitorSettings} />
-            <br></br>
-            <button onClick={handleApplyButtonClick}> Apply Settings </button>
-            <span /><button onClick={() => { sdApi.commFns.requestSimulationState() }}> Debug </button>
+            <div className={classes.buttonRow}>
+                <button className="btn" onClick={handleApplyButtonClick}> Apply Settings </button>
+                <button className="btn" onClick={() => { sdApi.commFns.requestSimulationState() }}> Debug </button>
+            </div>
         </div>
     );
 }

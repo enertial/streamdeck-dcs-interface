@@ -1,5 +1,6 @@
 import { ChangeEvent, useEffect, useState } from "react";
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import classes from "./Forms.module.css";
 
 export interface SendCommandSettings {
     send_address: string;
@@ -42,8 +43,8 @@ function SendCommand({ sdApi, setSettings }: Props): JSX.Element {
     }, [sendAddress, pressValue, releaseValue])
 
     return (
-        <div>
-            <h2>DCS Command:</h2>
+        <div className={classes.form}>
+            <h2 className={classes.header}>DCS Command:</h2>
             <p>Upon press of button, set Identifier to value:</p>
             <input
                 type="text"
