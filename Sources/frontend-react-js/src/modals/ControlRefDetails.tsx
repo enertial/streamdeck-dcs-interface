@@ -1,5 +1,6 @@
+import { useDrag } from 'react-dnd'
 import { MouseEventHandler } from "react";
-import { ControlData, ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface"
+import { ControlData, ControlInput, ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface"
 import classes from "./SelectedControlRef.module.css";
 
 interface Props {
@@ -26,6 +27,41 @@ function OutputDisplay({ output }: OutputType): JSX.Element {
 
 function ControlRefDetails({ controlData, onClick }: Props): JSX.Element {
 
+  interface InputProps {
+    controlInput: ControlInput,
+  }
+  const InputCard = ({ controlInput }: InputProps) => {
+    const [{ isDragging }, dragRef] = useDrag({
+      type: "dcsBiosInput",
+      item: { controlInput },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging()
+      })
+    })
+
+    return (
+      <div className='btn' ref={dragRef}>
+        Input (max: {controlInput.max_value})
+      </div>
+    )
+  }
+
+  const OutputCard = ({ output }: OutputType) => {
+    const [{ isDragging }, dragRef] = useDrag({
+      type: output.type === "integer" ? "dcsBiosIntegerOutput" : "dcsBiosStringOutput",
+      item: { output },
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging()
+      })
+    })
+
+    return (
+      <div className='btn' ref={dragRef}>
+        {output.type === "integer" ? "Integer Output" : "String Output"}
+      </div>
+    )
+  }
+
 
   return (
     <div className={classes.modal}>
@@ -37,11 +73,10 @@ function ControlRefDetails({ controlData, onClick }: Props): JSX.Element {
           <b>Description: </b> {controlData.description}
         </i>
       </p>
+      <b>Type:</b> {controlData.control_type}
       <p>
-        <b>{controlData.control_type}</b>
-        <p> inputs:{" "}
-          {controlData.inputs.length} </p>
-        <OutputDisplay output={controlData.outputs[0]} />
+        {controlData.inputs.map((input) => (input.interface === "set_state" && <InputCard controlInput={input} />))}
+        {controlData.outputs.map((output) => (<OutputCard output={output} />))}
       </p>
       <button onClick={onClick}>Close</button>
     </div>
