@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import IdLookupManager from "../components/IdLookupManager";
 import Backdrop from "../modals/Backdrop";
-import ControlRefDetails from "../modals/ControlRefDetails";
+import SelectedControlRef from "../modals/SelectedControlRef";
 
 import { ControlData } from "../api/DcsBios/ControlReferenceInterface"
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
@@ -26,7 +26,7 @@ function IdLookup({ sdApi }: Props): JSX.Element {
   let modal = null
   if (selectedControlReference) {
     modal = <div>
-      <ControlRefDetails controlData={selectedControlReference} onClick={clearSelection} />
+      <SelectedControlRef controlData={selectedControlReference} onClick={clearSelection} />
       <Backdrop onClick={clearSelection} globalScope={false} />
     </div>;
   }

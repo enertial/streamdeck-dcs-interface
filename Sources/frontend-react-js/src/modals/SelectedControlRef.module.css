@@ -11,3 +11,17 @@
   top: 20vh;
   left: calc(50% - 15rem);
 }
+
+.draggableRow {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+}
+
+.draggableCard {
+  box-shadow: 1px 4px 5px rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  background-color: mediumspringgreen;
+  color: #2d2d2d;
+  padding: 1em;
+}
