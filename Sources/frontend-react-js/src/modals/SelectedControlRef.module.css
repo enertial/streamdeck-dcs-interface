@@ -12,6 +12,13 @@
   left: calc(50% - 15rem);
 }
 
+.textArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60px;
+}
+
 .draggableRow {
   display: flex;
   justify-content: center;
@@ -24,4 +31,5 @@
   background-color: mediumspringgreen;
   color: #2d2d2d;
   padding: 1em;
+  cursor: grab;
 }
