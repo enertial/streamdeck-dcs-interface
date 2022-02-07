@@ -1,7 +1,6 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent } from "react";
 import { ControlOutputInteger } from "../api/DcsBios/ControlReferenceInterface";
 import { DcsBiosDraggableItem, DcsBiosDraggableTypes } from "../api/DcsBios/DraggableItems";
-import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import DropArea from "./DropArea";
 import classes from "./Forms.module.css";
 
@@ -39,7 +38,7 @@ function StateMonitor({ settings, setSettings }: Props): JSX.Element {
             const output = item.output as ControlOutputInteger;
             setSettings((prevSettings) => ({
                 ...prevSettings,
-                compare_monitor_identifier: item.module + "::" + item.identifier,
+                compare_monitor_identifier: item.module + "-" + item.identifier,
                 dcs_id_compare_monitor: "INTEGER",
                 compare_monitor_address: output.address,
                 compare_monitor_mask: output.mask,
@@ -65,8 +64,8 @@ function StateMonitor({ settings, setSettings }: Props): JSX.Element {
         let condition = "LESS_THAN";
         if (event.target.value === "GREATER_THAN") {
             condition = "GREATER_THAN";
-        } else if (event.target.value === "EQUAL") {
-            condition = "EQUAL";
+        } else if (event.target.value === "EQUAL_TO") {
+            condition = "EQUAL_TO";
         }
         setSettings((prevSettings) => ({
             ...prevSettings,
@@ -75,9 +74,10 @@ function StateMonitor({ settings, setSettings }: Props): JSX.Element {
     }
 
     function handleStateComparisonValueChange(event: ChangeEvent<HTMLInputElement>) {
+        const value = event.currentTarget.value;
         setSettings((prevSettings) => ({
             ...prevSettings,
-            dcs_id_comparison_value: event.currentTarget.value
+            dcs_id_comparison_value: value
         }));
     }
 
@@ -85,27 +85,30 @@ function StateMonitor({ settings, setSettings }: Props): JSX.Element {
         <div className={classes.form}>
             <h2 className={classes.header}>DCS State Monitor:</h2>
             <p>Change to second image state when:</p>
-            <DropArea
-                accept={[DcsBiosDraggableTypes.OUTPUT_INTEGER]}
-                displayText={settings.compare_monitor_identifier}
-                handleDroppedItem={handleDroppedItem}
-                onClear={clearMonitorSettings}
-            />
-            <select
-                value={settings.dcs_id_compare_condition}
-                onChange={handleStateCompareConditionChange}
-            >
-                <option value={"LESS_THAN"}>&lt;</option>
-                <option value={"EQUAL_TO"}>==</option>
-                <option value={"GREATER_THAN"}>&gt;</option>
-            </select>
-            <span> </span>
-            <input
-                type="text"
-                placeholder="Value"
-                value={settings.dcs_id_comparison_value}
-                onChange={handleStateComparisonValueChange}
-            />
+            <div className={classes.formRow}>
+                <DropArea
+                    accept={[DcsBiosDraggableTypes.OUTPUT_INTEGER]}
+                    displayText={settings.compare_monitor_identifier}
+                    handleDroppedItem={handleDroppedItem}
+                    onClear={clearMonitorSettings}
+                />
+                <select
+                    className={classes.input}
+                    value={settings.dcs_id_compare_condition}
+                    onChange={handleStateCompareConditionChange}
+                >
+                    <option value={"LESS_THAN"}>&lt;</option>
+                    <option value={"EQUAL_TO"}>==</option>
+                    <option value={"GREATER_THAN"}>&gt;</option>
+                </select>
+                <input
+                    className={classes.input}
+                    type="text"
+                    placeholder="Value"
+                    value={settings.dcs_id_comparison_value}
+                    onChange={handleStateComparisonValueChange}
+                />
+            </div>
         </div>
     );
 }

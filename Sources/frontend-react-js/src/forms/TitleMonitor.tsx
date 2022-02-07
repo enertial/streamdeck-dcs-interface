@@ -1,8 +1,6 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import { useDrop } from "react-dnd";
+import { useState } from "react";
 import { ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface";
 import { DcsBiosDraggableItem, DcsBiosDraggableTypes } from "../api/DcsBios/DraggableItems";
-import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import DropArea from "./DropArea";
 import classes from "./Forms.module.css";
 
@@ -29,11 +27,8 @@ interface Props {
 }
 
 function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
-    const [monitorIdentifer, setMonitorIdentifier] = useState("");
 
     function handleDroppedItem(item: DcsBiosDraggableItem) {
-        console.log(item);
-        setMonitorIdentifier(item.module + "::" + item.identifier);
         if (item.type === DcsBiosDraggableTypes.OUTPUT_STRING) {
             const output = item.output as ControlOutputString;
             setSettings((prevSettings) => ({
@@ -60,7 +55,6 @@ function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
     }
 
     function clearMonitorSettings() {
-        setMonitorIdentifier("");
         setSettings(defaultTitleMonitorSettings);
     }
 
@@ -68,12 +62,14 @@ function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
         <div className={classes.form}>
             <h2 className={classes.header}>DCS Title Monitor:</h2>
             <p>Set button title to the value of:</p>
-            <DropArea
-                accept={[DcsBiosDraggableTypes.OUTPUT_STRING, DcsBiosDraggableTypes.OUTPUT_INTEGER]}
-                displayText={settings.string_monitor_identfier}
-                handleDroppedItem={handleDroppedItem}
-                onClear={clearMonitorSettings}
-            />
+            <div className={classes.formRow}>
+                <DropArea
+                    accept={[DcsBiosDraggableTypes.OUTPUT_STRING, DcsBiosDraggableTypes.OUTPUT_INTEGER]}
+                    displayText={settings.string_monitor_identfier}
+                    handleDroppedItem={handleDroppedItem}
+                    onClear={clearMonitorSettings}
+                />
+            </div>
         </div >
     );
 }

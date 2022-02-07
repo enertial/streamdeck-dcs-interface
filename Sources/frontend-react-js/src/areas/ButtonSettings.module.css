@@ -1,7 +1,6 @@
 .settings {
   display: flex;
   flex-direction: column;
-  flex-grow: 1;
   justify-content: space-evenly;
   height: 100%;
   padding: 50px 10px;

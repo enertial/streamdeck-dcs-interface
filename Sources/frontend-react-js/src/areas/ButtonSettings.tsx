@@ -38,7 +38,7 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
 
     return (
         <div className={classes.settings}>
-            <SendCommand sdApi={sdApi} setSettings={setCommandSettings} />
+            <SendCommand settings={commandSettings} setSettings={setCommandSettings} />
             <TitleMonitor settings={titleMonitorSettings} setSettings={setTitleMonitorSettings} />
             <StateMonitor settings={stateMonitorSettings} setSettings={setStateMonitorSettings} />
             <div className={classes.buttonRow}>

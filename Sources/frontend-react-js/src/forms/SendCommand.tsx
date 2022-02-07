@@ -1,78 +1,103 @@
-import { ChangeEvent, useEffect, useState } from "react";
-import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import { ChangeEvent, useState } from "react";
+import { DcsBiosDraggableItem, DcsBiosDraggableTypes } from "../api/DcsBios/DraggableItems";
+import DropArea from "./DropArea";
 import classes from "./Forms.module.css";
 
 export interface SendCommandSettings {
+    send_identifier: string;
     send_address: string;
     press_value: string;
     release_value: string;
 }
 export const defaultSendCommandSettings: SendCommandSettings = {
+    send_identifier: "",
     send_address: "",
     press_value: "",
     release_value: ""
 }
 
 interface Props {
-    sdApi: StreamdeckApi;
+    settings: SendCommandSettings;
     setSettings: React.Dispatch<React.SetStateAction<SendCommandSettings>>;
 }
 
-function SendCommand({ sdApi, setSettings }: Props): JSX.Element {
-    const [sendAddress, setSendAddress] = useState(sdApi.buttonSettings.send_address);
-    const [pressValue, setPressValue] = useState(sdApi.buttonSettings.press_value);
-    const [releaseValue, setReleaseValue] = useState(sdApi.buttonSettings.press_value);
+function SendCommand({ settings, setSettings }: Props): JSX.Element {
+    const [maxValue, setMaxValue] = useState("");
 
-    function handleSendAddressChange(event: ChangeEvent<HTMLInputElement>) {
-        setSendAddress(event.currentTarget.value);
+    function handleDroppedItem(item: DcsBiosDraggableItem) {
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            send_identifier: item.module + "-" + item.identifier,
+            send_address: item.identifier,
+        }));
+        setMaxValue(item.input?.max_value?.toString() || "");
     }
+
+    function clearMonitorSettings() {
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            send_identifier: "",
+            send_address: "",
+        }));
+        setMaxValue("");
+    }
+
+
     function handlePressValueChange(event: ChangeEvent<HTMLInputElement>) {
-        setPressValue(event.currentTarget.value);
+        const value = event.currentTarget.value;
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            press_value: value
+        }));
     }
     function handleReleaseValueChange(event: ChangeEvent<HTMLInputElement>) {
-        setReleaseValue(event.currentTarget.value);
+        const value = event.currentTarget.value;
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            release_value: value
+        }));
     }
-
-    useEffect(() => {
-        const updatedSettings: SendCommandSettings = {
-            send_address: sendAddress,
-            press_value: pressValue,
-            release_value: releaseValue
-        };
-        setSettings(updatedSettings);
-    }, [sendAddress, pressValue, releaseValue])
 
     return (
         <div className={classes.form}>
             <h2 className={classes.header}>DCS Command:</h2>
             <p>Upon press of button, set Identifier to value:</p>
-            <input
-                type="text"
-                placeholder="Enter Control Reference"
-                value={sendAddress}
-                onChange={handleSendAddressChange}
-            />
-            <span> </span>
-            <input
-                type="text"
-                placeholder="Press Value"
-                value={pressValue}
-                onChange={handlePressValueChange}
-            />
-            <p>Upon press of button, set Identifier to value:</p>
-            <input
-                type="text"
-                placeholder="Enter Control Reference"
-                value={sendAddress}
-                onChange={handleSendAddressChange}
-            />
-            <span> </span>
-            <input
-                type="text"
-                placeholder="Release Value"
-                value={releaseValue}
-                onChange={handleReleaseValueChange}
-            />
+            <div className={classes.formRow}>
+                <DropArea
+                    accept={[DcsBiosDraggableTypes.INPUT]}
+                    displayText={settings.send_identifier}
+                    handleDroppedItem={handleDroppedItem}
+                    onClear={clearMonitorSettings}
+                />
+                <b>:</b>
+                <input
+                    className={classes.input}
+                    type="text"
+                    placeholder="Value"
+                    value={settings.press_value}
+                    onChange={handlePressValueChange}
+                />
+            </div>
+            <p>Upon release of button, set Identifier to value:</p>
+            <div className={classes.formRow}>
+                <DropArea
+                    accept={[]}
+                    displayText={settings.send_identifier}
+                    handleDroppedItem={handleDroppedItem}
+                    onClear={clearMonitorSettings}
+                />
+                <b>:</b>
+                <input
+                    className={classes.input}
+                    type="text"
+                    placeholder="Value"
+                    value={settings.release_value}
+                    onChange={handleReleaseValueChange}
+                />
+            </div>
+            <p>
+                {maxValue && "Max Value: " + maxValue}
+            </p>
         </div>
     );
 }

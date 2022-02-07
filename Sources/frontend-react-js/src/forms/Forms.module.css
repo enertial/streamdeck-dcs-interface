@@ -4,6 +4,13 @@
   background-color: #444;
   color: #fff;
   padding: 2rem 1rem;
+  margin: 1rem 0;
+}
+
+.formRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .header {
@@ -17,7 +24,9 @@
   border: 1px solid rgba(0, 0, 0, 0.8);
   background-color: snow;
   min-height: 40px;
+  min-width: 40%;
   max-width: 75%;
+  margin-right: 0.2em;
 }
 
 .droppableAreaHover {
@@ -34,7 +43,6 @@
   margin: 0 0.5em;
   background-color: mediumspringgreen;
   color: #2d2d2d;
-  font-size: 1.1vh;
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
   cursor: grab;
@@ -55,4 +63,12 @@
   height: 1.3em;
   width: 1.3em;
   cursor: pointer;
+}
+
+.input {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  max-width: 20%;
+  min-height: 35px;
+  font-size: inherit;
+  margin: 0 0.2em;
 }
