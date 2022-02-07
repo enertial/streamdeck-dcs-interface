@@ -19,8 +19,7 @@
 
 .wrapper {
   display: grid;
-  grid-template-columns: 70px 500px 700px 60px;
-  grid-template-rows: 900px;
+  grid-template-columns: 3% 42% 50% 5%;
   grid-template-areas: "leftSidebar buttonSettings idLookup rightSidebar";
   max-width: 1500px;
   max-height: 1000px;

@@ -22,7 +22,6 @@
 .draggableRow {
   display: flex;
   justify-content: center;
-  gap: 20px;
 }
 
 .draggableCard {
@@ -31,5 +30,6 @@
   background-color: mediumspringgreen;
   color: #2d2d2d;
   padding: 1em;
+  margin: 0 0.7em;
   cursor: grab;
 }
