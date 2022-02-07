@@ -39,8 +39,8 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
     return (
         <div className={classes.settings}>
             <SendCommand sdApi={sdApi} setSettings={setCommandSettings} />
-            <TitleMonitor sdApi={sdApi} setSettings={setTitleMonitorSettings} />
-            <StateMonitor sdApi={sdApi} setSettings={setStateMonitorSettings} />
+            <TitleMonitor settings={titleMonitorSettings} setSettings={setTitleMonitorSettings} />
+            <StateMonitor settings={stateMonitorSettings} setSettings={setStateMonitorSettings} />
             <div className={classes.buttonRow}>
                 <button className="btn" onClick={handleApplyButtonClick}> Apply Settings </button>
                 <button className="btn" onClick={() => { sdApi.commFns.requestSimulationState() }}> Debug </button>

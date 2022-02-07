@@ -13,13 +13,12 @@
 
 .droppableArea {
   display: flex;
+  justify-content: space-between;
   align-items: center;
-  gap: 5px;
   border: 1px solid rgba(0, 0, 0, 0.8);
   background-color: snow;
   min-height: 40px;
-  min-width: 50%;
-  max-width: 70%;
+  max-width: 75%;
 }
 
 .droppableAreaHover {
@@ -45,4 +44,16 @@
 .droppedItemReplace {
   background-color: lightcoral;
   opacity: 0.6;
+}
+
+.clearButton {
+  background-color: rgb(114, 114, 114);
+  color: #fff;
+  border: none;
+  border-radius: 100%;
+  padding: 0 0 0.25em 0;
+  margin-right: 5px;
+  height: 1.3em;
+  width: 1.3em;
+  cursor: pointer;
 }

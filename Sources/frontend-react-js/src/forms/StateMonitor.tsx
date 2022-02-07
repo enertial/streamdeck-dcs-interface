@@ -1,8 +1,12 @@
 import { ChangeEvent, useEffect, useState } from "react";
+import { ControlOutputInteger } from "../api/DcsBios/ControlReferenceInterface";
+import { DcsBiosDraggableItem, DcsBiosDraggableTypes } from "../api/DcsBios/DraggableItems";
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import DropArea from "./DropArea";
 import classes from "./Forms.module.css";
 
 export interface StateMonitorSettings {
+    compare_monitor_identifier: string;
     dcs_id_compare_monitor: string;
     compare_monitor_address: number;
     compare_monitor_mask: number;
@@ -12,6 +16,7 @@ export interface StateMonitorSettings {
     dcs_id_comparison_value: string;
 }
 export const defaultStateMonitorSettings: StateMonitorSettings = {
+    compare_monitor_identifier: "",
     dcs_id_compare_monitor: "NONE",
     compare_monitor_address: 0,
     compare_monitor_mask: 0,
@@ -22,101 +27,84 @@ export const defaultStateMonitorSettings: StateMonitorSettings = {
 }
 
 interface Props {
-    sdApi: StreamdeckApi;
+    settings: StateMonitorSettings;
     setSettings: React.Dispatch<React.SetStateAction<StateMonitorSettings>>;
 }
 
-function StateMonitor({ sdApi, setSettings }: Props): JSX.Element {
-    const [stateMonitorAddress, setStateMonitorAddress] = useState(sdApi.buttonSettings.compare_monitor_address);
-    const [stateMonitorMask, setStateMonitorMask] = useState(sdApi.buttonSettings.compare_monitor_mask);
-    const [stateMonitorShift, setStateMonitorShift] = useState(sdApi.buttonSettings.compare_monitor_shift);
-    const [stateCompareCondition, setStateCompareCondition] = useState(sdApi.buttonSettings.dcs_id_compare_condition);
-    const [stateComparisonValue, setStateComparisonValue] = useState(sdApi.buttonSettings.dcs_id_comparison_value);
+function StateMonitor({ settings, setSettings }: Props): JSX.Element {
 
-    function handleStateMonitorAddressChange(event: ChangeEvent<HTMLInputElement>) {
-        const value: number = parseInt(event.currentTarget.value);
-        !isNaN(value) && setStateMonitorAddress(value);
+    function handleDroppedItem(item: DcsBiosDraggableItem) {
+        console.log(item);
+        if (item.type === DcsBiosDraggableTypes.OUTPUT_INTEGER) {
+            const output = item.output as ControlOutputInteger;
+            setSettings((prevSettings) => ({
+                ...prevSettings,
+                compare_monitor_identifier: item.module + "::" + item.identifier,
+                dcs_id_compare_monitor: "INTEGER",
+                compare_monitor_address: output.address,
+                compare_monitor_mask: output.mask,
+                compare_monitor_shift: output.shift_by,
+                compare_monitor_max_length: 0
+            }));
+        }
     }
-    function handleStateMonitorMaskChange(event: ChangeEvent<HTMLInputElement>) {
-        const value: number = parseInt(event.currentTarget.value);
-        !isNaN(value) && setStateMonitorMask(value);
-    }
-    function handleStateMonitorShiftChange(event: ChangeEvent<HTMLInputElement>) {
-        const value: number = parseInt(event.currentTarget.value);
-        !isNaN(value) && setStateMonitorShift(value);
+
+    function clearMonitorSettings() {
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            compare_monitor_identifier: "",
+            dcs_id_compare_monitor: "NONE",
+            compare_monitor_address: 0,
+            compare_monitor_mask: 0,
+            compare_monitor_shift: 0,
+            compare_monitor_max_length: 0,
+        }));
     }
 
     function handleStateCompareConditionChange(event: ChangeEvent<HTMLSelectElement>) {
-        switch (event.target.value) {
-            case "GREATER_THAN":
-                setStateCompareCondition("GREATER_THAN");
-                break;
-            case "EQUAL_TO":
-                setStateCompareCondition("EQUAL_TO");
-                break;
-            default:
-                setStateCompareCondition("LESS_THAN");
+        let condition = "LESS_THAN";
+        if (event.target.value === "GREATER_THAN") {
+            condition = "GREATER_THAN";
+        } else if (event.target.value === "EQUAL") {
+            condition = "EQUAL";
         }
-    }
-    function handleStateComparisonValueChange(event: ChangeEvent<HTMLInputElement>) {
-        setStateComparisonValue(event.currentTarget.value);
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            dcs_id_compare_condition: condition
+        }));
     }
 
-    useEffect(() => {
-        const updatedSettings: StateMonitorSettings = {
-            dcs_id_compare_monitor: "INTEGER",
-            compare_monitor_address: stateMonitorAddress,
-            compare_monitor_mask: stateMonitorMask,
-            compare_monitor_shift: stateMonitorShift,
-            compare_monitor_max_length: 0,
-            dcs_id_compare_condition: stateCompareCondition,
-            dcs_id_comparison_value: stateComparisonValue
-        };
-        setSettings(updatedSettings);
-    }, [stateMonitorAddress, stateMonitorMask, stateMonitorShift, stateCompareCondition, stateComparisonValue])
+    function handleStateComparisonValueChange(event: ChangeEvent<HTMLInputElement>) {
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            dcs_id_comparison_value: event.currentTarget.value
+        }));
+    }
 
     return (
         <div className={classes.form}>
             <h2 className={classes.header}>DCS State Monitor:</h2>
             <p>Change to second image state when:</p>
-            <div className={classes.droppableArea}>
-
-            </div>
-            <input
-                type="text"
-                placeholder="Select from Control Reference Table"
-                value={stateMonitorAddress}
-                onChange={handleStateMonitorAddressChange}
+            <DropArea
+                accept={[DcsBiosDraggableTypes.OUTPUT_INTEGER]}
+                displayText={settings.compare_monitor_identifier}
+                handleDroppedItem={handleDroppedItem}
+                onClear={clearMonitorSettings}
             />
-            <span> </span>
             <select
-                value={stateCompareCondition}
+                value={settings.dcs_id_compare_condition}
                 onChange={handleStateCompareConditionChange}
             >
                 <option value={"LESS_THAN"}>&lt;</option>
-                <option value={"EQUAL_TO"}>=</option>
+                <option value={"EQUAL_TO"}>==</option>
                 <option value={"GREATER_THAN"}>&gt;</option>
             </select>
             <span> </span>
             <input
                 type="text"
                 placeholder="Value"
-                value={stateComparisonValue}
+                value={settings.dcs_id_comparison_value}
                 onChange={handleStateComparisonValueChange}
-            />
-            <br />
-            <input
-                type="text"
-                placeholder="Mask"
-                value={stateMonitorMask}
-                onChange={handleStateMonitorMaskChange}
-            />
-            <span />
-            <input
-                type="text"
-                placeholder="Shift"
-                value={stateMonitorShift}
-                onChange={handleStateMonitorShiftChange}
             />
         </div>
     );
