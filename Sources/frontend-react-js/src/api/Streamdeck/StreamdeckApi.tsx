@@ -71,8 +71,8 @@ export function defaultButtonSettings(): StreamdeckButtonSettings {
     return {
         send_identifier: "",
         send_address: "",
-        press_value: "",
-        release_value: "",
+        press_value: "1",
+        release_value: "0",
         disable_release_check: false,
         string_monitor_identifier: "",
         dcs_id_string_monitor: "",
@@ -89,8 +89,8 @@ export function defaultButtonSettings(): StreamdeckButtonSettings {
         compare_monitor_mask: 0,
         compare_monitor_shift: 0,
         compare_monitor_max_length: 0,
-        dcs_id_compare_condition: "LESS_THAN",
-        dcs_id_comparison_value: ""
+        dcs_id_compare_condition: "GREATER_THAN",
+        dcs_id_comparison_value: "0"
     };
 }
 

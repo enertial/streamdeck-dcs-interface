@@ -43,7 +43,7 @@ function ButtonConfiguration({ sdApi }: Props): JSX.Element {
         });
     }, [sdApi.buttonSettings]);
 
-    function updateStreamdeckSettings() {
+    useEffect(() => {
         const updatedSettings = Object.assign({}, sdApi.buttonSettings, {
             send_identifier: commandSettings.send_identifier,
             send_address: commandSettings.send_address,
@@ -66,7 +66,7 @@ function ButtonConfiguration({ sdApi }: Props): JSX.Element {
             dcs_id_comparison_value: stateMonitorSettings.dcs_id_comparison_value
         });
         sdApi.commFns.setSettings(updatedSettings);
-    }
+    }, [commandSettings, titleMonitorSettings, stateMonitorSettings]);
 
     return (
         <div className={classes.settings}>
@@ -74,10 +74,7 @@ function ButtonConfiguration({ sdApi }: Props): JSX.Element {
             <TitleMonitor settings={titleMonitorSettings} setSettings={setTitleMonitorSettings} />
             <StateMonitor settings={stateMonitorSettings} setSettings={setStateMonitorSettings} />
             <div className={classes.buttonRow}>
-                <button className="btn" onClick={() => { updateStreamdeckSettings(); }}>Apply</button>
-                <button className="btn" onClick={() => { updateStreamdeckSettings(); window.close(); }}>Save & Close</button>
-                <button className="btn" onClick={() => { window.close(); }}>Discard & Close</button>
-                <button className="btn" onClick={() => { sdApi.commFns.getSettings() }}>Revert</button>
+                <button className="btn" onClick={() => { window.close(); }}>Save & Close</button>
             </div>
         </div>
     );

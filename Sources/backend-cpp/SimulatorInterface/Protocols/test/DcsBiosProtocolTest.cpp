@@ -95,6 +95,19 @@ TEST_F(DcsBiosProtocolTestFixture, get_integer_value)
     EXPECT_TRUE(Decimal(7) == simulator_interface.get_value_at_addr(SimulatorAddress(0x5678, 0xFFFF, 0)));
 }
 
+TEST_F(DcsBiosProtocolTestFixture, get_integer_as_string)
+{
+    // clang-format off
+    const char mock_dcs_start_message[] = {0x55, 0x55, 0x55, 0x55,                          // Sync frame
+                                           0x78, 0x56, 0x02, 0x00, 0x07, 0x00,              // Addr 0x5678 (2 bytes)
+                                           (char)0xFE, (char)0xFF, 0x02, 0x00, 0x00, 0x00}; // End of frame
+    // clang-format on
+    mock_dcs.send_bytes(mock_dcs_start_message, SIZE_OF(mock_dcs_start_message));
+    simulator_interface.update_simulator_state();
+
+    EXPECT_EQ("7", simulator_interface.get_string_at_addr(SimulatorAddress(0x5678, 0xFFFF, 0)));
+}
+
 TEST_F(DcsBiosProtocolTestFixture, get_string_value_max_length)
 {
     constexpr int MAX_STRING_LEN = 8;

@@ -214,7 +214,6 @@ void StreamdeckInterface::DeviceDidConnect(const std::string &inDeviceID, const 
     // Request global settings from Streamdeck.
     if (mConnectionManager != nullptr) {
         mConnectionManager->GetGlobalSettings();
-        mConnectionManager->LogMessage("Streamdeck Device Connected");
     }
 }
 
@@ -229,7 +228,6 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                        const std::string &inDeviceID)
 {
     const std::string event = EPLJSONUtils::GetStringByName(inPayload, "event");
-    mConnectionManager->LogMessage("Received SendToPlugin event: " + event + " Payload: " + inPayload.dump());
 
     if (event == "SettingsUpdate") {
         // Update settings for the specified context -- triggered by Property Inspector detecting a change.
