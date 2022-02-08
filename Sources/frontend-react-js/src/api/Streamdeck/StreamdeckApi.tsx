@@ -41,11 +41,13 @@ export interface StreamdeckCommFns {
 
 export interface StreamdeckButtonSettings {
     // Simulator command settings
+    send_identifier: string;
     send_address: string;
     press_value: string;
     release_value: string;
     disable_release_check: boolean;
     // Title Monitor settings
+    string_monitor_identifier: string;
     dcs_id_string_monitor: string;
     string_monitor_address: number;
     string_monitor_mask: number;
@@ -55,6 +57,7 @@ export interface StreamdeckButtonSettings {
     string_monitor_passthrough_check: boolean;
     string_monitor_mapping: string;
     // State Monitor settings
+    compare_monitor_identifier: string;
     dcs_id_compare_monitor: string;
     compare_monitor_address: number;
     compare_monitor_mask: number;
@@ -66,10 +69,12 @@ export interface StreamdeckButtonSettings {
 
 export function defaultButtonSettings(): StreamdeckButtonSettings {
     return {
+        send_identifier: "",
         send_address: "",
         press_value: "",
         release_value: "",
         disable_release_check: false,
+        string_monitor_identifier: "",
         dcs_id_string_monitor: "",
         string_monitor_address: 0,
         string_monitor_mask: 0,
@@ -78,6 +83,7 @@ export function defaultButtonSettings(): StreamdeckButtonSettings {
         string_monitor_vertical_spacing: "0",
         string_monitor_passthrough_check: true,
         string_monitor_mapping: "",
+        compare_monitor_identifier: "",
         dcs_id_compare_monitor: "",
         compare_monitor_address: 0,
         compare_monitor_mask: 0,

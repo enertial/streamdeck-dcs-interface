@@ -38,7 +38,6 @@ function DcsBiosIdLookup({ sdApi }: Props): JSX.Element {
    */
   function handleControlReferenceSelect(controlData: ControlData) {
     setSelectedControlReference(controlData);
-    console.debug(controlData);
   }
 
   useEffect(() => {

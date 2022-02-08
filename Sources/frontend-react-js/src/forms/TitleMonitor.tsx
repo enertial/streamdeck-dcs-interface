@@ -5,7 +5,7 @@ import DropArea from "./DropArea";
 import classes from "./Forms.module.css";
 
 export interface TitleMonitorSettings {
-    string_monitor_identfier: string;
+    string_monitor_identifier: string;
     dcs_id_string_monitor: string;
     string_monitor_address: number;
     string_monitor_mask: number;
@@ -13,7 +13,7 @@ export interface TitleMonitorSettings {
     string_monitor_max_length: number;
 }
 export const defaultTitleMonitorSettings: TitleMonitorSettings = {
-    string_monitor_identfier: "",
+    string_monitor_identifier: "",
     dcs_id_string_monitor: "NONE",
     string_monitor_address: 0,
     string_monitor_mask: 0,
@@ -33,7 +33,7 @@ function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
             const output = item.output as ControlOutputString;
             setSettings((prevSettings) => ({
                 ...prevSettings,
-                string_monitor_identfier: item.module + "::" + item.identifier,
+                string_monitor_identifier: item.module + "::" + item.identifier,
                 dcs_id_string_monitor: "STRING",
                 string_monitor_address: output.address,
                 string_monitor_mask: 0,
@@ -44,7 +44,7 @@ function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
             const output = item.output as ControlOutputInteger;
             setSettings((prevSettings) => ({
                 ...prevSettings,
-                string_monitor_identfier: item.module + "::" + item.identifier,
+                string_monitor_identifier: item.module + "::" + item.identifier,
                 dcs_id_string_monitor: "INTEGER",
                 string_monitor_address: output.address,
                 string_monitor_mask: output.mask,
@@ -65,7 +65,7 @@ function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
             <div className={classes.formRow}>
                 <DropArea
                     accept={[DcsBiosDraggableTypes.OUTPUT_STRING, DcsBiosDraggableTypes.OUTPUT_INTEGER]}
-                    displayText={settings.string_monitor_identfier}
+                    displayText={settings.string_monitor_identifier}
                     handleDroppedItem={handleDroppedItem}
                     onClear={clearMonitorSettings}
                 />
