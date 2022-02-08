@@ -10,7 +10,6 @@ import { ControlData } from "../api/DcsBios/ControlReferenceInterface";
 import { flattenModuleControlsJson, getModuleName } from "../api/DcsBios/Utilities";
 
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
-import ModuleSelect from "./ModuleSelect";
 
 interface Props {
   sdApi: StreamdeckApi;

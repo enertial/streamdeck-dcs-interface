@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { ControlOutputInteger, ControlOutputString } from "../api/DcsBios/ControlReferenceInterface";
 import { DcsBiosDraggableItem, DcsBiosDraggableTypes } from "../api/DcsBios/DraggableItems";
 import DropArea from "./DropArea";
