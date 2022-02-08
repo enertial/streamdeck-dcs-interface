@@ -39,7 +39,7 @@ function Table(props: TableContents): JSX.Element {
       </div>
     );
   } else {
-    return <p>DCS-BIOS installation path needs to be specified in <b>Setup</b> to load json documentation</p>;
+    return <p>DCS-BIOS installation path needs to be specified in <b>Setup</b> to load json documentation ⇨</p>;
   }
 }
 

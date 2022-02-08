@@ -28,6 +28,7 @@ th {
   padding: 4px;
   padding-top: 10px;
   padding-bottom: 10px;
+  word-break: break-word;
 }
 
 tr:nth-child(odd) {

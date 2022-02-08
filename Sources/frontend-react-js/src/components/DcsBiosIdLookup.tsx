@@ -74,12 +74,9 @@ function DcsBiosIdLookup({ sdApi }: Props): JSX.Element {
 
   return (
     <div className={classes.main}>
-      <ModuleSelect
+      <SearchBar
         selectedModule={selectedModule}
         setSelectedModule={setSelectedModule}
-        sdApi={sdApi}
-      />
-      <SearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         sdApi={sdApi}

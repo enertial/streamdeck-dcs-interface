@@ -14,6 +14,7 @@
 }
 
 .header {
+  font-size: 1.3rem;
   margin: 0;
 }
 
@@ -23,7 +24,7 @@
   align-items: center;
   border: 1px solid rgba(0, 0, 0, 0.8);
   background-color: snow;
-  min-height: 40px;
+  min-height: 2vh;
   min-width: 40%;
   max-width: 75%;
   margin-right: 0.2em;
@@ -39,7 +40,7 @@
 .droppedItem {
   box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.5);
   border-radius: 5px;
-  padding: 0.3em 1em;
+  padding: 0.2em 1em;
   margin: 0 0.5em;
   background-color: mediumspringgreen;
   color: #2d2d2d;
@@ -67,8 +68,9 @@
 
 .input {
   border: 1px solid rgba(0, 0, 0, 0.8);
-  max-width: 20%;
-  min-height: 35px;
+  max-width: 15%;
+  min-height: 1.8vh;
   font-size: inherit;
+  text-align: center;
   margin: 0 0.2em;
 }

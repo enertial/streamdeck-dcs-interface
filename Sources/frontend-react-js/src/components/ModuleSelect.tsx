@@ -1,6 +1,7 @@
 import { ChangeEvent } from "react";
 import { getModuleName } from "../api/DcsBios/Utilities";
 import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import classes from "./ModuleSelect.module.css";
 
 interface Props {
     selectedModule: string;
@@ -20,19 +21,18 @@ function ModuleSelect({ selectedModule, setSelectedModule, sdApi }: Props): JSX.
     );
 
     return (
-        <div>
-            <select
-                value={selectedModule}
-                onChange={handleSelection}
-            >
-                {filteredModuleList.map((module) => (
-                    <option key={module} value={module}>
-                        {getModuleName(module)}
-                    </option>
-                ))}
+        <select
+            className={classes.select}
+            value={selectedModule}
+            onChange={handleSelection}
+        >
+            {filteredModuleList.map((module) => (
+                <option key={module} value={module}>
+                    {getModuleName(module)}
+                </option>
+            ))}
 
-            </select>
-        </div>
+        </select>
     )
 }
 
