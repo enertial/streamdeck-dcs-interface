@@ -13,6 +13,12 @@
   align-items: center;
 }
 
+.formRowSpreadApart {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
 .header {
   font-size: 1.3rem;
   margin: 0;
@@ -73,4 +79,22 @@
   font-size: inherit;
   text-align: center;
   margin: 0 0.2em;
+}
+
+.label {
+  font-size: 12pt;
+  border-radius: 25%;
+  padding: 0.2em 0.5em;
+}
+
+.checkbox {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  height: 12px;
+}
+
+.fractionLabel {
+  font-size: 12pt;
+  border-radius: 25%;
+  background-color: rgb(88, 88, 88);
+  padding: 0.2em 0.5em;
 }

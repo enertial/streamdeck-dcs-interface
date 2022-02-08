@@ -21,6 +21,7 @@ function ButtonConfiguration({ sdApi }: Props): JSX.Element {
             send_address: sdApi.buttonSettings.send_address,
             press_value: sdApi.buttonSettings.press_value,
             release_value: sdApi.buttonSettings.release_value,
+            disable_release_check: sdApi.buttonSettings.disable_release_check,
         });
         setTitleMonitorSettings({
             string_monitor_identifier: sdApi.buttonSettings.string_monitor_identifier,
@@ -48,6 +49,7 @@ function ButtonConfiguration({ sdApi }: Props): JSX.Element {
             send_address: commandSettings.send_address,
             press_value: commandSettings.press_value,
             release_value: commandSettings.release_value,
+            disable_release_check: commandSettings.disable_release_check,
             string_monitor_identifier: titleMonitorSettings.string_monitor_identifier,
             dcs_id_string_monitor: titleMonitorSettings.dcs_id_string_monitor,
             string_monitor_address: titleMonitorSettings.string_monitor_address,
@@ -66,18 +68,16 @@ function ButtonConfiguration({ sdApi }: Props): JSX.Element {
         sdApi.commFns.setSettings(updatedSettings);
     }
 
-    function handleApplyButtonClick() {
-        updateStreamdeckSettings();
-    }
-
     return (
         <div className={classes.settings}>
             <SendCommand settings={commandSettings} setSettings={setCommandSettings} />
             <TitleMonitor settings={titleMonitorSettings} setSettings={setTitleMonitorSettings} />
             <StateMonitor settings={stateMonitorSettings} setSettings={setStateMonitorSettings} />
             <div className={classes.buttonRow}>
-                <button className="btn" onClick={handleApplyButtonClick}> Apply Settings </button>
-                <button className="btn" onClick={() => { sdApi.commFns.requestSimulationState() }}> Debug </button>
+                <button className="btn" onClick={() => { updateStreamdeckSettings(); }}>Apply</button>
+                <button className="btn" onClick={() => { updateStreamdeckSettings(); window.close(); }}>Save & Close</button>
+                <button className="btn" onClick={() => { window.close(); }}>Discard & Close</button>
+                <button className="btn" onClick={() => { sdApi.commFns.getSettings() }}>Revert</button>
             </div>
         </div>
     );

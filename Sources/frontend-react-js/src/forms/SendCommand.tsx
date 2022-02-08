@@ -8,12 +8,14 @@ export interface SendCommandSettings {
     send_address: string;
     press_value: string;
     release_value: string;
+    disable_release_check: boolean;
 }
 export const defaultSendCommandSettings: SendCommandSettings = {
     send_identifier: "",
     send_address: "",
     press_value: "",
-    release_value: ""
+    release_value: "",
+    disable_release_check: false,
 }
 
 interface Props {
@@ -23,6 +25,7 @@ interface Props {
 
 function SendCommand({ settings, setSettings }: Props): JSX.Element {
     const [maxValue, setMaxValue] = useState("");
+    const [disableRelease, setDisableRelease] = useState(false);
 
     function handleDroppedItem(item: DcsBiosDraggableItem) {
         setSettings((prevSettings) => ({
@@ -57,6 +60,21 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
             release_value: value
         }));
     }
+    function handleReleaseDisable(event: ChangeEvent<HTMLInputElement>) {
+        const isDisabled = event.currentTarget.checked;
+        setDisableRelease(isDisabled);
+        setSettings((prevSettings) => ({
+            ...prevSettings,
+            disable_release_check: isDisabled
+        }));
+    }
+
+    function MaxValueOutOf(): JSX.Element | null {
+        if (maxValue) {
+            return <span className={classes.fractionLabel}> {"/ " + maxValue} </span>;
+        }
+        return null;
+    }
 
     return (
         <div className={classes.form}>
@@ -77,12 +95,24 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
                     value={settings.press_value}
                     onChange={handlePressValueChange}
                 />
+                <MaxValueOutOf />
             </div>
-            <p>Upon release of button, set Identifier to value:</p>
+            <div className={classes.formRowSpreadApart}>
+                <p>Upon release of button, set Identifier to value</p>
+                <span />
+                <div className={classes.label}> (
+                    <input
+                        className={classes.checkbox}
+                        type="checkbox"
+                        checked={disableRelease}
+                        onChange={handleReleaseDisable}
+                    />Disable ):
+                </div>
+            </div>
             <div className={classes.formRow}>
                 <DropArea
                     accept={[]}
-                    displayText={settings.send_identifier}
+                    displayText={disableRelease ? "" : settings.send_identifier}
                     handleDroppedItem={handleDroppedItem}
                     onClear={clearMonitorSettings}
                 />
@@ -91,13 +121,12 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
                     className={classes.input}
                     type="text"
                     placeholder="Value"
-                    value={settings.release_value}
+                    value={disableRelease ? "" : settings.release_value}
                     onChange={handleReleaseValueChange}
+                    disabled={disableRelease}
                 />
+                <MaxValueOutOf />
             </div>
-            <p>
-                {maxValue && "Max Value: " + maxValue}
-            </p>
         </div>
     );
 }
