@@ -3,13 +3,13 @@ import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 import SendCommand, { defaultSendCommandSettings } from "../forms/SendCommand";
 import StateMonitor, { defaultStateMonitorSettings } from "../forms/StateMonitor";
 import TitleMonitor, { defaultTitleMonitorSettings } from "../forms/TitleMonitor";
-import classes from "./ButtonSettings.module.css";
+import classes from "./ButtonConfiguration.module.css";
 
 interface Props {
     sdApi: StreamdeckApi
 }
 
-function ButtonSettings({ sdApi }: Props): JSX.Element {
+function ButtonConfiguration({ sdApi }: Props): JSX.Element {
 
     const [commandSettings, setCommandSettings] = useState(defaultSendCommandSettings);
     const [titleMonitorSettings, setTitleMonitorSettings] = useState(defaultTitleMonitorSettings);
@@ -83,4 +83,4 @@ function ButtonSettings({ sdApi }: Props): JSX.Element {
     );
 }
 
-export default ButtonSettings;
+export default ButtonConfiguration;

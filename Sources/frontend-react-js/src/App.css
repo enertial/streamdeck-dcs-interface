@@ -2,8 +2,8 @@
   grid-area: leftSidebar;
 }
 
-.buttonSettings {
-  grid-area: buttonSettings;
+.buttonConfiguration {
+  grid-area: buttonConfiguration;
 }
 
 .idLookup {
@@ -20,7 +20,7 @@
 .wrapper {
   display: grid;
   grid-template-columns: 3% 42% 50% 5%;
-  grid-template-areas: "leftSidebar buttonSettings idLookup rightSidebar";
+  grid-template-areas: "leftSidebar buttonConfiguration idLookup rightSidebar";
   max-width: 1500px;
   max-height: 1000px;
 }
