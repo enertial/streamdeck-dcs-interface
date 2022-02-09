@@ -3,4 +3,4 @@
 #include "Vendor/json/src/json.hpp"
 using json = nlohmann::json;
 
-json backwardsCompatibilityHandler(json prevVersionPayload);
+json backwardsCompatibilityHandler(const json &prevVersionPayload);

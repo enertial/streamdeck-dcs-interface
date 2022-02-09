@@ -17,7 +17,7 @@
 #include "ElgatoSD/EPLJSONUtils.h"
 #include "ElgatoSD/ESDConnectionManager.h"
 #include "SimulatorInterface/SimulatorInterfaceParameters.h"
-#include "StreamdeckInterface/BackwardsCompatibilityHandler.h"
+#include "StreamdeckContext/BackwardsCompatibilityHandler.h"
 #include "Utilities/JsonReader.h"
 #include "Utilities/LuaReader.h"
 
