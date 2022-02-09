@@ -21,8 +21,8 @@ function connectElgatoStreamDeckSocket(
     console.log("Received websocket settings:", socketSettings);
     console.log("Received settings:", settings);
     console.log("Received actionInfo:", inActionInfo);
-    document.getElementById("port").innerHTML = "Port: " + socketSettings.port;
     document.getElementById("uuid").innerHTML = "UUID: " + socketSettings.propertyInspectorUUID;
+    // document.getElementById("uuid").hidden = false;
 
     // Connect to Streamdeck and get stored Global settings.
     connectStreamdeckWebsocket();

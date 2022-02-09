@@ -69,6 +69,7 @@ function TitleMonitor({ settings, setSettings }: Props): JSX.Element {
                     onClear={clearMonitorSettings}
                 />
             </div>
+            <p className={classes.message}><i>Beta Build: Modification of received value not yet available</i></p>
         </div >
     );
 }

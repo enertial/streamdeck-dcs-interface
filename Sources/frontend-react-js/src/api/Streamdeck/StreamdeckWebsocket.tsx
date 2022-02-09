@@ -13,7 +13,7 @@ export interface StreamdeckSocketSettings {
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
         port: 28196,
-        propertyInspectorUUID: "2DAD99DB124E69800F4762E2F4B7C10B",
+        propertyInspectorUUID: "036C706A34A5E5992D955E24E8D5C6F8",
         registerEvent: "registerPropertyInspector",
         info: {},
         action: "",

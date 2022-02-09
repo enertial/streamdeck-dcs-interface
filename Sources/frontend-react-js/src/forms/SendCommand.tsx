@@ -127,6 +127,7 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
                 />
                 <MaxValueOutOf />
             </div>
+            <p className={classes.message}><i>Beta build: Switch and Increment command actions not yet available</i></p>
         </div>
     );
 }

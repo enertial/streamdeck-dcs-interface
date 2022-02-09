@@ -59,6 +59,7 @@ function SelectedControlRef({ module, controlData, onClick }: Props): JSX.Elemen
           />))}
       </div>
       <div className={classes.textArea}><i>{hoverText}</i></div>
+      <div className={classes.userInstructions}><b>Drag item to use in button settings</b></div>
       <button className="btn" onClick={onClick}>Close</button>
     </div>
   );

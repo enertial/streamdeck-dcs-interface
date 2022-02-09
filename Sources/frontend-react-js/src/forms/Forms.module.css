@@ -98,3 +98,10 @@
   background-color: rgb(88, 88, 88);
   padding: 0.2em 0.5em;
 }
+
+.message {
+  font-size: 10pt;
+  color: rgb(167, 167, 167);
+  text-align: center;
+  margin: 2rem 0 0 0;
+}
