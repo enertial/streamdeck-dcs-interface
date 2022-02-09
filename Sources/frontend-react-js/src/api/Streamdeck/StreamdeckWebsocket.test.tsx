@@ -32,8 +32,8 @@ function UserOfStreamdeckWebsocket() {
 beforeEach(async () => {
     render(<UserOfStreamdeckWebsocket />);
     await mockServer.connected;
-    // StreamdeckWebsocket is expected to publish 2 messages on open.
-    for (let i = 0; i < 4; i++) {
+    // StreamdeckWebsocket is expected to publish 3 messages on open.
+    for (let i = 0; i < 3; i++) {
         await mockServer.nextMessage;
     }
 })
@@ -47,12 +47,10 @@ test("connect to Streamdeck websocket and onopen publishes registerPropertyInspe
     const expectedRegistrationMessage = JSON.stringify({ event: "registerPropertyInspector", uuid: socketSettings.propertyInspectorUUID });
     const expectedGlobalSettingsUpdateRequest = JSON.stringify({ event: "getGlobalSettings", context: socketSettings.propertyInspectorUUID });
     const expectedButtonSettingsUpdateRequest = JSON.stringify({ event: "getSettings", context: socketSettings.propertyInspectorUUID });
-    const expectedRequestModuleListRequest = JSON.stringify({ action: "", event: "sendToPlugin", context: socketSettings.propertyInspectorUUID, payload: { event: "requestModuleList", path: exampleGlobalSettings.dcs_bios_install_path } });
 
     expect(mockServer).toHaveReceivedMessages([expectedRegistrationMessage,
         expectedGlobalSettingsUpdateRequest,
         expectedButtonSettingsUpdateRequest,
-        expectedRequestModuleListRequest
     ]);
 });
 

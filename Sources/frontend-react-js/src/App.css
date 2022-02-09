@@ -2,12 +2,8 @@
   grid-area: leftSidebar;
 }
 
-.buttonSettings {
-  grid-area: buttonSettings;
-  background-color: #444;
-  color: #fff;
-  border-radius: 5px;
-  padding: 20px;
+.buttonConfiguration {
+  grid-area: buttonConfiguration;
 }
 
 .idLookup {
@@ -23,9 +19,8 @@
 
 .wrapper {
   display: grid;
-  grid-template-columns: 70px 500px 700px 60px;
-  grid-template-rows: 900px;
-  grid-template-areas: "leftSidebar buttonSettings idLookup rightSidebar";
+  grid-template-columns: 3% 42% 50% 5%;
+  grid-template-areas: "leftSidebar buttonConfiguration idLookup rightSidebar";
   max-width: 1500px;
   max-height: 1000px;
 }

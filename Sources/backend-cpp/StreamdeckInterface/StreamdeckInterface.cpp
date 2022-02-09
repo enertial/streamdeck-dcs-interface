@@ -17,6 +17,7 @@
 #include "ElgatoSD/EPLJSONUtils.h"
 #include "ElgatoSD/ESDConnectionManager.h"
 #include "SimulatorInterface/SimulatorInterfaceParameters.h"
+#include "StreamdeckContext/BackwardsCompatibilityHandler.h"
 #include "Utilities/JsonReader.h"
 #include "Utilities/LuaReader.h"
 
@@ -154,11 +155,13 @@ void StreamdeckInterface::KeyDownForAction(const std::string &inAction,
                                            const json &inPayload,
                                            const std::string &inDeviceID)
 {
+    const auto payload = backwardsCompatibilityHandler(inPayload);
+
     mVisibleContextsMutex.lock();
     const auto protocol = mVisibleContexts[inContext].protocol();
     if (simConnectionManager_.is_connected(protocol)) {
         mVisibleContexts[inContext].handleButtonPressedEvent(
-            simConnectionManager_.get_interface(protocol), mConnectionManager, inPayload);
+            simConnectionManager_.get_interface(protocol), mConnectionManager, payload);
     }
     mVisibleContextsMutex.unlock();
 }
@@ -168,12 +171,13 @@ void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
                                          const json &inPayload,
                                          const std::string &inDeviceID)
 {
+    const auto payload = backwardsCompatibilityHandler(inPayload);
 
     mVisibleContextsMutex.lock();
     const auto protocol = mVisibleContexts[inContext].protocol();
     if (simConnectionManager_.is_connected(protocol)) {
         mVisibleContexts[inContext].handleButtonReleasedEvent(
-            simConnectionManager_.get_interface(protocol), mConnectionManager, inPayload);
+            simConnectionManager_.get_interface(protocol), mConnectionManager, payload);
     }
     mVisibleContextsMutex.unlock();
 }
@@ -214,7 +218,6 @@ void StreamdeckInterface::DeviceDidConnect(const std::string &inDeviceID, const 
     // Request global settings from Streamdeck.
     if (mConnectionManager != nullptr) {
         mConnectionManager->GetGlobalSettings();
-        mConnectionManager->LogMessage("Streamdeck Device Connected");
     }
 }
 
@@ -229,7 +232,6 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
                                        const std::string &inDeviceID)
 {
     const std::string event = EPLJSONUtils::GetStringByName(inPayload, "event");
-    mConnectionManager->LogMessage("Received SendToPlugin event: " + event + " Payload: " + inPayload.dump());
 
     if (event == "SettingsUpdate") {
         // Update settings for the specified context -- triggered by Property Inspector detecting a change.

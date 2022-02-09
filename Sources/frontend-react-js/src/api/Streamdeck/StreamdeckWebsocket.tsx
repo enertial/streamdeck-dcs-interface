@@ -1,25 +1,26 @@
 import { useState, useEffect, useRef } from 'react';
 import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
-import { ModuleControlsJson } from '../components/control-reference/ControlReferenceInterface';
+import { ModuleControlsJson } from '../DcsBios/ControlReferenceInterface';
 
 export interface StreamdeckSocketSettings {
     port: number,
     propertyInspectorUUID: string,
     registerEvent: string,
     info: Record<string, unknown>, // A large json object that only needs to be gatewayed
+    action: string,
 }
 
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
         port: 28196,
-        propertyInspectorUUID: "69BA0822E70B08236B256C19E81363B4",
+        propertyInspectorUUID: "036C706A34A5E5992D955E24E8D5C6F8",
         registerEvent: "registerPropertyInspector",
-        info: {}
+        info: {},
+        action: "",
     };
 }
 
 export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings): StreamdeckApi {
-    const [buttonAction, setButtonAction] = useState("");
     const [buttonSettings, setButtonSettings] = useState(defaultButtonSettings());
     const [globalSettings, setGlobalSettingsState] = useState(defaultGlobalSettings());
     const [moduleList, setModuleList] = useState<string[]>(["No modules found..."]);
@@ -29,20 +30,28 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     // Protocol to send messages to the Streamdeck application.
     function send(event: string, payload: Record<string, unknown>) {
         const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
-        websocket.current?.send(JSON.stringify(json));
-        console.debug("Sent message (", event, "):", json);
+        if (websocket.current?.readyState === WebSocket.OPEN) {
+            websocket.current.send(JSON.stringify(json));
+            console.debug("Sent message (", event, "):", json);
+        } else {
+            console.debug("WebSocket not open, cannot send message (", event, "):", json);
+        }
     }
 
     // Sends a message to the C++ plugin executable.
-    async function sendToPlugin(payload: Record<string, unknown>) {
+    function sendToPlugin(payload: Record<string, unknown>) {
         const json = {
-            action: buttonAction,
+            action: socketSettings.action,
             event: "sendToPlugin",
             context: socketSettings.propertyInspectorUUID,
             payload: payload,
         };
-        websocket.current?.send(JSON.stringify(json));
-        console.debug("Sent message: ", payload);
+        if (websocket.current?.readyState === WebSocket.OPEN) {
+            websocket.current.send(JSON.stringify(json));
+            console.debug("Sent message: ", payload);
+        } else {
+            console.debug("Websocket is not open, cannot SendToPlugin message: ", payload);
+        }
     }
 
     // Definition of the API that is used by other components.
@@ -60,10 +69,8 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             send('getGlobalSettings', {});
         },
 
-        setGlobalSettings: function (setting: string, value: string) {
-            console.debug("Before Global Settings: ", globalSettings);
+        setGlobalSettings: function (setting: string, value: string | boolean) {
             const updatedGlobalSettings = Object.assign({}, globalSettings, { [setting]: value });
-            console.debug("After Global Settings: ", updatedGlobalSettings);
             setGlobalSettingsState(updatedGlobalSettings);
             send('setGlobalSettings', { payload: updatedGlobalSettings });
         },
@@ -129,8 +136,8 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     function handleReceivedMessageEvent(event: string, msg: SDMessage) {
         switch (event) {
             case "didReceiveSettings":
-                if (msg.action) { setButtonAction(msg.action); }
-                setButtonSettings(prevButtonSetting => Object.assign(prevButtonSetting, msg.payload.settings));
+                // Use a shallow copy/replace to force a re-render of downstream users of sdApi.
+                setButtonSettings((prevButtonSettings) => ({ ...prevButtonSettings, ...msg.payload.settings }));
                 console.debug("Received Button Settings", msg.payload.settings);
                 break;
             case "didReceiveGlobalSettings":
@@ -140,7 +147,10 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             case "sendToPropertyInspector":
                 switch (msg.payload.event) {
                     case "ModuleList":
-                        if (msg.payload.moduleList) { console.log("ModuleList Recieved"); setModuleList(msg.payload.moduleList); }
+                        if (msg.payload.moduleList) {
+                            setModuleList(msg.payload.moduleList);
+                            console.debug("ModuleList Recieved");
+                        }
                         break;
                     case "JsonFile":
                         if (msg.payload.jsonFile) { setModuleControlRefs(msg.payload.jsonFile); }
@@ -164,7 +174,6 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             registerPropertyInspector();
             commFns.getGlobalSettings();
             commFns.getSettings();
-            commFns.requestModuleList(globalSettings.dcs_bios_install_path);
         }
         websocket.current.onmessage = (msg: MessageEvent) => {
             onReceivedMessage(msg.data);

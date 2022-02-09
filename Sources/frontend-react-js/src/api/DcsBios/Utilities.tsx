@@ -2,7 +2,7 @@
 
 import { ControlData, ModuleControlsJson } from "./ControlReferenceInterface";
 
-function flattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlData[] {
+export function flattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlData[] {
   const controls: ControlData[] = [];
 
   Object.keys(moduleControls).forEach((category) =>
@@ -14,5 +14,7 @@ function flattenModuleControlsJson(moduleControls: ModuleControlsJson): ControlD
   return controls;
 }
 
-export default flattenModuleControlsJson;
+export function getModuleName(filename: string) {
+  return filename.split('\\').pop()?.split('/').pop()?.split('.json')[0] || "";
+}
 

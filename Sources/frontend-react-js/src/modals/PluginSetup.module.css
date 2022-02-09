@@ -1,7 +1,7 @@
 .popupwindow {
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   border-radius: 6px;
-  background-color: white;
+  background-color: rgb(240, 240, 240);
   color: #2d2d2d;
   padding: 2em;
   text-align: center;
@@ -13,8 +13,66 @@
   top: 1rem;
   left: 0;
   grid-column: idLookup;
+  animation-duration: 500ms;
+  animation-name: slidein;
+}
+
+@keyframes slidein {
+  from {
+    margin-left: 100%;
+  }
+
+  to {
+    margin-left: 0%;
+  }
 }
 
 .pathInput {
+  border: 1px solid rgba(0, 0, 0, 0.8);
   min-width: 75%;
+  min-height: 1.8vh;
+  font-size: 11pt;
+  text-align: center;
+  margin: 0 0.2em;
+}
+
+.btn {
+  border-radius: 3px;
+  border-color: transparent;
+  background-color: rgb(196, 197, 209);
+  padding: 0.25em;
+  font-size: 11pt;
+}
+
+.btn:hover {
+  border-color: rgba(58, 58, 58, 0.5);
+}
+
+.label {
+  font-size: 12pt;
+}
+
+.header {
+  margin-top: 2rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 150px 150px;
+  row-gap: 10px;
+  justify-content: center;
+  margin: 2vh;
+}
+
+.input {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  min-width: 10%;
+  min-height: 1.5vh;
+  font-size: 11pt;
+  text-align: center;
+  margin: 0 0.2em;
+}
+
+.input:disabled {
+  background-color: rgb(224, 224, 224);
 }

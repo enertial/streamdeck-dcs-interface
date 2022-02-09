@@ -1,14 +1,17 @@
 import { ChangeEvent, useEffect } from "react";
-import StreamdeckApi from "../../api/StreamdeckApi";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
+import ModuleSelect from "./ModuleSelect";
 import classes from "./SearchBar.module.css";
 
 interface Props {
+  selectedModule: string;
+  setSelectedModule: React.Dispatch<React.SetStateAction<string>>;
   searchQuery: string;
   setSearchQuery: React.Dispatch<React.SetStateAction<string>>;
   sdApi: StreamdeckApi;
 }
 
-function SearchBar({ searchQuery, setSearchQuery, sdApi }: Props): JSX.Element {
+function SearchBar({ selectedModule, setSelectedModule, searchQuery, setSearchQuery, sdApi }: Props): JSX.Element {
 
   // Restore previous session search query.
   useEffect(() => {
@@ -31,7 +34,12 @@ function SearchBar({ searchQuery, setSearchQuery, sdApi }: Props): JSX.Element {
 
   return (
     <div className={classes.searchBar}>
-      <span className={classes.searchTitle}>Search Control References: </span>
+      <ModuleSelect
+        selectedModule={selectedModule}
+        setSelectedModule={setSelectedModule}
+        sdApi={sdApi}
+      />
+      <span className={classes.searchTitle}>Search: </span>
       <input
         className={classes.searchInput}
         type="text"

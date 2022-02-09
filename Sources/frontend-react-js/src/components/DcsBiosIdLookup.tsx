@@ -1,21 +1,21 @@
 import { useEffect, useState } from "react";
 
-import classes from "./ControlReference.module.css";
+import classes from "./DcsBiosIdLookup.module.css";
 
+import Backdrop from "../modals/Backdrop";
+import SelectedControlRef from "../modals/SelectedControlRef";
 import Table from "./Table";
 import SearchBar from "./SearchBar";
-import { ControlData } from "./ControlReferenceInterface";
-import flattenModuleControlsJson from "./FlattenModuleControlsJson";
+import { ControlData } from "../api/DcsBios/ControlReferenceInterface";
+import { flattenModuleControlsJson, getModuleName } from "../api/DcsBios/Utilities";
 
-import StreamdeckApi from "../../api/StreamdeckApi";
-import ModuleSelect from "./ModuleSelect";
+import StreamdeckApi from "../api/Streamdeck/StreamdeckApi";
 
 interface Props {
   sdApi: StreamdeckApi;
-  onSelect: (arg: ControlData) => void;
 }
 
-function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
+function DcsBiosIdLookup({ sdApi }: Props): JSX.Element {
   /******* Internal State  *******/
   /*
    ** Internal State
@@ -23,6 +23,7 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   const [fullModuleControlRefs, setFullModuleControlRefs] = useState<ControlData[]>([]); // eslint-disable-line @typescript-eslint/no-unused-vars
   const [selectedModule, setSelectedModule] = useState(sdApi.globalSettings.last_selected_module);
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedControlReference, setSelectedControlReference] = useState<ControlData | null>(null);
 
   const filteredControlRefs = fullModuleControlRefs.filter(
     (control) =>
@@ -34,6 +35,9 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   /*
    ** Handlers
    */
+  function handleControlReferenceSelect(controlData: ControlData) {
+    setSelectedControlReference(controlData);
+  }
 
   useEffect(() => {
     sdApi.commFns.requestModuleList(sdApi.globalSettings.dcs_bios_install_path);
@@ -57,14 +61,21 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
   /*
    ** Render
    */
+  function ShowSelectedControlRef() {
+    if (selectedControlReference) {
+      return (<div>
+        <SelectedControlRef module={getModuleName(selectedModule)} controlData={selectedControlReference} onClick={() => { setSelectedControlReference(null) }} />
+        <Backdrop onClick={() => { setSelectedControlReference(null) }} globalScope={false} />
+      </div>);
+    }
+    return null;
+  }
+
   return (
     <div className={classes.main}>
-      <ModuleSelect
+      <SearchBar
         selectedModule={selectedModule}
         setSelectedModule={setSelectedModule}
-        sdApi={sdApi}
-      />
-      <SearchBar
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         sdApi={sdApi}
@@ -73,10 +84,11 @@ function ControlReference({ sdApi, onSelect }: Props): JSX.Element {
         tableData={filteredControlRefs}
         // Still show empty table if filtered set is empty, but full set is not.
         isDataLoaded={fullModuleControlRefs.length > 0}
-        getSelectedControlData={onSelect}
+        getSelectedControlData={handleControlReferenceSelect}
       />
+      <ShowSelectedControlRef />
     </div>
   );
 }
 
-export default ControlReference;
+export default DcsBiosIdLookup;

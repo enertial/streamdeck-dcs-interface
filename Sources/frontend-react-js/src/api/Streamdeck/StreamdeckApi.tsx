@@ -5,7 +5,7 @@
  * 
  */
 
-import { ModuleControlsJson } from "../components/control-reference/ControlReferenceInterface";
+import { ModuleControlsJson } from "../DcsBios/ControlReferenceInterface";
 
 export default interface StreamdeckApi {
     commFns: StreamdeckCommFns;
@@ -24,7 +24,7 @@ export interface StreamdeckCommFns {
     // Gets global settings for all buttons of the Streamdeck plugin.
     getGlobalSettings(): void;
     // Sets global settings for all buttons of the Streamdeck plugin.
-    setGlobalSettings(setting: string, value: string): void;
+    setGlobalSettings(setting: string, value: string | boolean): void;
     // Logs a message to the Elgato Streamdeck error log.
     logMessage(message: string): void;
 
@@ -41,11 +41,13 @@ export interface StreamdeckCommFns {
 
 export interface StreamdeckButtonSettings {
     // Simulator command settings
+    send_identifier: string;
     send_address: string;
     press_value: string;
     release_value: string;
     disable_release_check: boolean;
     // Title Monitor settings
+    string_monitor_identifier: string;
     dcs_id_string_monitor: string;
     string_monitor_address: number;
     string_monitor_mask: number;
@@ -55,6 +57,7 @@ export interface StreamdeckButtonSettings {
     string_monitor_passthrough_check: boolean;
     string_monitor_mapping: string;
     // State Monitor settings
+    compare_monitor_identifier: string;
     dcs_id_compare_monitor: string;
     compare_monitor_address: number;
     compare_monitor_mask: number;
@@ -66,10 +69,12 @@ export interface StreamdeckButtonSettings {
 
 export function defaultButtonSettings(): StreamdeckButtonSettings {
     return {
+        send_identifier: "",
         send_address: "",
-        press_value: "",
-        release_value: "",
+        press_value: "1",
+        release_value: "0",
         disable_release_check: false,
+        string_monitor_identifier: "",
         dcs_id_string_monitor: "",
         string_monitor_address: 0,
         string_monitor_mask: 0,
@@ -78,17 +83,20 @@ export function defaultButtonSettings(): StreamdeckButtonSettings {
         string_monitor_vertical_spacing: "0",
         string_monitor_passthrough_check: true,
         string_monitor_mapping: "",
+        compare_monitor_identifier: "",
         dcs_id_compare_monitor: "",
         compare_monitor_address: 0,
         compare_monitor_mask: 0,
         compare_monitor_shift: 0,
         compare_monitor_max_length: 0,
-        dcs_id_compare_condition: "LESS_THAN",
-        dcs_id_comparison_value: ""
+        dcs_id_compare_condition: "GREATER_THAN",
+        dcs_id_comparison_value: "0"
     };
 }
 
 export interface StreamdeckGlobalSettings {
+    // General UI settings
+    autoOpenConfigureWindow: boolean;
     // Connection settings to Simulator export.
     ip_address: string,
     listener_port: string,
@@ -102,6 +110,7 @@ export interface StreamdeckGlobalSettings {
 
 export function defaultGlobalSettings(): StreamdeckGlobalSettings {
     return {
+        autoOpenConfigureWindow: false,
         ip_address: "",
         listener_port: "",
         send_port: "",

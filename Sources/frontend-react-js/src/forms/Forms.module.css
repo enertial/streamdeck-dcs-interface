@@ -1,0 +1,107 @@
+.form {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  background-color: #444;
+  color: #fff;
+  padding: 2rem 1rem;
+  margin: 1rem 0;
+}
+
+.formRow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.formRowSpreadApart {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+
+.header {
+  font-size: 1.3rem;
+  margin: 0;
+}
+
+.droppableArea {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  background-color: snow;
+  min-height: 2vh;
+  min-width: 40%;
+  max-width: 75%;
+  margin-right: 0.2em;
+}
+
+.droppableAreaHover {
+  background-color: rgb(170, 252, 221);
+}
+.droppableAreaCanDrop {
+  background-color: moccasin;
+}
+
+.droppedItem {
+  box-shadow: 1px 2px 2px rgba(0, 0, 0, 0.5);
+  border-radius: 5px;
+  padding: 0.2em 1em;
+  margin: 0 0.5em;
+  background-color: mediumspringgreen;
+  color: #2d2d2d;
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+  cursor: grab;
+}
+
+.droppedItemReplace {
+  background-color: lightcoral;
+  opacity: 0.6;
+}
+
+.clearButton {
+  background-color: rgb(114, 114, 114);
+  color: #fff;
+  border: none;
+  border-radius: 100%;
+  padding: 0 0 0.25em 0;
+  margin-right: 5px;
+  height: 1.3em;
+  width: 1.3em;
+  cursor: pointer;
+}
+
+.input {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  max-width: 15%;
+  min-height: 1.8vh;
+  font-size: inherit;
+  text-align: center;
+  margin: 0 0.2em;
+}
+
+.label {
+  font-size: 12pt;
+  border-radius: 25%;
+  padding: 0.2em 0.5em;
+}
+
+.checkbox {
+  border: 1px solid rgba(0, 0, 0, 0.8);
+  height: 12px;
+}
+
+.fractionLabel {
+  font-size: 12pt;
+  border-radius: 25%;
+  background-color: rgb(88, 88, 88);
+  padding: 0.2em 0.5em;
+}
+
+.message {
+  font-size: 10pt;
+  color: rgb(167, 167, 167);
+  text-align: center;
+  margin: 2rem 0 0 0;
+}

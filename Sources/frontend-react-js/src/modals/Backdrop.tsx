@@ -1,5 +1,5 @@
 import { MouseEventHandler } from "react";
-import classes from "./UI.module.css";
+import classes from "./Backdrop.module.css";
 
 interface Props {
   onClick: MouseEventHandler;

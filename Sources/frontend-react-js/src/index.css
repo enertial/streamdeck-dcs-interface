@@ -22,15 +22,14 @@ code {
   padding: 0.5rem 1.5rem;
   cursor: pointer;
   border-radius: 4px;
-  background-color: #800040;
+  background-color: #969696;
   color: white;
-  border: 1px solid #800040;
-  margin: 0 1rem;
+  border: 0px solid #3a3a3a;
+  margin: 0 0.5rem;
 }
 
 .btn:hover {
-  background-color: #9c1458;
-  border-color: #9c1458;
+  background-color: #7e7e7e;
 }
 
 .btn--alt {

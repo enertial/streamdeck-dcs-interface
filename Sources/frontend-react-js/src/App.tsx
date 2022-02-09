@@ -1,6 +1,8 @@
 import { useState } from "react";
-import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./api/StreamdeckWebsocket";
-import ButtonSettings from "./areas/ButtonSettings";
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { StreamdeckSocketSettings, defaultStreamdeckSocketSettings, useStreamdeckWebsocket } from "./api/Streamdeck/StreamdeckWebsocket";
+import ButtonConfiguration from "./areas/ButtonConfiguration";
 import IdLookup from "./areas/IdLookup";
 import RightSidebar from "./areas/RightSidebar";
 import PluginSetup from "./modals/PluginSetup";
@@ -18,18 +20,20 @@ function App(): JSX.Element {
   const [pluginSetupVisible, setPluginSetupVisible] = useState(false);
 
   return (
-    <div className="wrapper">
-      <div className="buttonSettings">
-        <ButtonSettings sdApi={sdApi} />
-      </div>
-      <div className="idLookup">
-        <IdLookup sdApi={sdApi} />
-        {pluginSetupVisible && <PluginSetup sdApi={sdApi} hide={() => { setPluginSetupVisible(false) }} />}
-      </div>
-      <div className="rightSidebar">
-        <RightSidebar showSetupModal={() => { setPluginSetupVisible(true) }} />
-      </div>
-    </div >
+    <DndProvider backend={HTML5Backend}>
+      <div className="wrapper">
+        <div className="buttonConfiguration">
+          <ButtonConfiguration sdApi={sdApi} />
+        </div>
+        <div className="idLookup">
+          <IdLookup sdApi={sdApi} />
+          {pluginSetupVisible && <PluginSetup sdApi={sdApi} hide={() => { setPluginSetupVisible(false) }} />}
+        </div>
+        <div className="rightSidebar">
+          <RightSidebar showSetupModal={() => { setPluginSetupVisible(true) }} />
+        </div>
+      </div >
+    </DndProvider>
   );
 }
 

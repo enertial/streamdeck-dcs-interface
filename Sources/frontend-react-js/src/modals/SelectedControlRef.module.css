@@ -1,0 +1,41 @@
+.modal {
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  background-color: white;
+  color: #2d2d2d;
+  padding: 1rem;
+  text-align: center;
+  width: 30rem;
+  z-index: 10;
+  position: absolute;
+  top: 20vh;
+  left: calc(50% - 15rem);
+}
+
+.textArea {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 60px;
+}
+
+.draggableRow {
+  display: flex;
+  justify-content: center;
+}
+
+.draggableCard {
+  box-shadow: 1px 4px 5px rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  background-color: mediumspringgreen;
+  color: #2d2d2d;
+  padding: 1em;
+  margin: 0 0.7em;
+  cursor: grab;
+}
+
+.userInstructions {
+  font-size: 11pt;
+  color: #00af6b;
+  margin: 1em;
+}

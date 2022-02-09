@@ -10,14 +10,16 @@
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   font-weight: bold;
   font-size: 12pt;
-  width: 40%;
+  padding: 0 1rem;
+  width: 20%;
+  margin-left: 10%;
 }
 
 .searchInput {
   text-align: left;
   font-family: "Trebuchet MS", Arial, Helvetica, sans-serif;
   font-size: 11pt;
-  width: 40%;
+  width: 30%;
 }
 
 .button {

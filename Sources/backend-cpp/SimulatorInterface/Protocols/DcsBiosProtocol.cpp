@@ -35,8 +35,12 @@ void DcsBiosProtocol::send_reset_command() { simulator_socket_.send_string("SYNC
 std::optional<std::string> DcsBiosProtocol::get_string_at_addr(const SimulatorAddress &address) const
 {
     const bool data_exists_at_start_address = current_game_state_by_address_.count(address.address) > 0;
-    if (address.type != AddressType::STRING || !data_exists_at_start_address) {
+    if (address.type == AddressType::ADDRESS_ONLY || !data_exists_at_start_address) {
         return std::nullopt;
+    }
+
+    if (address.type == AddressType::INTEGER) {
+        return std::to_string((current_game_state_by_address_.at(address.address) & address.mask) >> address.shift);
     }
 
     std::string assembled_string = "";
