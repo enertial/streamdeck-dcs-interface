@@ -24,7 +24,7 @@ export interface StreamdeckCommFns {
     // Gets global settings for all buttons of the Streamdeck plugin.
     getGlobalSettings(): void;
     // Sets global settings for all buttons of the Streamdeck plugin.
-    setGlobalSettings(setting: string, value: string): void;
+    setGlobalSettings(setting: string, value: string | boolean): void;
     // Logs a message to the Elgato Streamdeck error log.
     logMessage(message: string): void;
 
@@ -95,6 +95,8 @@ export function defaultButtonSettings(): StreamdeckButtonSettings {
 }
 
 export interface StreamdeckGlobalSettings {
+    // General UI settings
+    autoOpenConfigureWindow: boolean;
     // Connection settings to Simulator export.
     ip_address: string,
     listener_port: string,
@@ -108,6 +110,7 @@ export interface StreamdeckGlobalSettings {
 
 export function defaultGlobalSettings(): StreamdeckGlobalSettings {
     return {
+        autoOpenConfigureWindow: false,
         ip_address: "",
         listener_port: "",
         send_port: "",

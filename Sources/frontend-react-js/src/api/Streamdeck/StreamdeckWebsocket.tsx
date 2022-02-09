@@ -7,6 +7,7 @@ export interface StreamdeckSocketSettings {
     propertyInspectorUUID: string,
     registerEvent: string,
     info: Record<string, unknown>, // A large json object that only needs to be gatewayed
+    action: string,
 }
 
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
@@ -14,7 +15,8 @@ export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
         port: 28196,
         propertyInspectorUUID: "2DAD99DB124E69800F4762E2F4B7C10B",
         registerEvent: "registerPropertyInspector",
-        info: {}
+        info: {},
+        action: "",
     };
 }
 
@@ -39,7 +41,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     // Sends a message to the C++ plugin executable.
     function sendToPlugin(payload: Record<string, unknown>) {
         const json = {
-            action: "com.ctytler.dcs.dcs-bios", // This must be set to one of the actions registered with manifest.json
+            action: socketSettings.action,
             event: "sendToPlugin",
             context: socketSettings.propertyInspectorUUID,
             payload: payload,
@@ -67,10 +69,8 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             send('getGlobalSettings', {});
         },
 
-        setGlobalSettings: function (setting: string, value: string) {
-            console.debug("Before Global Settings: ", globalSettings);
+        setGlobalSettings: function (setting: string, value: string | boolean) {
             const updatedGlobalSettings = Object.assign({}, globalSettings, { [setting]: value });
-            console.debug("After Global Settings: ", updatedGlobalSettings);
             setGlobalSettingsState(updatedGlobalSettings);
             send('setGlobalSettings', { payload: updatedGlobalSettings });
         },

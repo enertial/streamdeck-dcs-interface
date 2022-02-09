@@ -5,10 +5,12 @@
     <meta charset="utf-8" />
   </head>
 
+  <script src="js/common.js"></script>
+  <script src="js/dcs_bios_pi.js"></script>
+
   <style>
     .div {
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       min-height: 80px;
@@ -29,46 +31,12 @@
     }
 
     .text {
-      margin: 0;
       color: rgb(226, 226, 226);
-      color: transparent;
+      margin: 0;
     }
   </style>
 
   <body>
-    <script>
-      // This callback function is called by the Streamdeck application populating socketSettings to use.
-      function connectElgatoStreamDeckSocket(
-        inPort,
-        inPluginUUID,
-        inRegisterEvent,
-        inInfo
-      ) {
-        // Store settings to the window object, so the Config Window when opened can access it.
-        window.socketSettings = {
-          port: inPort,
-          propertyInspectorUUID: inPluginUUID,
-          registerEvent: inRegisterEvent,
-          info: inInfo,
-        };
-        console.log("Received settings:", socketSettings);
-        document.getElementById("port").innerHTML = "Port: " + inPort;
-        document.getElementById("uuid").innerHTML = "UUID: " + inPluginUUID;
-      }
-
-      function handleButtonPress() {
-        // Only open if socketSettings have been populated.
-        if (window.socketSettings) {
-          // Only open window if there is not one already open.
-          if (!window.configWindow || window.configWindow.closed) {
-            window.configWindow = window.open(
-              "../settingsUI/index.html",
-              "Button Configuration"
-            );
-          }
-        }
-      }
-    </script>
     <div class="div">
       <button
         class="btn"
@@ -77,8 +45,15 @@
       >
         Configure
       </button>
+      <input
+        id="auto_open_checkbox"
+        type="checkbox"
+        onclick="handleAutoOpenCheckboxChange();"
+      />
+      <label class="text" for="auto_open_checkbox"> Auto Open</label>
     </div>
-    <p class="text" id="port"></p>
-    <p class="text" id="uuid"></p>
+    <p class="text" id="message"></p>
+    <p hidden class="text" id="port"></p>
+    <p hidden class="text" id="uuid"></p>
   </body>
 </html>
