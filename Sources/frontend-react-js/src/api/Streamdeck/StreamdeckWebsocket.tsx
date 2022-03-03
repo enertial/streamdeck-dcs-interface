@@ -32,6 +32,12 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         const json = Object.assign({}, { event: event, context: socketSettings.propertyInspectorUUID }, payload);
         if (websocket.current?.readyState === WebSocket.OPEN) {
             websocket.current.send(JSON.stringify(json));
+            // Debug logging
+            if (event !== "logMessage") {
+                const debugMessage = Object.assign({}, { event: 'logMessage', context: socketSettings.propertyInspectorUUID },
+                    { payload: { message: "Send message: \n" + JSON.stringify(json) } });
+                websocket.current.send(JSON.stringify(debugMessage));
+            }
             console.debug("Sent message (", event, "):", json);
         } else {
             console.debug("WebSocket not open, cannot send message (", event, "):", json);
@@ -135,6 +141,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     }
 
     function handleReceivedMessageEvent(event: string, msg: SDMessage) {
+        send('logMessage', { payload: { message: `Received message (${event})` } });
         switch (event) {
             case "didReceiveSettings":
                 // Use a shallow copy/replace to force a re-render of downstream users of sdApi.
@@ -146,6 +153,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 console.debug("Received Global Settings", msg.payload.settings);
                 break;
             case "sendToPropertyInspector":
+                send('logMessage', { payload: { message: `    - ${msg.payload.event}` } });
                 switch (msg.payload.event) {
                     case "ModuleList":
                         if (msg.payload.moduleList) {
