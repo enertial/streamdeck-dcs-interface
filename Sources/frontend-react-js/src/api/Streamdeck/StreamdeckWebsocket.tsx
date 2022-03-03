@@ -48,6 +48,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         };
         if (websocket.current?.readyState === WebSocket.OPEN) {
             websocket.current.send(JSON.stringify(json));
+            send('logMessage', { payload: { message: "Send message to plugin: \n" + JSON.stringify(json) } });
             console.debug("Sent message: ", payload);
         } else {
             console.debug("Websocket is not open, cannot SendToPlugin message: ", payload);

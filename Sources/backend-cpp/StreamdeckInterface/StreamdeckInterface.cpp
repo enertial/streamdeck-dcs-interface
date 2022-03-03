@@ -296,6 +296,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         if (maybe_module_list) {
             mConnectionManager->SendToPropertyInspector(
                 inAction, inContext, json({{"event", "ModuleList"}, {"moduleList", maybe_module_list.value()}}));
+            mConnectionManager->LogMessage("Successfully found json modules at: " + path);
         } else {
             mConnectionManager->LogMessage("Get list of json modules failed at: " + path);
         }
@@ -307,6 +308,7 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         if (maybe_json) {
             mConnectionManager->SendToPropertyInspector(
                 inAction, inContext, json({{"event", "JsonFile"}, {"jsonFile", maybe_json.value()}}));
+            mConnectionManager->LogMessage("Successfully read in json file from: " + filename);
         } else {
             mConnectionManager->LogMessage("Unable to read in json file from: " + filename);
         }
