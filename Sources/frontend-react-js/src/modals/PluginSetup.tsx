@@ -34,6 +34,7 @@ function PluginSetup({ sdApi, hide }: Props): JSX.Element {
                         className={classes.pathInput}
                         value={dcsBiosInstallPath}
                         onChange={handleDcsBiosPathInputChange}
+                        onKeyPress={(e) => { (e.key === 'Enter' ? handleDcsBiosPathButtonPress() : null) }}
                     />
                     <button className={classes.btn} onClick={handleDcsBiosPathButtonPress}>Update</button>
                     <p>If you do not have DCS-BIOS installed you can download it and follow the "Quick Setup Guide" from
