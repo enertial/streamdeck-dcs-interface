@@ -1,5 +1,3 @@
-let waitingForAutoOpenSetting = true;
-
 // This callback function is called by the Streamdeck application populating socketSettings to use.
 function connectElgatoStreamDeckSocket(
     inPort,
@@ -23,25 +21,6 @@ function connectElgatoStreamDeckSocket(
     console.log("Received actionInfo:", inActionInfo);
     document.getElementById("uuid").innerHTML = "UUID: " + socketSettings.propertyInspectorUUID;
     // document.getElementById("uuid").hidden = false;
-
-    // Connect to Streamdeck and get stored Global settings.
-    connectStreamdeckWebsocket();
-    window.$SD.api = Object.assign({ send: SDApi.send }, SDApi.common, SDApi[inMessageType]);
-    $SD.on("connected", (jsn) => {
-        $SD.api.getGlobalSettings($SD.uuid);
-    });
-
-    $SD.on("didReceiveGlobalSettings", (jsn) => {
-        console.log("Received global settings: ", jsn);
-        window.globalSettings = jsn.payload.settings;
-        if (globalSettings.hasOwnProperty("autoOpenConfigureWindow")) {
-            document.getElementById("auto_open_checkbox").checked = globalSettings.autoOpenConfigureWindow;
-            if (globalSettings.autoOpenConfigureWindow) {
-                waitingForAutoOpenSetting && handleButtonPress();
-            }
-        }
-        waitingForAutoOpenSetting = false;
-    });
 }
 
 function connectStreamdeckWebsocket() {
@@ -61,48 +40,11 @@ function disconnectStreamdeckWebsocket() {
 }
 
 function handleButtonPress() {
-    // Only open if socketSettings have been populated.
-    if (window.socketSettings) {
-        // Only open window if there is not one already open.
-        if (!window.configWindow || window.configWindow.closed) {
-            disconnectStreamdeckWebsocket();
-            window.configWindow = window.open(
-                "../settingsUI/index.html",
-                "Button Configuration"
-            );
-            var pollTimer = setInterval(function () {
-                if (window.configWindow.closed) {
-                    clearInterval(pollTimer);
-                    connectStreamdeckWebsocket();
-                    document.getElementById("message").innerHTML = "";
-                }
-            }, 500);
-        }
+    // Only open if socketSettings have been populated and if there is not already a Configure window open.
+    if (window.socketSettings && (!window.configWindow || window.configWindow.closed)) {
+        window.configWindow = window.open(
+            "../settingsUI/index.html",
+            "Button Configuration"
+        );
     }
 }
-
-function handleConfigureWindowClose() {
-    connectStreamdeckWebsocket();
-}
-
-function handleAutoOpenCheckboxChange() {
-    const autoOpenChecked = document.getElementById("auto_open_checkbox").checked;
-    if ($SD.connection) {
-        $SD.api.setGlobalSettings($SD.uuid, Object.assign({}, globalSettings, { autoOpenConfigureWindow: autoOpenChecked }));
-        globalSettings.autoOpenConfigureWindow = autoOpenChecked;
-    }
-    else if (window.configWindow) {
-        document.getElementById("auto_open_checkbox").checked = globalSettings.autoOpenConfigureWindow;
-        document.getElementById("message").innerHTML = "Must be set when Configure window is closed";
-    }
-}
-
-/** the beforeunload event is fired, right before the PI will remove all nodes */
-window.addEventListener('beforeunload', function (e) {
-    e.preventDefault();
-    if ($SD.connection) {
-        globalSettings.autoOpenConfigureWindow = document.getElementById("auto_open_checkbox").checked;
-        $SD.api.setGlobalSettings($SD.uuid, globalSettings);
-    }
-    // Don't set a returnValue to the event, otherwise Chromium with throw an error.  // e.returnValue = '';
-});
