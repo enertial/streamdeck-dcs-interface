@@ -16,7 +16,7 @@ env:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: windows-2019
 
     steps:
       - name: Checkout repository
@@ -24,8 +24,6 @@ jobs:
 
       - name: Add MSBuild to PATH
         uses: microsoft/setup-msbuild@v1.1
-        with:
-          vs-version: "[16.4,16.5)"
 
       - name: Restore NuGet packages
         working-directory: ${{env.GITHUB_WORKSPACE}}
