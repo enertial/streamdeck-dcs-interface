@@ -121,9 +121,10 @@ void StreamdeckInterface::DidReceiveGlobalSettings(const json &inPayload)
         if (!simConnectionManager_.is_connected_with_settings(protocol.first, protocol.second)) {
             try {
                 simConnectionManager_.connect_to_protocol(protocol.first, protocol.second);
-                mConnectionManager->LogMessage("Successfully connected to Simulator Interface UDP port");
+                mConnectionManager->LogMessage("[Plugin] Successfully connected to Simulator Interface UDP port");
             } catch (const std::exception &e) {
-                mConnectionManager->LogMessage("Caught Exception While Opening Connection: " + std::string(e.what()));
+                mConnectionManager->LogMessage("[Plugin] Caught Exception While Opening Connection: " +
+                                               std::string(e.what()));
             }
         }
     }
@@ -197,8 +198,8 @@ void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
         mVisibleContexts[inContext].forceSendState(mConnectionManager);
         mVisibleContextsMutex.unlock();
     } else {
-        mConnectionManager->LogMessage("Unable to handle button of type: " + inAction + " context: " + inContext +
-                                       " with Settings: " + settings.dump());
+        mConnectionManager->LogMessage("[Plugin] Unable to handle button of type: " + inAction +
+                                       " context: " + inContext + " with Settings: " + settings.dump());
     }
 }
 
@@ -267,7 +268,8 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         const json installed_modules_and_result = get_installed_modules(dcs_install_path, modules_subdir);
         const std::string result = EPLJSONUtils::GetStringByName(installed_modules_and_result, "result");
         if (result != "success") {
-            mConnectionManager->LogMessage("Get Installed Modules Failure: " + result);
+            mConnectionManager->LogMessage("[DCS-ExportScript:IdLookupWindow] Get Installed Modules Failure: " +
+                                           result);
         }
         mConnectionManager->SendToPropertyInspector(
             inAction,
@@ -282,7 +284,8 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         json clickabledata_and_result = get_clickabledata(dcs_install_path, module, "bin/extract_clickabledata.lua");
         const std::string lua_result = EPLJSONUtils::GetStringByName(clickabledata_and_result, "result");
         if (lua_result != "success") {
-            mConnectionManager->LogMessage(module + " Clickabledata Result: " + lua_result);
+            mConnectionManager->LogMessage("[DCS-ExportScript:IdLookupWindow] " + module +
+                                           " Clickabledata Result: " + lua_result);
         }
         mConnectionManager->SendToPropertyInspector(
             inAction,
@@ -296,9 +299,9 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         if (maybe_module_list) {
             mConnectionManager->SendToPropertyInspector(
                 inAction, inContext, json({{"event", "ModuleList"}, {"moduleList", maybe_module_list.value()}}));
-            mConnectionManager->LogMessage("Successfully found json modules at: " + path);
+            mConnectionManager->LogMessage("[Plugin] Successfully found json modules at: " + path);
         } else {
-            mConnectionManager->LogMessage("Get list of json modules failed at: " + path);
+            mConnectionManager->LogMessage("[Plugin] Get list of json modules failed at: " + path);
         }
     }
 
@@ -308,9 +311,9 @@ void StreamdeckInterface::SendToPlugin(const std::string &inAction,
         if (maybe_json) {
             mConnectionManager->SendToPropertyInspector(
                 inAction, inContext, json({{"event", "JsonFile"}, {"jsonFile", maybe_json.value()}}));
-            mConnectionManager->LogMessage("Successfully read in json file from: " + filename);
+            mConnectionManager->LogMessage("[Plugin] Successfully read in json file from: " + filename);
         } else {
-            mConnectionManager->LogMessage("Unable to read in json file from: " + filename);
+            mConnectionManager->LogMessage("[Plugin] Unable to read in json file from: " + filename);
         }
     }
 }

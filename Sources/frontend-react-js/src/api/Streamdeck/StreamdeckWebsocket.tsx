@@ -13,7 +13,7 @@ export interface StreamdeckSocketSettings {
 export function defaultStreamdeckSocketSettings(): StreamdeckSocketSettings {
     return {
         port: 28196,
-        propertyInspectorUUID: "036C706A34A5E5992D955E24E8D5C6F8",
+        propertyInspectorUUID: "D1B07034FBD0C99D8D1BA7E97B05D2FB",
         registerEvent: "registerPropertyInspector",
         info: {},
         action: "",
@@ -35,7 +35,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             // Debug logging
             if (event !== "logMessage") {
                 const debugMessage = Object.assign({}, { event: 'logMessage', context: socketSettings.propertyInspectorUUID },
-                    { payload: { message: "Send message: \n" + JSON.stringify(json) } });
+                    { payload: { message: `[ConfigWindow] Send message: (${event})` } });
                 websocket.current.send(JSON.stringify(debugMessage));
             }
             console.debug("Sent message (", event, "):", json);
@@ -54,7 +54,6 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         };
         if (websocket.current?.readyState === WebSocket.OPEN) {
             websocket.current.send(JSON.stringify(json));
-            send('logMessage', { payload: { message: "Send message to plugin: \n" + JSON.stringify(json) } });
             console.debug("Sent message: ", payload);
         } else {
             console.debug("Websocket is not open, cannot SendToPlugin message: ", payload);
@@ -96,10 +95,12 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
 
         requestModuleList: function (path: string) {
             sendToPlugin({ event: "requestModuleList", path: path });
+            send('logMessage', { payload: { message: "[ConfigWindow] Send message to plugin: (requestModuleList) at " + path } });
         },
 
         requestModule: function (filename: string) {
             sendToPlugin({ event: "requestControlReferenceJson", filename: filename });
+            send('logMessage', { payload: { message: "[ConfigWindow] Send message to plugin: (requestControlReferenceJson) at " + filename } });
         },
     };
 
@@ -141,7 +142,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
     }
 
     function handleReceivedMessageEvent(event: string, msg: SDMessage) {
-        send('logMessage', { payload: { message: `Received message (${event})` } });
+        let logMessageContent = `[ConfigWindow] Received message (${event})`;
         switch (event) {
             case "didReceiveSettings":
                 // Use a shallow copy/replace to force a re-render of downstream users of sdApi.
@@ -153,7 +154,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
                 console.debug("Received Global Settings", msg.payload.settings);
                 break;
             case "sendToPropertyInspector":
-                send('logMessage', { payload: { message: `    - ${msg.payload.event}` } });
+                logMessageContent += ` - ${msg.payload.event}`;
                 switch (msg.payload.event) {
                     case "ModuleList":
                         if (msg.payload.moduleList) {
@@ -172,7 +173,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
             default:
                 console.warn("Message Handler not defined for Event: ", event);
         }
-
+        send('logMessage', { payload: { message: logMessageContent } });
     }
 
     // Websocket connect and shutdown setup.
@@ -192,7 +193,7 @@ export function useStreamdeckWebsocket(socketSettings: StreamdeckSocketSettings)
         };
         websocket.current.onclose = function (event: CloseEvent) {
             // Websocket is closed
-            const reason = WEBSOCKETERROR(event);
+            const reason = event.reason || WEBSOCKETERROR(event);
             console.log('[STREAMDECK]***** WEBOCKET CLOSED **** reason:', reason);
         };
         return function onUnmount() {
