@@ -22,7 +22,16 @@ void TitleMonitor::update_settings(const json &title_monitor_settings)
             address = SimulatorAddress{title_monitor_settings["monitor_address"]["address"]};
         }
 
-        modify_string_ = false; // TODO: Handle modification of strings
+        modify_string_ = title_monitor_settings["modify_string"];
+        if (modify_string_) {
+            string_monitor_mapping_.clear();
+            std::optional<std::pair<std::string, std::string>> maybe_token_pair;
+            std::stringstream mapping;
+            mapping << title_monitor_settings["mapping"];
+            while (maybe_token_pair = pop_key_and_value(mapping, ',', '=')) {
+                string_monitor_mapping_[maybe_token_pair.value().first] = maybe_token_pair.value().second;
+            }
+        }
         vertical_spacing_ =
             title_monitor_settings.contains("vertical_spacing") ? title_monitor_settings["vertical_spacing"] : 0;
     }
