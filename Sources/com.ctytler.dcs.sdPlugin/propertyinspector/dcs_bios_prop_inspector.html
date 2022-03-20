@@ -25,8 +25,14 @@
       margin: 0 1rem;
     }
 
-    .btn:hover {
+    .btn:enabled:hover {
       background-color: #7e7e7e;
+    }
+
+    .btn:disabled {
+      background-color: #3a3a3a;
+      color: #707070;
+      cursor: auto;
     }
 
     .text {
@@ -45,6 +51,7 @@
         Configure
       </button>
     </div>
+    <p class="text" id="user_message"></p>
     <p hidden class="text" id="uuid"></p>
   </body>
 </html>

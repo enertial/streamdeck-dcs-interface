@@ -46,5 +46,8 @@ function handleButtonPress() {
             "../settingsUI/index.html",
             "Button Configuration"
         );
+        // Temporary fix for inability to reconnect websocket multiple times.
+        document.getElementById("external_config_window_button").disabled = true;
+        document.getElementById("user_message").innerHTML = "Beta limitation: Configure window can only be opened once. Re-select button to open again.";
     }
 }
