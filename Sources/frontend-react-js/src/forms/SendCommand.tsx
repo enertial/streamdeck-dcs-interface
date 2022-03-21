@@ -25,7 +25,6 @@ interface Props {
 
 function SendCommand({ settings, setSettings }: Props): JSX.Element {
     const [maxValue, setMaxValue] = useState("");
-    const [disableRelease, setDisableRelease] = useState(false);
 
     function handleDroppedItem(item: DcsBiosDraggableItem) {
         setSettings((prevSettings) => ({
@@ -62,7 +61,6 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
     }
     function handleReleaseDisable(event: ChangeEvent<HTMLInputElement>) {
         const isDisabled = event.currentTarget.checked;
-        setDisableRelease(isDisabled);
         setSettings((prevSettings) => ({
             ...prevSettings,
             disable_release_check: isDisabled
@@ -104,7 +102,7 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
                     <input
                         className={classes.checkbox}
                         type="checkbox"
-                        checked={disableRelease}
+                        checked={settings.disable_release_check}
                         onChange={handleReleaseDisable}
                     />Disable ):
                 </div>
@@ -112,7 +110,7 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
             <div className={classes.formRow}>
                 <DropArea
                     accept={[]}
-                    displayText={disableRelease ? "" : settings.send_identifier}
+                    displayText={settings.disable_release_check ? "" : settings.send_identifier}
                     handleDroppedItem={handleDroppedItem}
                     onClear={clearMonitorSettings}
                 />
@@ -121,9 +119,9 @@ function SendCommand({ settings, setSettings }: Props): JSX.Element {
                     className={classes.input}
                     type="text"
                     placeholder="Value"
-                    value={disableRelease ? "" : settings.release_value}
+                    value={settings.disable_release_check ? "" : settings.release_value}
                     onChange={handleReleaseValueChange}
-                    disabled={disableRelease}
+                    disabled={settings.disable_release_check}
                 />
                 <MaxValueOutOf />
             </div>
