@@ -1,0 +1,85 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <!-- additional ui -->
+  <ItemGroup>
+    <PropertyPageSchema Include="$(MSBuildThisFileDirectory)\Lua-propertiesui.xml" />
+  </ItemGroup>
+  <!-- Fix configuration settings -->
+  <PropertyGroup Condition="'$(LuaType)' != 'static'">
+    <LuaType>dynamic</LuaType>
+  </PropertyGroup>
+  <Choose>
+    <When Condition="$(Configuration.ToLower().Contains('debug'))">
+      <PropertyGroup Condition="'$(LuaConfiguration)' != 'Release'">
+        <LuaConfiguration>Debug</LuaConfiguration>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup Condition="'$(LuaConfiguration)' != 'Debug'">
+        <LuaConfiguration>Release</LuaConfiguration>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <Choose>
+    <When Condition="'$(PlatformToolset)' == 'v143'">
+      <PropertyGroup Condition="'$(LuaRuntimePlatform)' == ''">
+        <LuaRuntimePlatform>v143</LuaRuntimePlatform>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(PlatformToolset)' == 'v142'">
+      <PropertyGroup Condition="'$(LuaRuntimePlatform)' == ''">
+        <LuaRuntimePlatform>v142</LuaRuntimePlatform>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(PlatformToolset)' == 'v141'">
+      <PropertyGroup Condition="'$(LuaRuntimePlatform)' == ''">
+        <LuaRuntimePlatform>v141</LuaRuntimePlatform>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(PlatformToolset)' == 'v140'">
+      <PropertyGroup Condition="'$(LuaRuntimePlatform)' == ''">
+        <LuaRuntimePlatform>v140</LuaRuntimePlatform>
+      </PropertyGroup>
+    </When>
+    <When Condition="'$(PlatformToolset)' == 'v120'">
+      <PropertyGroup Condition="'$(LuaRuntimePlatform)' == ''">
+        <LuaRuntimePlatform>v120</LuaRuntimePlatform>
+      </PropertyGroup>
+    </When>
+    <Otherwise>
+      <PropertyGroup Condition="'$(LuaRuntimePlatform)' == ''">
+        <LuaRuntimePlatform>ERROR</LuaRuntimePlatform>
+      </PropertyGroup>
+    </Otherwise>
+  </Choose>
+  <!-- Compiler settings: defines and includes -->
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <PreprocessorDefinitions>HAS_LUA;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildThisFileDirectory)include\;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(LuaType)' == 'dynamic'">
+    <ClCompile>
+      <PreprocessorDefinitions>LUA_BUILD_AS_DLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <!-- Linker settings -->
+  <ItemDefinitionGroup Condition="'$(LuaType)' == 'static'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib\$(PlatformName)\$(LuaRuntimePlatform)\$(LuaConfiguration)\lua_static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(LuaType)' == 'dynamic'">
+    <Link>
+      <AdditionalDependencies>$(MSBuildThisFileDirectory)lib\$(PlatformName)\$(LuaRuntimePlatform)\$(LuaConfiguration)\lua.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <!-- Copy dll redistributable -->
+  <ItemGroup Condition="'$(LuaType)' == 'dynamic'">
+    <LuaDlls Include="$(MSBuildThisFileDirectory)bin\$(PlatformName)\$(LuaRuntimePlatform)\$(LuaConfiguration)\lua.dll" />
+  </ItemGroup>
+  <Target Name="LuaCopyDlls" AfterTargets="AfterBuild" Condition="'$(LuaType)' == 'dynamic'">
+    <Copy SourceFiles="@(LuaDlls)" DestinationFiles="@(LuaDlls-&gt;'$(TargetDir)%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+</Project>

@@ -4,7 +4,7 @@
 
 #include "Utilities/Decimal.h"
 #include "Utilities/UdpSocket.h"
-#include "Vendor/json/src/json.hpp"
+#include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
 #include <optional>

@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProjectSchemaDefinitions xmlns="clr-namespace:Microsoft.Build.Framework.XamlTypes;assembly=Microsoft.Build.Framework">
+  <Rule Name="ReferencedPackages-lua" PageTemplate="tool" DisplayName="Referenced Packages" SwitchPrefix="/" Order="1">
+    <Rule.Categories>
+      <Category Name="lua" DisplayName="Lua" />
+    </Rule.Categories>
+    <Rule.DataSource>
+      <DataSource Persistence="ProjectFile" ItemType="" />
+    </Rule.DataSource>
+    <EnumProperty Name="LuaType" DisplayName="Library Type" Description="Which type of the library to link to" Category="lua">
+      <EnumValue Name="" DisplayName="default" />
+      <EnumValue Name="dynamic" DisplayName="Dynamic Library - Dll (Default)" />
+      <EnumValue Name="static" DisplayName="Static Library - Lib" />
+    </EnumProperty>
+    <EnumProperty Name="LuaConfiguration" DisplayName="Configuration" Description="Which configuration of the library to use" Category="lua">
+      <EnumValue Name="" DisplayName="default" />
+      <EnumValue Name="Release" DisplayName="Release" />
+      <EnumValue Name="Debug" DisplayName="Debug" />
+    </EnumProperty>
+    <EnumProperty Name="LuaRuntimePlatform" DisplayName="Runtime Platform" Description="Which cpp runtime platform version of the library to use" Category="lua">
+      <EnumValue Name="" DisplayName="default" />
+      <EnumValue Name="v143" DisplayName="v143" />
+      <EnumValue Name="v142" DisplayName="v142" />
+      <EnumValue Name="v141" DisplayName="v141" />
+      <EnumValue Name="v140" DisplayName="v140" />
+      <EnumValue Name="v120" DisplayName="v120" />
+    </EnumProperty>
+  </Rule>
+</ProjectSchemaDefinitions>

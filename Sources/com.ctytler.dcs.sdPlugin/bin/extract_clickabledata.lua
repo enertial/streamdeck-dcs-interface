@@ -45,6 +45,15 @@ function len(table)
 	return count
 end
 
+function file_exists(filename)
+    local file = io.open(filename, "r")
+    if file then
+        file:close()
+        return true
+    end
+    return false
+end
+
 function get_device_name(device_id)
     device_name = ""
 	for device,id in pairs(devices) do
@@ -144,22 +153,22 @@ function load_module(module_name)
 	else
 		LockOn_Options.script_path = dcs_install_path..[[\Mods\aircraft\]]..module_name..[[\Cockpit\]]
 	end
-
+	
 	script_to_run = loadfile(LockOn_Options.script_path.."clickabledata.lua")
 	if script_to_run == nil then
 		failed_script_path = LockOn_Options.script_path
 		LockOn_Options.script_path = LockOn_Options.script_path..[[Scripts\]]
 		script_to_run = loadfile(LockOn_Options.script_path.."clickabledata.lua")
-		if script_to_run == nil then
+	  if script_to_run == nil then
 			error("Could not find clickabledata.lua from "..failed_script_path.." or "..LockOn_Options.script_path.." (or file found but contains syntax errors)", 2)
 		end
-	end
+	  end
 
-	script_to_run()
+	  script_to_run()
 	
 	element_list = collect_element_attributes(elements)
 	return element_list
 end
 
 list = load_module(module_name)
-return unpack(list)
+return table.unpack(list)
