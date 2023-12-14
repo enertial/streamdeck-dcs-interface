@@ -1,11 +1,11 @@
 <img src="Images/DCS_Interface_Banner.png" width=400>
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/cpp-tests?label=C%2B%2B%20Tests)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/reactjs-tests?label=ReactJS%20Tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/enertial/streamdeck-dcs-interface/cpp-tests.yml?label=C%2B%2B%20Tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/enertial/streamdeck-dcs-interface/reactjs-tests.yml?label=ReactJS%20Tests)
 [![codecov](https://codecov.io/gh/charlestytler/streamdeck-dcs-interface/branch/master/graph/badge.svg?token=9K0CA0IGSM)](https://codecov.io/gh/charlestytler/streamdeck-dcs-interface)
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/charlestytler/streamdeck-dcs-interface/clang-format?label=clang-format)
-![GitHub all releases](https://img.shields.io/github/downloads/charlestytler/streamdeck-dcs-interface/total)
-![GitHub release (latest by date)](https://img.shields.io/github/v/release/charlestytler/streamdeck-dcs-interface)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/enertial/streamdeck-dcs-interface/clang-format.yml?label=clang-format)
+![GitHub all releases](https://img.shields.io/github/downloads/enertial/streamdeck-dcs-interface/total)
+![GitHub release (latest by date)](https://img.shields.io/github/v/release/enertial/streamdeck-dcs-interface)
 
 `DCS Interface` is a plugin for the Streamdeck that allows communication with DCS via lua UDP sockets for both receiving updates of the simulation state as well as sending commands to interact with the clickable cockpits.
 
