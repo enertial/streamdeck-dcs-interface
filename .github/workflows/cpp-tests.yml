@@ -2,6 +2,8 @@ name: cpp-tests
 
 on:
   push:
+    branches:
+      - master
     paths-ignore:
       - "*.md"
   pull_request:
