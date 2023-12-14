@@ -4,6 +4,10 @@ on:
   push:
     paths-ignore:
       - "*.md"
+  pull_request:
+    paths-ignore:
+      - "*.md"
+  workflow_dispatch:
 
 env:
   # Path to the solution file relative to the root of the project.
