@@ -6,4 +6,4 @@ settingsUI/
 *.log
 .vs
 .vscode
-.vcxproj.*
+.vcxproj.user
