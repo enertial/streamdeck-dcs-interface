@@ -5,8 +5,12 @@
 :: Change directory to the project root (directory above this batch file location)
 cd /D "%~dp0"\..
 
+:: Restore NuGet packages
+MSBuild.exe .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /t:Restore /p:RestorePackagesConfig=true
+if %errorlevel% neq 0 echo "Canceling plugin build due to failure to restore NuGet packages" && pause && exit /b %errorlevel%
+
 :: Build C++ executable:
-call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin\MSBuild.exe" .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /p:Configuration="Release"
+MSBuild.exe .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /p:Configuration="Release"
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed backend build" && pause && exit /b %errorlevel%
 
 :: Run unit tests, only continue if all tests pass
@@ -23,7 +27,7 @@ echo. && echo *** Removing any previous builds of com.ctytler.dcs.streamDeckPlug
 del Release\com.ctytler.dcs.streamDeckPlugin && echo ...Successfully removed
 
 :: Build the ReactJS user interface:
-cd Sources\frontend-react-js && call npm run build
+cd Sources\frontend-react-js && call npm install && call npm run build
 cd ..\..
 echo *** React JS build complete, published to Sources/com.ctytler.dcs.sdPlugin/settingsUI/ *** && echo.
 

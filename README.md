@@ -115,11 +115,14 @@ Sources
 
 A build script is included which will build both the C++ executable which handles the communcation with DCS as well as the package for the Stream Deck plugin: `Tools/build_plugin.bat`
 
-You will need Visual Studio installed, and may need to edit the location of the Visual Studio install location inside the batch file if it does not match for your machine. Running the batch script will build the Streamdeck plugin and run all unit tests, generating the plugin file at `Release/com.ctytler.dcs.streamDeckPlugin`.
+Before running the .bat file you will need to:
+ - Install MSBuild to compile C++ (comes with Microsoft Visual Studio or Build Tools)
+ - Install npm for Windows
+ - Add your install location of MSBuild.exe to your PATH environment variable:
+   - Click start button to search and select "Edit environment variables for your account"
+   - Under "User variables for ..." select the "Path" row and choose "Edit"
+   - Add a New path of your MSBuild.exe install location, such as "C:\Program Files\Microsoft Visual Studio\2022\Community\MSBuild\Current\Bin"
 
-Current version was built with Visual Studio Community 2019.
+Running the batch script will build the Streamdeck plugin and run all unit tests, generating the plugin file at `Release/com.ctytler.dcs.streamDeckPlugin`.
 
-Additional convenient one-liner to build if using Windows Subsystem for Linux (WSL):
-```
-cmd.exe /C """C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat" \& devenv D:\\code\\DCS\\streamdeck-dcs-interface\\Sources\\Windows\\com.ctytler.dcs.sdPlugin.sln /build "Release^|x64"""
-```
+Current version was built with Visual Studio Community 2022.
