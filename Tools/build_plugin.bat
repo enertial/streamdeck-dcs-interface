@@ -5,27 +5,30 @@
 :: Change directory to the project root (directory above this batch file location)
 cd /D "%~dp0"\..
 
-:: Configure the environment for Visual Studio
-call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\Common7\Tools\VsDevCmd.bat"
+:: Restore NuGet packages
+MSBuild.exe .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /t:Restore /p:RestorePackagesConfig=true
+if %errorlevel% neq 0 echo "Canceling plugin build due to failure to restore NuGet packages" && pause && exit /b %errorlevel%
 
 :: Build C++ executable:
-devenv Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /build "Release|x64"
+MSBuild.exe .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /p:Configuration="Release"
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed backend build" && pause && exit /b %errorlevel%
 
 :: Run unit tests, only continue if all tests pass
 Sources\backend-cpp\Windows\x64\Release\Test.exe
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed unit tests" && pause && exit /b %errorlevel%
 
-:: Copy C++ executable to StreamDeck Plugin package:
+:: Copy C++ executable and DLLs to StreamDeck Plugin package:
 echo. && echo *** C++ binary compilation complete, published to Sources/com.ctytler.dcs.sdPlugin/bin/ *** && echo.
 copy Sources\backend-cpp\Windows\x64\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
+copy Sources\backend-cpp\Windows\x64\Release\*.dll Sources\com.ctytler.dcs.sdPlugin\bin\
 
 :: Remove any prior build of the Plugin:
 echo. && echo *** Removing any previous builds of com.ctytler.dcs.streamDeckPlugin from Release/ ***
 del Release\com.ctytler.dcs.streamDeckPlugin && echo ...Successfully removed
 
 :: Build the ReactJS user interface:
-cd Sources\frontend-react-js && call npm run build && cd ..\..
+cd Sources\frontend-react-js && call npm install && call npm run build
+cd ..\..
 echo *** React JS build complete, published to Sources/com.ctytler.dcs.sdPlugin/settingsUI/ *** && echo.
 
 :: Build StreamDeck Plugin:

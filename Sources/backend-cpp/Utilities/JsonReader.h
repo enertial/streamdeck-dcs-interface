@@ -5,7 +5,7 @@
 #include <optional>
 #include <string>
 
-#include "Vendor/json/src/json.hpp"
+#include "nlohmann\json.hpp"
 using json = nlohmann::json;
 
 std::optional<json> get_module_list(const std::string &path);

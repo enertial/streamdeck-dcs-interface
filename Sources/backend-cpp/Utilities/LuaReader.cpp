@@ -2,7 +2,7 @@
 
 #include "LuaReader.h"
 
-#include "Vendor/lua-5.1.5/etc/lua.hpp"
+#include "lua.hpp"
 
 #include <filesystem>
 #include <iostream>

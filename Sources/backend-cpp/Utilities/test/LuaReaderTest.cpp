@@ -4,7 +4,7 @@
 
 #include "Utilities/LuaReader.h"
 
-#include "Vendor/json/src/json.hpp"
+#include "nlohmann/json.hpp"
 using json = nlohmann::json;
 
 namespace test
