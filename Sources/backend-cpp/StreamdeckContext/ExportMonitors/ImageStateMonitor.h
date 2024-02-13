@@ -31,18 +31,24 @@ class ImageStateMonitor
   private:
     enum class Comparison { GREATER_THAN, EQUAL_TO, LESS_THAN };
 
+    using StateMonitorSettings = struct {
+        SimulatorAddress address;
+        Comparison comparison;
+        Decimal comparison_value;
+    };
+
     /**
-     * @brief Checks if current game value satisfies the comparison criteria configured in settings.
-     *
-     * @param current_game_value
+     * @brief Checks if current game value satisfies the comparison criteria for state.
      */
-    bool comparison_is_satisfied(Decimal current_game_value) const;
+    bool comparison_is_satisfied(const Decimal &current_game_value,
+                                 const Comparison &comparison,
+                                 const Decimal &comparison_value) const;
 
     // Status of user-filled fields.
-    bool settings_are_filled_ = false; // True if all DCS ID comparison monitor settings have been set.
+    bool monitor_is_set_ = false; // True if all monitor settings have been set.
 
     // Stored settings extracted from user-filled fields.
-    SimulatorAddress dcs_id_compare_monitor_{0};                     // Simulator address to monitor for state change.
+    std::vector<StateMonitorSettings> settings_per_state_;
     Comparison dcs_id_compare_condition_ = Comparison::GREATER_THAN; // Comparison to use for DCS ID compare monitor.
     Decimal dcs_id_comparison_value_; // Value to compare DCS ID compare monitor value to.
 };

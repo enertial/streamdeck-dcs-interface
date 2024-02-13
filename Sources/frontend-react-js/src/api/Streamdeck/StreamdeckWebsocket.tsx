@@ -1,5 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import StreamdeckApi, { defaultButtonSettings, defaultGlobalSettings, StreamdeckButtonSettings, StreamdeckCommFns } from './StreamdeckApi';
+import StreamdeckApi, { StreamdeckCommFns } from './StreamdeckApi';
+import StreamdeckButtongSettings, { defaultButtonSettings } from './StreamdeckButtonSettings';
+import { defaultGlobalSettings } from './StreamdeckGlobalSettings';
 import { ModuleControlsJson } from '../DcsBios/ControlReferenceInterface';
 
 export interface StreamdeckSocketSettings {

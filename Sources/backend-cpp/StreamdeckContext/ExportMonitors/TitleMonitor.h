@@ -38,9 +38,9 @@ class TitleMonitor
 
     bool string_monitor_is_set_ = false; // True if all DCS ID string monitor settings have been set.
 
-    SimulatorAddress dcs_id_string_monitor_{0}; // Simulator address to monitor for context title.
-    int string_monitor_vertical_spacing_ = 0;   // Vertical spacing (number of '\n') to include before or after title.
-    bool string_monitor_passthrough_ = true;    // Flag set by user to passthrough string to title unaltered.
+    SimulatorAddress monitor_address_; // Simulator address to monitor for context title.
+    int vertical_spacing_ = 0;         // Vertical spacing (number of '\n') to include before or after title.
+    bool modify_string_ = false;       // Flag set if string should be modified before using as title.
     std::unordered_map<std::string, std::string>
         string_monitor_mapping_; // Map of received values to title text to display on context.
 };

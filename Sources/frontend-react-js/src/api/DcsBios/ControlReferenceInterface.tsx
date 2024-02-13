@@ -39,7 +39,13 @@ interface ControlOutputString {
   description: string,
   max_length: number,
   suffix: string,
+<<<<<<< HEAD:Sources/frontend-react-js/src/api/DcsBios/ControlReferenceInterface.tsx
   type: "string"
+||||||| constructed merge base:Sources/frontend-react-js/src/components/control-reference/ControlReferenceInterface.tsx
+  type: string, // Will be "string"
+=======
+  type: "string",
+>>>>>>> New version of ButtonSettings and GlobalSettings structures:Sources/frontend-react-js/src/components/control-reference/ControlReferenceInterface.tsx
 }
 
 export type {
