@@ -13,7 +13,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      - uses: DoozyX/clang-format-lint-action@v0.12
+      - uses: DoozyX/clang-format-lint-action@v0.20
         with:
           source: "./Sources/backend-cpp"
           exclude: "./Sources/backend-cpp/Vendor ./Sources/backend-cpp/Windows"
