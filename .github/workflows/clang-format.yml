@@ -18,5 +18,5 @@ jobs:
           source: "./Sources/backend-cpp"
           exclude: "./Sources/backend-cpp/Vendor ./Sources/backend-cpp/Windows"
           extensions: "h,cpp"
-          clangFormatVersion: 12
+          clangFormatVersion: 20
           style: "{BasedOnStyle: LLVM, IndentWidth: 4, BreakBeforeBraces: Linux, UseTab: Never, AllowShortBlocksOnASingleLine: Empty, BinPackArguments: false, BinPackParameters: false, ColumnLimit: 120}"
