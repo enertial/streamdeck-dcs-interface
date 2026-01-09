@@ -58,4 +58,3 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: ./StreamdeckDcsInterfaceCov.xml
           flags: Cpp
-          functionalities: fix
