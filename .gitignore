@@ -1,25 +1,48 @@
-x64/
-x86/
-[Aa][Rr][Mm]/
-[Aa][Rr][Mm]64/
+# Project-specific Ignore List
 settingsUI/
-*.exe
-*.pdb
-*.log
-.vs/
-.vscode
-*.user
 
-# NuGet Packages
-*.nupkg
-# NuGet Symbol Packages
-*.snupkg
-# The packages folder can be ignored because of Package Restore
-**/[Pp]ackages/*
-# except build/, which is used as an MSBuild target.
-!**/[Pp]ackages/build/
-# Uncomment if necessary however generally it will be regenerated when needed
-#!**/[Pp]ackages/repositories.config
-# NuGet v3's project.json files produces more ignorable files
-*.nuget.props
-*.nuget.targets
+# --- CMake Artifacts ---
+# Ignore the entire build directory (assuming you name it 'build' or 'out')
+build/
+out/
+
+# If you accidentally build in the root directory (In-Source Build), 
+# these lines will catch the mess:
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+cmake_install.cmake
+install_manifest.txt
+compile_commands.json
+_deps/
+
+# --- CMake Presets ---
+# CMakePresets.json IS usually committed (it shares build configs with the team)
+# CMakeUserPresets.json is NOT committed (it contains your personal paths)
+CMakeUserPresets.json
+
+# --- IDE Specifics ---
+# Visual Studio
+.vs/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.user
+*.suo
+
+# VS Code
+.vscode/
+!.vscode/extensions.json  # Keep this if you want to suggest extensions
+
+# --- Output Binaries ---
+*.exe
+*.dll
+*.pdb
+*.lib
+*.obj
+*.ilk
+*.exp
+
+# --- Log Files ---
+*.log
+
