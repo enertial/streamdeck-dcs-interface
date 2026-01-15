@@ -44,7 +44,7 @@ add_subdirectory(Vendor)
 
 # Static Libraries
 # add_subdirectory(Utilities)
-# add_subdirectory(ElgatoSD)
+add_subdirectory(ElgatoSD)
 # add_subdirectory(SimulatorInterface)
 # add_subdirectory(StreamdeckContext)
 

@@ -15,11 +15,13 @@
 #include "ESDBasePlugin.h"
 #include "ESDSDKDefines.h"
 
+#ifndef ASIO_STANDALONE
 #define ASIO_STANDALONE
-#include <Vendor/websocketpp/websocketpp/client.hpp>
-#include <Vendor/websocketpp/websocketpp/common/memory.hpp>
-#include <Vendor/websocketpp/websocketpp/common/thread.hpp>
-#include <Vendor/websocketpp/websocketpp/config/asio_no_tls_client.hpp>
+#endif
+#include <websocketpp/client.hpp>
+#include <websocketpp/common/memory.hpp>
+#include <websocketpp/common/thread.hpp>
+#include <websocketpp/config/asio_no_tls_client.hpp>
 
 typedef websocketpp::config::asio_client::message_type::ptr message_ptr;
 typedef websocketpp::client<websocketpp::config::asio_client> WebsocketClient;
