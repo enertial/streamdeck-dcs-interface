@@ -1,11 +1,17 @@
 cmake_minimum_required(VERSION 3.23)
-project(StreamdeckPluginBackend LANGUAGES CXX)
+
+# Note: C is included because of the lua-5.4.8 C library
+project(StreamdeckPluginBackend LANGUAGES C CXX)
 
 # TODO: Delete this if not desired
 # Enforce Windows x64 MSVC
 # if(NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
 #     message(FATAL_ERROR "This project requires MSVC x64.")
 # endif()
+
+# Force the use of the Dynamic Runtime (/MD and /MDd) across the whole project
+# This is added to align with the Vendored websocketpp library
+set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 
 # Global C++ Settings
 set(CMAKE_CXX_STANDARD 17)
@@ -49,4 +55,4 @@ add_subdirectory(SimulatorInterface)
 add_subdirectory(StreamdeckContext)
 
 # Executable
-# add_subdirectory(StreamdeckInterface)
+add_subdirectory(StreamdeckInterface)
