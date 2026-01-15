@@ -1,13 +1,7 @@
 cmake_minimum_required(VERSION 3.23)
 
-# Note: C is included because of the lua-5.4.8 C library
+# Note: C is included because of the Vendor/lua-5.4.8 C library
 project(StreamdeckPluginBackend LANGUAGES C CXX)
-
-# TODO: Delete this if not desired
-# Enforce Windows x64 MSVC
-# if(NOT MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
-#     message(FATAL_ERROR "This project requires MSVC x64.")
-# endif()
 
 # Force the use of the Dynamic Runtime (/MD and /MDd) across the whole project
 # This is added to align with the Vendored websocketpp library
@@ -18,7 +12,6 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-# TODO: Consider /W4 or /Wall
 if(MSVC)
     add_compile_options(
         /W3              # Warning Level 3
@@ -41,14 +34,27 @@ add_compile_definitions(
 # _WINDOWS instead of _CONSOLE, but for development and debugging,
 # using _CONSOLE is much easier because you can see your log output.
 
+# Testing
+include(CTest)
 
-# Vendored dependencies
+if(BUILD_TESTING)
+    include(FetchContent)
+
+    FetchContent_Declare(
+      googletest
+      GIT_REPOSITORY https://github.com/google/googletest
+      GIT_TAG v1.17.0
+      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+    )
+
+    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+
+    FetchContent_MakeAvailable(googletest)
+endif()
+
+# Libraries
 add_subdirectory(Vendor)
-
-# Enable testing for the whole project (Gtest)
-# enable_testing()
-
-# Static Libraries
 add_subdirectory(Utilities)
 add_subdirectory(ElgatoSD)
 add_subdirectory(SimulatorInterface)
