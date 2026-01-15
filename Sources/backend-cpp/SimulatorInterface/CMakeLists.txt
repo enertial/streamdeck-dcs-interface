@@ -4,6 +4,12 @@ target_sources(SimulatorInterface
     PRIVATE
         SimConnectionManager.cpp
         SimulatorInterface.cpp
+        Protocols/DcsBiosProtocol.cpp
+        Protocols/DcsBiosProtocol.h
+        Protocols/DcsBiosStreamParser.cpp
+        Protocols/DcsBiosStreamParser.h
+        Protocols/DcsExportScriptProtocol.cpp
+        Protocols/DcsExportScriptProtocol.h
     PUBLIC FILE_SET HEADERS
         BASE_DIRS ..   # Include from backend-cpp/ root.
         FILES

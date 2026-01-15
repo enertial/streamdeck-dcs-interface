@@ -15,19 +15,3 @@ target_link_libraries(websocketpp INTERFACE asio)
 # --- Lua ---
 add_subdirectory(lua-5.4.8)
 
-# --- Google Test ---
-include(FetchContent)
-FetchContent_Declare(
-  googletest
-  # Release 1.17.0 (04/23/2025)
-  URL https://github.com/google/googletest/archive/52eb8108c5bdec04579160ae17225d66034bd723.zip
-  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
-)
-# For Windows: Prevent overriding the parent project's compiler/linker settings
-set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-FetchContent_MakeAvailable(googletest)
-
-# Now simply link against gtest or gtest_main as needed. Eg
-# add_executable(example example.cpp)
-# target_link_libraries(example gtest_main)
-# add_test(NAME example_test COMMAND example)

@@ -1,23 +1,24 @@
-set(SOURCES
-    ESDConnectionManager.cpp
-    ESDLocalizer.cpp
-    ESDUtilitiesWindows.cpp
-    pch.cpp
-)
+add_library(ElgatoSD STATIC)
 
-set(HEADERS
-    EPLJSONUtils.h
-    ESDBasePlugin.h
-    ESDConnectionManager.h
-    ESDLocalizer.h
-    ESDSDKDefines.h
-    ESDUtilities.h
-    pch.h
-)
+target_sources(ElgatoSD
+    PRIVATE
+        ESDConnectionManager.cpp
+        ESDLocalizer.cpp
+        ESDUtilitiesWindows.cpp
+        pch.cpp
 
+    PUBLIC FILE_SET HEADERS
+        BASE_DIRS ..   # Include from backend-cpp/ root.
+        FILES
+            EPLJSONUtils.h
+            ESDBasePlugin.h
+            ESDConnectionManager.h
+            ESDLocalizer.h
+            ESDSDKDefines.h
+            ESDUtilities.h
+            pch.h
 # TODO: Consider deleting the pch.* files, as they are not used as precompiled headers
-
-add_library(ElgatoSD STATIC ${SOURCES} ${HEADERS})
+)
 
 target_link_libraries(ElgatoSD 
     PUBLIC 
