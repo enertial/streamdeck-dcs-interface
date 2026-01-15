@@ -1,132 +1,27 @@
-set(PROJECT_NAME ElgatoSD)
-
-################################################################################
-# Source groups
-################################################################################
-set(Sources
-    "@(_WildCardClCompile)"
-)
-source_group("Sources" FILES ${Sources})
-
-set(ALL_FILES
-    ${Sources}
+set(SOURCES
+    ESDConnectionManager.cpp
+    ESDLocalizer.cpp
+    ESDUtilitiesWindows.cpp
+    pch.cpp
 )
 
-################################################################################
-# Target
-################################################################################
-add_library(${PROJECT_NAME} STATIC ${ALL_FILES})
-
-use_props(${PROJECT_NAME} "${CMAKE_CONFIGURATION_TYPES}" "${DEFAULT_CXX_PROPS}")
-set(ROOT_NAMESPACE ElgatoSD)
-
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    VS_GLOBAL_KEYWORD "Win32Proj"
+set(HEADERS
+    EPLJSONUtils.h
+    ESDBasePlugin.h
+    ESDConnectionManager.h
+    ESDLocalizer.h
+    ESDSDKDefines.h
+    ESDUtilities.h
+    pch.h
 )
-################################################################################
-# Output directory
-################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        OUTPUT_DIRECTORY_DEBUG   "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-        OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/${CMAKE_VS_PLATFORM_NAME}/$<CONFIG>/"
-    )
-endif()
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-    )
-elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
-    set_target_properties(${PROJECT_NAME} PROPERTIES
-        INTERPROCEDURAL_OPTIMIZATION_RELEASE "TRUE"
-    )
-endif()
-################################################################################
-# Compile definitions
-################################################################################
-if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "$<$<CONFIG:Debug>:"
-            "_DEBUG"
-        ">"
-        "$<$<CONFIG:Release>:"
-            "NDEBUG"
-        ">"
-        "_CONSOLE;"
-        "UNICODE;"
-        "_UNICODE"
-    )
-elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE
-        "$<$<CONFIG:Debug>:"
-            "_DEBUG"
-        ">"
-        "$<$<CONFIG:Release>:"
-            "NDEBUG"
-        ">"
-        "WIN32;"
-        "_CONSOLE;"
-        "UNICODE;"
-        "_UNICODE"
-    )
-endif()
 
-################################################################################
-# Compile and link options
-################################################################################
-if(MSVC)
-    if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-        target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Release>:
-                /Oi;
-                /Gy
-            >
-            /permissive-;
-            /std:c++17;
-            /sdl;
-            /W3;
-            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-            /Zc:__cplusplus;
-            ${DEFAULT_CXX_EXCEPTION_HANDLING};
-            /Y-
-        )
-    elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
-        target_compile_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Release>:
-                /Oi;
-                /Gy
-            >
-            /permissive-;
-            /std:c++17;
-            /sdl;
-            /W3;
-            ${DEFAULT_CXX_DEBUG_INFORMATION_FORMAT};
-            /Zc:__cplusplus;
-            ${DEFAULT_CXX_EXCEPTION_HANDLING};
-            /Y-
-        )
-    endif()
-    if("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x64")
-        target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Release>:
-                /OPT:REF;
-                /OPT:ICF
-            >
-            /SUBSYSTEM:CONSOLE
-        )
-    elseif("${CMAKE_VS_PLATFORM_NAME}" STREQUAL "x86")
-        target_link_options(${PROJECT_NAME} PRIVATE
-            $<$<CONFIG:Release>:
-                /OPT:REF;
-                /OPT:ICF
-            >
-            /SUBSYSTEM:CONSOLE
-        )
-    endif()
-endif()
+# TODO: Consider deleting the pch.* files, as they are not used as precompiled headers
 
-################################################################################
-# Dependencies
-################################################################################
-use_package(${PROJECT_NAME} Microsoft.googletest.v140.windesktop.msvcstl.static.rt-dyn 1.8.1.7)
-use_package(${PROJECT_NAME} nlohmann.json 3.11.2)
+add_library(ElgatoSD STATIC ${SOURCES} ${HEADERS})
+
+target_link_libraries(ElgatoSD 
+    PRIVATE 
+        nlohmann_json
+        websocketpp
+)
+
