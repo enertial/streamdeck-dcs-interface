@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.23)
 project(StreamdeckPluginBackend LANGUAGES CXX)
 
 # TODO: Delete this if not desired
@@ -43,7 +43,7 @@ add_subdirectory(Vendor)
 # enable_testing()
 
 # Static Libraries
-# add_subdirectory(Utilities)
+add_subdirectory(Utilities)
 add_subdirectory(ElgatoSD)
 # add_subdirectory(SimulatorInterface)
 # add_subdirectory(StreamdeckContext)
