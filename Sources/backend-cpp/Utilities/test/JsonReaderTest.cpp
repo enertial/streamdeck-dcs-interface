@@ -15,42 +15,42 @@ TEST(JsonReaderTest, getModuleListNonexistantPath)
 
 TEST(JsonReaderTest, getModuleTestPath)
 {
-    const std::string path = "Sources\\backend-cpp\\Utilities\\test";
+    const std::string path = "Utilities\\test";
     const auto maybe_module_list = get_module_list(path);
     ASSERT_TRUE(maybe_module_list);
     const auto module_list = maybe_module_list.value();
     EXPECT_EQ(module_list.size(), 1);
-    EXPECT_EQ(module_list[0], "Sources\\backend-cpp\\Utilities\\test\\sample.json");
+    EXPECT_EQ(module_list[0], "Utilities\\test\\sample.json");
 }
 
 TEST(JsonReaderTest, getModuleUnderRecursiveTestPath)
 {
-    const std::string path = "Sources\\backend-cpp\\Utilities\\";
+    const std::string path = "Utilities\\";
     const auto maybe_module_list = get_module_list(path);
     ASSERT_TRUE(maybe_module_list);
     const auto module_list = maybe_module_list.value();
     EXPECT_EQ(module_list.size(), 1);
-    EXPECT_EQ(module_list[0], "Sources\\backend-cpp\\Utilities\\test\\sample.json");
+    EXPECT_EQ(module_list[0], "Utilities\\test\\sample.json");
 }
 
 TEST(JsonReaderTest, getModuleTestPathWithForwardSlashes)
 {
-    const std::string path = "Sources/backend-cpp/Utilities/test";
+    const std::string path = "Utilities/test";
     const auto maybe_module_list = get_module_list(path);
     ASSERT_TRUE(maybe_module_list);
     const auto module_list = maybe_module_list.value();
     EXPECT_EQ(module_list.size(), 1);
-    EXPECT_EQ(module_list[0], "Sources/backend-cpp/Utilities/test\\sample.json");
+    EXPECT_EQ(module_list[0], "Utilities/test\\sample.json");
 }
 
 TEST(JsonReaderTest, getModuleTestPathWithForwardSlashesTrailing)
 {
-    const std::string path = "Sources/backend-cpp/Utilities/test/";
+    const std::string path = "Utilities/test/";
     const auto maybe_module_list = get_module_list(path);
     ASSERT_TRUE(maybe_module_list);
     const auto module_list = maybe_module_list.value();
     EXPECT_EQ(module_list.size(), 1);
-    EXPECT_EQ(module_list[0], "Sources/backend-cpp/Utilities/test/sample.json");
+    EXPECT_EQ(module_list[0], "Utilities/test/sample.json");
 }
 
 TEST(JsonReaderTest, nonexistantJsonFile)
@@ -62,7 +62,7 @@ TEST(JsonReaderTest, nonexistantJsonFile)
 
 TEST(JsonReaderTest, readSampleJsonFile)
 {
-    const std::string json_file = "Sources/backend-cpp/Utilities/test/sample.json";
+    const std::string json_file = "Utilities/test/sample.json";
     const auto maybe_json = read_json_file(json_file);
     ASSERT_TRUE(maybe_json);
     const auto json_obj = maybe_json.value();

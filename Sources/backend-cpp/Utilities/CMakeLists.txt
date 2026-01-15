@@ -24,3 +24,7 @@ target_link_libraries(Utilities
         lua-5.4.8
 )
 
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
+
