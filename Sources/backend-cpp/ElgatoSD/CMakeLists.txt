@@ -20,7 +20,7 @@ set(HEADERS
 add_library(ElgatoSD STATIC ${SOURCES} ${HEADERS})
 
 target_link_libraries(ElgatoSD 
-    PRIVATE 
+    PUBLIC 
         nlohmann_json
         websocketpp
 )

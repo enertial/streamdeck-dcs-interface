@@ -46,7 +46,7 @@ add_subdirectory(Vendor)
 add_subdirectory(Utilities)
 add_subdirectory(ElgatoSD)
 add_subdirectory(SimulatorInterface)
-# add_subdirectory(StreamdeckContext)
+add_subdirectory(StreamdeckContext)
 
 # Executable
 # add_subdirectory(StreamdeckInterface)
