@@ -5,7 +5,7 @@
 #include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/SendActions/MomentaryAction.h"
 
-#include "Test/MockESDConnectionManager.h"
+#include "MockESDConnectionManager.h"
 
 namespace test
 {

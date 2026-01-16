@@ -4,8 +4,8 @@
 
 #include "StreamdeckContext/SendActions/SwitchAction.h"
 
+#include "MockESDConnectionManager.h"
 #include "SimulatorInterface/SimConnectionManager.h"
-#include "Test/MockESDConnectionManager.h"
 namespace test
 {
 
