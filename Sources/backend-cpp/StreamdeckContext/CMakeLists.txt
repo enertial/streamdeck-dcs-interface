@@ -37,3 +37,9 @@ target_link_libraries(StreamdeckContext
         Utilities
 )
 
+if(BUILD_TESTING)
+    add_subdirectory(test)
+    add_subdirectory(ExportMonitors/test)
+    add_subdirectory(SendActions/test)
+endif()
+

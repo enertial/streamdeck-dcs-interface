@@ -1,17 +1,18 @@
-find_package(GTest REQUIRED)
+add_executable(StreamdeckContextTest)
+
+target_sources(StreamdeckContextTest
+    PRIVATE
+        BackwardsCompatibilityHandlerTest.cpp
+        StreamdeckContextTest.cpp
+)
+
+target_link_libraries(StreamdeckContextTest
+    PRIVATE 
+        StreamdeckContext
+        GTest::gtest_main
+)
+
 include(GoogleTest)
 
-set(SOURCES
-    BackwardsCompatibilityHandlerTest.cpp
-    StreamdeckContextTest.cpp
-)
+gtest_discover_tests(StreamdeckContextTest)
 
-add_executable(test_StreamdeckContext ${SOURCES})
-
-# Link to the library being tested + GTest
-target_link_libraries(test_StreamdeckContext PRIVATE 
-    StreamdeckContext 
-    GTest::gtest_main
-)
-
-gtest_discover_tests(test_StreamdeckContext)
