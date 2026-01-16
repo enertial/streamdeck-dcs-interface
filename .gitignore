@@ -5,6 +5,7 @@ settingsUI/
 # Ignore the entire build directory (assuming you name it 'build' or 'out')
 build/
 out/
+Testing/
 
 # If you accidentally build in the root directory (In-Source Build), 
 # these lines will catch the mess:
@@ -29,6 +30,9 @@ CMakeUserPresets.json
 *.vcxproj.filters
 *.user
 *.suo
+packages/
+x64/
+x86/
 
 # VS Code
 .vscode/
