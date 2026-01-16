@@ -24,3 +24,8 @@ target_link_libraries(SimulatorInterface
         Utilities
 )
 
+if(BUILD_TESTING)
+    add_subdirectory(test)
+    add_subdirectory(Protocols/test)
+endif()
+
