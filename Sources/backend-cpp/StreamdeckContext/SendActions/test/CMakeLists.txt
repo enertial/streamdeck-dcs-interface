@@ -1,6 +1,7 @@
 add_executable(SendActionsTest)
 
-target_sources(SendActionsTest
+target_sources(
+    SendActionsTest
     PRIVATE
         IncrementActionTest.cpp
         MomentaryActionTest.cpp
@@ -8,14 +9,11 @@ target_sources(SendActionsTest
         SwitchActionTest.cpp
 )
 
-target_link_libraries(SendActionsTest
-    PRIVATE 
-        StreamdeckContext
-        MockESDConnectionManager
-        GTest::gtest_main
+target_link_libraries(
+    SendActionsTest
+    PRIVATE StreamdeckContext MockESDConnectionManager GTest::gtest_main
 )
 
 include(GoogleTest)
 
 gtest_discover_tests(SendActionsTest)
-
