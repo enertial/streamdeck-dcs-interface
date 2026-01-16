@@ -14,19 +14,15 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 if(MSVC)
     add_compile_options(
-        /W3              # Warning Level 3
-        /WX              # Treat Warning As Error
-        /sdl             # Enable Security Checks
-        /MP              # Multi-processor compilation
-        /Zc:__cplusplus  # Correct __cplusplus macro
+        /W3 # Warning Level 3
+        /WX # Treat Warning As Error
+        /sdl # Enable Security Checks
+        /MP # Multi-processor compilation
+        /Zc:__cplusplus # Correct __cplusplus macro
     )
 endif()
 
-add_compile_definitions(
-    UNICODE 
-    _UNICODE
-    _CONSOLE
-)
+add_compile_definitions(UNICODE _UNICODE _CONSOLE)
 # TODO: If you are using _CONSOLE, you might see a black command prompt
 # window pop up when your plugin starts. If you eventually want your
 # plugin to run silently in the background without that window,
@@ -41,10 +37,10 @@ if(BUILD_TESTING)
     include(FetchContent)
 
     FetchContent_Declare(
-      googletest
-      GIT_REPOSITORY https://github.com/google/googletest
-      GIT_TAG v1.17.0
-      DOWNLOAD_EXTRACT_TIMESTAMP TRUE
+        googletest
+        GIT_REPOSITORY https://github.com/google/googletest
+        GIT_TAG v1.17.0
+        DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
 
     # For Windows: Prevent overriding the parent project's compiler/linker settings
