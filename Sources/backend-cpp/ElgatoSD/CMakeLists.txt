@@ -26,3 +26,7 @@ target_link_libraries(ElgatoSD
         websocketpp
 )
 
+if(BUILD_TESTING)
+    add_subdirectory(test)
+endif()
+

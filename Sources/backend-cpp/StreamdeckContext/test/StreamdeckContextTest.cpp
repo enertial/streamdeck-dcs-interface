@@ -3,7 +3,7 @@
 #include "gtest/gtest.h"
 #include <unordered_map>
 
-#include "Test/MockESDConnectionManager.h" // Must be called before other includes
+#include "MockESDConnectionManager.h" // Must be called before other includes
 
 #include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/StreamdeckContext.h"

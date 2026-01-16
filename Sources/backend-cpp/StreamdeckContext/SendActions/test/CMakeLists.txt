@@ -11,6 +11,7 @@ target_sources(SendActionsTest
 target_link_libraries(SendActionsTest
     PRIVATE 
         StreamdeckContext
+        MockESDConnectionManager
         GTest::gtest_main
 )
 

@@ -9,6 +9,7 @@ target_sources(StreamdeckContextTest
 target_link_libraries(StreamdeckContextTest
     PRIVATE 
         StreamdeckContext
+        MockESDConnectionManager
         GTest::gtest_main
 )
 
