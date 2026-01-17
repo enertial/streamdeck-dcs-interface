@@ -16,6 +16,7 @@ cmake_install.cmake
 install_manifest.txt
 compile_commands.json
 _deps/
+*.cmake
 
 # --- CMake Presets ---
 # CMakePresets.json IS usually committed (it shares build configs with the team)
