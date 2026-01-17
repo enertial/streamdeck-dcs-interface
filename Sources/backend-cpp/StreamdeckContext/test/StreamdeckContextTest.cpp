@@ -1,9 +1,9 @@
 // Copyright 2020 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <unordered_map>
 
-#include "MockESDConnectionManager.h" // Must be called before other includes
+#include "ElgatoSD/test/MockESDConnectionManager.h" // Must be called before other includes
 
 #include "SimulatorInterface/SimConnectionManager.h"
 #include "StreamdeckContext/StreamdeckContext.h"

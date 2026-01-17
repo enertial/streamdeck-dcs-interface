@@ -21,7 +21,7 @@
 #include "Utilities/JsonReader.h"
 #include "Utilities/LuaReader.h"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 class CallBackTimer

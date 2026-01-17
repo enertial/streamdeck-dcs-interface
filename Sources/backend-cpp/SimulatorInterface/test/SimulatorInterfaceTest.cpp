@@ -1,6 +1,6 @@
 // Copyright 2020 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "SimulatorInterface/SimulatorInterface.h"
 
@@ -11,9 +11,9 @@ class SimulatorInterfaceDerivedClass : public SimulatorInterface
 {
     using SimulatorInterface::SimulatorInterface;
     // Implement pure virtual functions to allow testing of common functions.
-    void update_simulator_state(){};
-    void send_command(const std::string &address, const std::string &value){};
-    void send_reset_command(){};
+    void update_simulator_state() {};
+    void send_command(const std::string &address, const std::string &value) {};
+    void send_reset_command() {};
     std::optional<std::string> get_string_at_addr(const SimulatorAddress &address) const { return std::nullopt; }
     std::optional<Decimal> get_value_at_addr(const SimulatorAddress &address) const { return std::nullopt; }
     json get_current_state_as_json() const { return json{}; };

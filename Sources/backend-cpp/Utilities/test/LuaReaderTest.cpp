@@ -1,10 +1,10 @@
 // Copyright 2020 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "Utilities/LuaReader.h"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 using json = nlohmann::json;
 
 namespace test

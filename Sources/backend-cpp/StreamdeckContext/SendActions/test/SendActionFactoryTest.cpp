@@ -1,6 +1,6 @@
 // Copyright 2021 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "StreamdeckContext/SendActions/SendActionFactory.h"
 

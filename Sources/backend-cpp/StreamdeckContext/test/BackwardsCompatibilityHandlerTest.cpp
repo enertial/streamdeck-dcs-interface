@@ -1,6 +1,6 @@
 // Copyright 2022 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "StreamdeckContext/BackwardsCompatibilityHandler.h"
 

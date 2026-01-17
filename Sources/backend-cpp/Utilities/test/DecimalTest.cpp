@@ -1,6 +1,6 @@
 // Copyright 2020 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "Utilities/Decimal.h"
 
