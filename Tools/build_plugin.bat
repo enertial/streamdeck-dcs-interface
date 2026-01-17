@@ -5,22 +5,19 @@
 :: Change directory to the project root (directory above this batch file location)
 cd /D "%~dp0"\..
 
-:: Restore NuGet packages
-MSBuild.exe .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /t:Restore /p:RestorePackagesConfig=true
-if %errorlevel% neq 0 echo "Canceling plugin build due to failure to restore NuGet packages" && pause && exit /b %errorlevel%
-
 :: Build C++ executable:
-MSBuild.exe .\Sources\backend-cpp\Windows\com.ctytler.dcs.sdPlugin.sln /p:Configuration="Release"
+cmake -S ./Sources/backend-cpp -B ./Sources/backend-cpp/build
+cmake --build ./Sources/backend-cpp/build --config Release
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed backend build" && pause && exit /b %errorlevel%
 
 :: Run unit tests, only continue if all tests pass
-Sources\backend-cpp\Windows\x64\Release\Test.exe
+ctest --test-dir ./Sources/backend-cpp/build --output-on-failure
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed unit tests" && pause && exit /b %errorlevel%
 
 :: Copy C++ executable and DLLs to StreamDeck Plugin package:
 echo. && echo *** C++ binary compilation complete, published to Sources/com.ctytler.dcs.sdPlugin/bin/ *** && echo.
-copy Sources\backend-cpp\Windows\x64\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
-copy Sources\backend-cpp\Windows\x64\Release\*.dll Sources\com.ctytler.dcs.sdPlugin\bin\
+copy Sources\backend-cpp\build\bin\Release\StreamdeckInterface.exe Sources\com.ctytler.dcs.sdPlugin\bin\streamdeck_dcs_interface.exe
+copy Sources\backend-cpp\build\bin\Release\*.dll Sources\com.ctytler.dcs.sdPlugin\bin\
 
 :: Remove any prior build of the Plugin:
 echo. && echo *** Removing any previous builds of com.ctytler.dcs.streamDeckPlugin from Release/ ***
