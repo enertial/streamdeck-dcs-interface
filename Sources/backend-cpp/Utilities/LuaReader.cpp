@@ -2,7 +2,7 @@
 
 #include "LuaReader.h"
 
-#include <lua.hpp>
+#include "lua.hpp"
 
 #include <filesystem>
 #include <iostream>
