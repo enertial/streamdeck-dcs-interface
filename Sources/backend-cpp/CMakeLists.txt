@@ -43,10 +43,15 @@ if(BUILD_TESTING)
         DOWNLOAD_EXTRACT_TIMESTAMP TRUE
     )
 
-    # For Windows: Prevent overriding the parent project's compiler/linker settings
+    # For Windows: Prevent overriding parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(googletest)
+endif()
+
+# Tools
+if(BUILD_TOOLS)
+    add_subdirectory(Tools)
 endif()
 
 # Libraries

@@ -27,7 +27,7 @@ jobs:
         uses: microsoft/setup-msbuild@v2
 
       - name: CMake
-        run: cmake -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -A x64 -DBUILD_TESTING=ON
+        run: cmake -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -A x64 -DBUILD_TESTING=ON -DBUILD_TOOLS=OFF
 
       - name: Build
         run: cmake --build ${{env.BUILD_DIR}} --config RelWithDebInfo

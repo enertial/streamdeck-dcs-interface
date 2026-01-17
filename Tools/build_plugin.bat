@@ -1,3 +1,5 @@
+@echo off
+
 :: Build script for streamdeck-dcs.
 :: Instructions: You must call this file from the "Developer Command Prompt for VS"
 ::               For details see https://docs.microsoft.com/en-us/cpp/build/building-on-the-command-line
@@ -6,12 +8,12 @@
 cd /D "%~dp0"\..
 
 :: Build C++ executable:
-cmake -S ./Sources/backend-cpp -B ./Sources/backend-cpp/build
+cmake -S ./Sources/backend-cpp -B ./Sources/backend-cpp/build -DBUILD_TESTING=ON -DBUILD_TOOLS=OFF
 cmake --build ./Sources/backend-cpp/build --config Release
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed backend build" && pause && exit /b %errorlevel%
 
 :: Run unit tests, only continue if all tests pass
-ctest --test-dir ./Sources/backend-cpp/build --output-on-failure
+ctest --test-dir ./Sources/backend-cpp/build --output-on-failure --progress
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed unit tests" && pause && exit /b %errorlevel%
 
 :: Copy C++ executable and DLLs to StreamDeck Plugin package:
