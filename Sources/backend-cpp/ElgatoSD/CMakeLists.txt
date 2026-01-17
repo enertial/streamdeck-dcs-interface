@@ -9,8 +9,7 @@ target_sources(
         pch.cpp
     PUBLIC
         FILE_SET HEADERS
-            BASE_DIRS
-                .. # Include from backend-cpp/ root.
+            BASE_DIRS ${CMAKE_SOURCE_DIR}
             FILES
                 EPLJSONUtils.h
                 ESDBasePlugin.h
@@ -19,7 +18,8 @@ target_sources(
                 ESDSDKDefines.h
                 ESDUtilities.h
                 pch.h
-    # TODO: Consider deleting the pch.* files, as they are not used as precompiled headers
+    # TODO: Consider deleting the pch.* files,
+    # as they are not used as precompiled headers
 )
 
 target_link_libraries(ElgatoSD PUBLIC nlohmann_json websocketpp)

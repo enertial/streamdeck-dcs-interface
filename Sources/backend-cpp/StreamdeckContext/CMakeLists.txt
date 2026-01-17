@@ -22,8 +22,7 @@ target_sources(
         SendActions/SwitchAction.h
     PUBLIC
         FILE_SET HEADERS
-            BASE_DIRS
-                .. # Include from backend-cpp/ root.
+            BASE_DIRS ${CMAKE_SOURCE_DIR}
             FILES BackwardsCompatibilityHandler.h StreamdeckContext.h
 )
 
