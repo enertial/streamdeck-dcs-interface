@@ -5,8 +5,7 @@ target_sources(
     PRIVATE main.cpp StreamdeckInterface.cpp
     PUBLIC
         FILE_SET HEADERS
-            BASE_DIRS
-                .. # Include from backend-cpp/ root.
+            BASE_DIRS ${CMAKE_SOURCE_DIR}
             FILES StreamdeckInterface.h
 )
 

@@ -10,8 +10,7 @@ target_sources(
         UdpSocket.cpp
     PUBLIC
         FILE_SET HEADERS
-            BASE_DIRS
-                ../ # Include from backend-cpp/ root.
+            BASE_DIRS ${CMAKE_SOURCE_DIR}
             FILES
                 Decimal.h
                 JsonReader.h

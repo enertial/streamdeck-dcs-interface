@@ -15,7 +15,4 @@ target_link_libraries(UtilitiesTest PRIVATE Utilities GTest::gtest_main)
 
 include(GoogleTest)
 
-gtest_discover_tests(
-    UtilitiesTest
-    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/../../
-)
+gtest_discover_tests(UtilitiesTest WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
