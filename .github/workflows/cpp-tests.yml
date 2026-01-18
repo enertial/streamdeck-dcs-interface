@@ -27,8 +27,16 @@ jobs:
         run: choco install ninja -y
         shell: powershell
 
+      - name: Install vcpkg
+        run: |
+          choco install vcpkg -y
+          echo "::add-path::C:\tools\vcpkg"  # ensure it's on PATH
+
+      - name: Install Boost
+        run: vcpkg install boost-thread:x64-windows
+
       - name: CMake
-        run: cmake -G Ninja -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_PREFIX_PATH="C:/local/boost_1_82_0"
+        run: cmake -G Ninja -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_TOOLCHAIN_FILE=C:/tools/vcpkg/scripts/buildsystems/vcpkg.cmake
 
       - name: Build
         run: cmake --build ${{env.BUILD_DIR}}
