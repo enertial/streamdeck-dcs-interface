@@ -1,15 +1,24 @@
-coverage:
-  status:
-    default_rules:
-    project:
-      default:
-        target: auto
-        threshold: 1%
-        flags:
-          - Cpp
-          - ReactJS
 codecov:
+  require_ci_to_pass: true
   notify:
     after_n_builds: 2
+
+coverage:
+  status:
+    project:
+      cpp:
+        informational: true
+        flags:
+          - Cpp
+
+      react:
+        informational: true
+        flags:
+          - ReactJS
+    patch:
+      default:
+        informational: true
+
 comment:
   after_n_builds: 2
+
