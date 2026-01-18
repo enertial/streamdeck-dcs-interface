@@ -28,8 +28,7 @@ jobs:
         shell: powershell
 
       - name: CMake
-        run: cmake -G Ninja -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} ^
-          -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake
+        run: cmake -G Ninja -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON -DBOOST_ROOT="C:/local/boost_1_82_0"
 
       - name: Build
         run: cmake --build ${{env.BUILD_DIR}}
