@@ -5,6 +5,10 @@
 #include <iostream>
 json backwardsCompatibilityHandler(const json &prevVersionPayload)
 {
+    if (prevVersionPayload.empty()) {
+        return prevVersionPayload;
+    }
+
     json payload = prevVersionPayload;
     const auto prevSettings = prevVersionPayload["settings"];
     if (!prevSettings.contains("send_address") && prevSettings.contains("device_id") &&

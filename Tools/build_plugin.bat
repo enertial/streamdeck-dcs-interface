@@ -6,8 +6,8 @@
 cd /D "%~dp0"\..
 
 :: Build C++ executable:
-cmake -S ./Sources/backend-cpp -B ./Sources/backend-cpp/build
-cmake --build ./Sources/backend-cpp/build --config Release
+cmake -G Ninja -S ./Sources/backend-cpp -B ./Sources/backend-cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_TESTING=ON
+cmake --build ./Sources/backend-cpp/build
 if %errorlevel% neq 0 echo "Canceling plugin build due to failed backend build" && pause && exit /b %errorlevel%
 
 :: Run unit tests, only continue if all tests pass
@@ -16,8 +16,8 @@ if %errorlevel% neq 0 echo "Canceling plugin build due to failed unit tests" && 
 
 :: Copy C++ executable and DLLs to StreamDeck Plugin package:
 echo. && echo *** C++ binary compilation complete, published to Sources/com.ctytler.dcs.sdPlugin/bin/ *** && echo.
-copy Sources\backend-cpp\build\Release\streamdeck_dcs_interface.exe Sources\com.ctytler.dcs.sdPlugin\bin\
-copy Sources\backend-cpp\build\Release\*.dll Sources\com.ctytler.dcs.sdPlugin\bin\
+copy Sources\backend-cpp\build\bin\StreamdeckInterface.exe Sources\com.ctytler.dcs.sdPlugin\bin\streamdeck_dcs_interface.exe
+copy Sources\backend-cpp\build\bin\*.dll Sources\com.ctytler.dcs.sdPlugin\bin\
 
 :: Remove any prior build of the Plugin:
 echo. && echo *** Removing any previous builds of com.ctytler.dcs.streamDeckPlugin from Release/ ***

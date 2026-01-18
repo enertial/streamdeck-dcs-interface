@@ -23,14 +23,15 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Add MSBuild to PATH
-        uses: microsoft/setup-msbuild@v2
+      - name: Install Ninja
+        run: choco install ninja -y
+        shell: powershell
 
       - name: CMake
-        run: cmake -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -A x64 -DBUILD_TESTING=ON
+        run: cmake -G Ninja -S ${{env.SOURCE_DIR}} -B ${{env.BUILD_DIR}} -DCMAKE_BUILD_TYPE=Debug -DBUILD_TESTING=ON
 
       - name: Build
-        run: cmake --build ${{env.BUILD_DIR}} --config RelWithDebInfo
+        run: cmake --build ${{env.BUILD_DIR}}
 
       - name: Setup OpenCppCoverage and add to PATH
         id: setup_opencppcoverage
@@ -50,7 +51,7 @@ jobs:
             --excluded_sources Tools ^
             --export_type cobertura:StreamdeckDcsInterfaceCov.xml ^
             --cover_children ^
-            -- ctest --test-dir ./${{env.BUILD_DIR}} -C RelWithDebInfo --output-on-failure
+            -- ctest --test-dir ./${{env.BUILD_DIR}} --output-on-failure
 
       - name: Upload Report to Codecov
         uses: codecov/codecov-action@v5
