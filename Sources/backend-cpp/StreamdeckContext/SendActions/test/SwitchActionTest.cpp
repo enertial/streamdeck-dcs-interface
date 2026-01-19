@@ -1,10 +1,10 @@
 // Copyright 2021 Charles Tytler
 
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 #include "StreamdeckContext/SendActions/SwitchAction.h"
 
-#include "MockESDConnectionManager.h"
+#include "ElgatoSD/test/MockESDConnectionManager.h"
 #include "SimulatorInterface/SimConnectionManager.h"
 namespace test
 {
