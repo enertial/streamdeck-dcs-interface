@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport"
+    content="width=device-width,initial-scale=1,maximum-scale=1,minimum-scale=1,user-scalable=no,minimal-ui,viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  <title>DCS Rotary Encoder Property Inspector</title>
+  <link rel="stylesheet" href="css/sdpi.css" />
+</head>
+
+<body>
+  <div class="sdpi-wrapper">
+    <details open>
+      <summary>Encoder Rotation Settings (Incremental Input)</summary>
+
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Button ID</div>
+        <input id="button_id" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
+        <button class="sdpi-item-value" id="clear_dcs_command_button" onclick="callbackClearDcsCommand()"> Clear
+        </button>
+      </div>
+
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Device ID</div>
+        <input id="device_id" class="sdpi-item-value" type="text" value="" placeholder="Enter number" />
+      </div>
+
+      <div id="increment_button_settings" hidden>
+        <div class="sdpi-item" id="send_increment">
+          <div class="sdpi-item-label">DCS ID (Monitor)</div>
+          <input id="dcs_id_increment_monitor" class="sdpi-item-value" type="text" value=""
+            placeholder="Enter DCS ID to monitor" />
+        </div>
+
+        <div class="sdpi-item" id="send_increment_cw">
+          <div class="sdpi-item-label">Increment CW (Clockwise per tick)</div>
+          <input id="increment_cw" class="sdpi-item-value" type="text" placeholder="Example: 0.1 or -0.1" />
+        </div>
+
+        <div class="sdpi-item" id="send_increment_ccw">
+          <div class="sdpi-item-label">Increment CCW (Counter-Clockwise per tick)</div>
+          <input id="increment_ccw" class="sdpi-item-value" type="text" placeholder="Example: -0.1 or 0.1" />
+        </div>
+
+        <div class="sdpi-item" id="send_increment_range">
+          <div class="sdpi-item-label">Increment range min/max</div>
+          <input id="increment_min" class="sdpi-item-value" type="text" placeholder="Example: 0" />
+          <input id="increment_max" class="sdpi-item-value" type="text" placeholder="Example: 1" />
+        </div>
+
+        <div type="checkbox" class="sdpi-item">
+          <div class="sdpi-item-label">Cycle Settings</div>
+          <input class="sdpi-item-value" id="increment_cycle_allowed_check" type="checkbox" value="check" />
+          <label for="increment_cycle_allowed_check"><span></span>Allow cycling to beginning</label>
+        </div>
+      </div>
+    </details>
+
+    <details open>
+      <summary>Encoder Press Settings (Fixed Value)</summary>
+
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Value to Send on Press</div>
+        <input id="encoder_press_value" class="sdpi-item-value" type="text" 
+          placeholder="Example: 0 (leave empty to send min value)" 
+          onmouseover="document.getElementById('encoder_press_help').style.display='block'" 
+          onmouseout="document.getElementById('encoder_press_help').style.display='none'" />
+      </div>
+
+      <div id="encoder_press_help" class="sdpi-item" style="margin-top: 8px; font-size: 11px; color: #999; display: none;">
+        <div class="sdpi-item-label" style="max-width: 100%;">
+          When you press the encoder button, this fixed value will be sent. 
+          Leave empty to send the minimum value by default.
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>DCS Display Settings</summary>
+
+      <div class="sdpi-item">
+        <div class="sdpi-item-label">Value Mappings</div>
+        <button class="sdpi-item-value" onclick="addValueMapping()" style="width: 100px;">+ Add</button>
+      </div>
+
+      <div id="value_mappings_container" style="margin-left: 5px; margin-right: 5px;">
+        <!-- Dynamic mapping rows will be added here -->
+      </div>
+
+      <!-- Hidden field to store the serialized mappings -->
+      <input id="encoder_value_text_mapping" type="hidden" />
+<!--
+      <div class="sdpi-item" style="margin-top: 8px; font-size: 11px; color: #999;">
+        <div class="sdpi-item-label" style="max-width: 100%;">
+          Define how DCS values should be displayed on the encoder LCD.
+          Choose between text display or background image for each value.
+        </div>
+      </div>
+      -->
+    </details>
+
+    <details>
+      <summary>Additional Help</summary>
+
+      <div class="sdpi-item">
+        <button class="sdpi-item-value" id="external_id_lookup_window_button" onclick="callbackIdLookupButtonPress()">
+          ID Lookup
+        </button>
+        <button class="sdpi-item-value" id="external_help_window_button" onclick="callbackHelpButtonPress()">
+          Help
+        </button>
+        <button class="sdpi-item-value" id="external_comms_window_button" onclick="callbackCommsSettingsButtonPress()">
+          DCS Comms
+        </button>
+      </div>
+    </details>
+  </div>
+
+  <!-- Hidden divs for compatibility with settings_functions.js -->
+  <div id="momentary_button_settings" hidden></div>
+  <div id="switch_button_settings" hidden></div>
+
+  <div class="sdpi-info-label hidden" style="top: -1000;" value=""></div>
+  <script src="js/common.js"></script>
+  <script src="js/common_pi.js"></script>
+  <script src="js/index_pi.js"></script>
+  <script src="js/settings_functions.js"></script>
+  <script src="js/send_receive_functions.js"></script>
+  <script src="js/external_windows_functions.js"></script>
+
+  <script>
+    let mappingCounter = 0;
+
+    function addValueMapping(dcsValue = '', text = '') {
+      const container = document.getElementById('value_mappings_container');
+      if (!container) {
+        console.error('Container value_mappings_container not found');
+        return;
+      }
+      
+      const rowId = `mapping_row_${mappingCounter++}`;
+      
+      const row = document.createElement('div');
+      row.id = rowId;
+      row.className = 'sdpi-item';
+      row.style.cssText = 'border: 1px solid #444; padding: 6px; margin-bottom: 6px; border-radius: 3px; background: #1e1e1e;';
+      
+      row.innerHTML = `
+        <div style="display: flex; gap: 4px; align-items: center;">
+          <input type="text" placeholder="Value" value="${dcsValue}" 
+            style="width: 60px; padding: 3px; background: #2a2a2a; border: 1px solid #555; color: #ccc; font-size: 11px;" />
+          
+          <input type="text" placeholder="Display Text" value="${text}" 
+            style="flex: 1; padding: 3px; background: #2a2a2a; border: 1px solid #555; color: #ccc; font-size: 11px;" />
+          
+          <button onclick="saveMappingRow('${rowId}')" 
+            style="width: 30px; padding: 3px; background: #0e639c; border: none; color: white; cursor: pointer; border-radius: 3px; font-size: 10px;">
+            ✓
+          </button>
+          
+          <button onclick="removeMapping('${rowId}')" 
+            style="width: 30px; padding: 3px; background: #c41e3a; border: none; color: white; cursor: pointer; border-radius: 3px; font-size: 10px;">
+            ✕
+          </button>
+        </div>
+      `;
+      
+      container.appendChild(row);
+    }
+
+    function removeMapping(rowId) {
+      const row = document.getElementById(rowId);
+      if (row) {
+        row.remove();
+        serializeMappings();
+      }
+    }
+
+    function saveMappingRow(rowId) {
+      const row = document.getElementById(rowId);
+      const saveButton = row.querySelector('button[onclick*="saveMappingRow"]');
+      
+      // Visual feedback
+      const originalBg = saveButton.style.background;
+      saveButton.style.background = '#28a745';
+      saveButton.innerHTML = '✓';
+      
+      // Serialize and save
+      serializeMappings();
+      
+      // Reset button after a short delay
+      setTimeout(() => {
+        saveButton.style.background = originalBg;
+      }, 1000);
+    }
+
+    function serializeMappings() {
+      const container = document.getElementById('value_mappings_container');
+      const rows = container.querySelectorAll('.sdpi-item');
+      const mappings = [];
+      
+      rows.forEach(row => {
+        const inputs = row.querySelectorAll('input');
+        const dcsValue = inputs[0].value.trim();
+        const text = inputs[1].value.trim();
+        
+        if (dcsValue !== '' && text !== '') {
+          mappings.push(`${dcsValue}:${text}`);
+        }
+      });
+      
+      const mappingString = mappings.join(';');
+      const hiddenInput = document.getElementById('encoder_value_text_mapping');
+      hiddenInput.value = mappingString;
+      
+      // Save to settings directly
+      if (typeof settings !== 'undefined') {
+        settings['encoder_value_text_mapping'] = mappingString;
+        if (typeof $SD !== 'undefined' && $SD.api) {
+          console.log('Saving encoder_value_text_mapping:', mappingString);
+          $SD.api.setSettings($SD.uuid, settings);
+          
+          // Send updated settings to plugin immediately
+          if (typeof sendSettingsToPlugin === 'function') {
+            sendSettingsToPlugin();
+          }
+        }
+      }
+    }
+
+    function deserializeMappings(mappingString) {
+      // Clear existing mappings
+      const container = document.getElementById('value_mappings_container');
+      container.innerHTML = '';
+      mappingCounter = 0;
+      
+      if (!mappingString || mappingString.trim() === '') return;
+      
+      const entries = mappingString.split(';');
+      entries.forEach(entry => {
+        const trimmed = entry.trim();
+        if (trimmed === '') return;
+        
+        const colonIndex = trimmed.indexOf(':');
+        if (colonIndex === -1) return;
+        
+        const dcsValue = trimmed.substring(0, colonIndex);
+        let text = trimmed.substring(colonIndex + 1);
+        
+        // Clean up old format with pipes (color/size formatting)
+        const pipeIndex = text.indexOf('|');
+        if (pipeIndex !== -1) {
+          text = text.substring(0, pipeIndex);
+        }
+        
+        addValueMapping(dcsValue, text);
+      });
+    }
+
+    // Hook into settings load
+    document.addEventListener('DOMContentLoaded', function() {
+      // Wait a bit for settings to be loaded by the SDK
+      setTimeout(function() {
+        const hiddenInput = document.getElementById('encoder_value_text_mapping');
+        if (hiddenInput && hiddenInput.value) {
+          console.log('Loading mappings from hidden input:', hiddenInput.value);
+          deserializeMappings(hiddenInput.value);
+        } else {
+          console.log('No mappings to load, hidden input value:', hiddenInput ? hiddenInput.value : 'element not found');
+        }
+      }, 500);
+    });
+
+    // Also hook into the SDK's connected event to reload mappings when settings are received
+    if (typeof $SD !== 'undefined') {
+      $SD.on('connected', function(jsn) {
+        setTimeout(function() {
+          const settings = jsn.actionInfo && jsn.actionInfo.payload && jsn.actionInfo.payload.settings;
+          if (settings && settings.encoder_value_text_mapping) {
+            console.log('Loading mappings from connected event:', settings.encoder_value_text_mapping);
+            deserializeMappings(settings.encoder_value_text_mapping);
+          }
+        }, 100);
+      });
+    }
+
+    // Override the global updateUI function to also update mappings
+    if (typeof window !== 'undefined') {
+      setTimeout(function() {
+        if (typeof updateUI !== 'undefined') {
+          const originalUpdateUI = updateUI;
+          window.updateUI = function(pl) {
+            // Call original first
+            if (originalUpdateUI) {
+              originalUpdateUI(pl);
+            }
+            
+            // Then load mappings
+            if (pl && pl.encoder_value_text_mapping) {
+              console.log('Loading mappings from updateUI:', pl.encoder_value_text_mapping);
+              deserializeMappings(pl.encoder_value_text_mapping);
+            }
+          };
+        }
+      }, 10);
+    }
+  </script>
+
+</body>
+
+</html>

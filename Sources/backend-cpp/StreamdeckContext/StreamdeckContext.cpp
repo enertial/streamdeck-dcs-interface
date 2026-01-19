@@ -2,6 +2,7 @@
 
 #include "StreamdeckContext.h"
 
+#include "StreamdeckContext/SendActions/IncrementAction.h"
 #include "StreamdeckContext/SendActions/SendActionFactory.h"
 
 #include "ElgatoSD/EPLJSONUtils.h"
@@ -33,6 +34,55 @@ void StreamdeckContext::updateContextState(SimulatorInterface *simulator_interfa
         mConnectionManager->SetTitle(current_title_, context_, kESDSDKTarget_HardwareAndSoftware);
     }
 
+    // Update encoder display with current increment value if this is an encoder action
+    if (send_action_) {
+        auto *increment_action = dynamic_cast<IncrementAction *>(send_action_.get());
+        if (increment_action) {
+            const std::string current_value = increment_action->getCurrentDisplayValue(simulator_interface, settings_);
+            
+            if (!current_value.empty()) {
+                json feedback;
+                feedback["value"] = current_value;
+                
+                // Calculate indicator (gauge) based on min/max/current
+                const auto min_str = EPLJSONUtils::GetStringByName(settings_, "increment_min");
+                const auto max_str = EPLJSONUtils::GetStringByName(settings_, "increment_max");
+                const auto dcs_id_str = EPLJSONUtils::GetStringByName(settings_, "dcs_id_increment_monitor");
+                
+                if (!min_str.empty() && !max_str.empty() && is_integer(dcs_id_str)) {
+                    try {
+                        double min_val = std::stod(min_str);
+                        double max_val = std::stod(max_str);
+                        int dcs_id = std::stoi(dcs_id_str);
+                        
+                        auto maybe_current = simulator_interface->get_value_at_addr(dcs_id);
+                        if (maybe_current.has_value()) {
+                            double current = std::stod(maybe_current.value().str());
+                            
+                            // Calculate percentage (0-100)
+                            double range = max_val - min_val;
+                            if (range > 0) {
+                                double percentage = ((current - min_val) / range) * 100.0;
+                                // Clamp to 0-100
+                                if (percentage < 0.0) percentage = 0.0;
+                                if (percentage > 100.0) percentage = 100.0;
+                                feedback["indicator"] = static_cast<int>(percentage);
+                            }
+                        }
+                    } catch (...) {
+                        // Ignore errors in indicator calculation
+                    }
+                }
+                
+                // Send feedback on every update, not just when value changes
+                if (current_value != last_encoder_display_value_) {
+                    last_encoder_display_value_ = current_value;
+                }
+                mConnectionManager->SetFeedback(feedback, context_);
+            }
+        }
+    }
+
     if (delay_for_force_send_state_) {
         if (delay_for_force_send_state_.value()-- <= 0) {
             mConnectionManager->SetState(current_state_, context_);
@@ -53,6 +103,7 @@ void StreamdeckContext::forceSendStateAfterDelay(const int delay_count)
 
 void StreamdeckContext::updateContextSettings(const json &settings)
 {
+    settings_ = settings;
     comparison_monitor_.update_settings(settings);
     title_monitor_.update_settings(settings);
 }
@@ -77,4 +128,38 @@ void StreamdeckContext::handleButtonReleasedEvent(SimulatorInterface *simulator_
     } else {
         forceSendState(mConnectionManager);
     }
+}
+
+void StreamdeckContext::handleEncoderRotation(SimulatorInterface *simulator_interface,
+                                             ESDConnectionManager *mConnectionManager,
+                                             const json &inPayload,
+                                             int ticks)
+{
+    // Cast to IncrementAction to access encoder-specific methods
+    auto *increment_action = dynamic_cast<IncrementAction *>(send_action_.get());
+    if (increment_action) {
+        // Create a new payload with stored settings
+        json payload_with_settings = inPayload;
+        payload_with_settings["settings"] = settings_;
+        
+        increment_action->handleEncoderRotation(simulator_interface, mConnectionManager, payload_with_settings, ticks);
+    }
+}
+
+void StreamdeckContext::handleEncoderPress(SimulatorInterface *simulator_interface,
+                                          ESDConnectionManager *mConnectionManager,
+                                          const json &inPayload)
+{
+    // Cast to IncrementAction to access encoder-specific methods
+    auto *increment_action = dynamic_cast<IncrementAction *>(send_action_.get());
+    if (increment_action) {
+        // Create a new payload with stored settings
+        json payload_with_settings = inPayload;
+        payload_with_settings["settings"] = settings_;
+        
+        increment_action->handleEncoderPress(simulator_interface, mConnectionManager, payload_with_settings);
+    }
+    
+    // Force send state update after encoder press
+    forceSendState(mConnectionManager);
 }

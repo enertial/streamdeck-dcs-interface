@@ -15,6 +15,8 @@ SendActionFactory::SendActionFactory()
     button_action_from_uuid_["com.ctytler.dcs.static.text.one-state"] = ButtonAction::MOMENTARY;
     button_action_from_uuid_["com.ctytler.dcs.increment.dial.two-state"] = ButtonAction::INCREMENT;
     button_action_from_uuid_["com.ctytler.dcs.increment.textdial.two-state"] = ButtonAction::INCREMENT;
+    button_action_from_uuid_["com.ctytler.dcs.encoder.rotary"] = ButtonAction::INCREMENT;
+    button_action_from_uuid_["com.ctytler.dcs.encoder.rotary.text"] = ButtonAction::INCREMENT;
     button_action_from_uuid_["com.ctytler.dcs.up-down.switch.two-state"] = ButtonAction::SWITCH;
 }
 

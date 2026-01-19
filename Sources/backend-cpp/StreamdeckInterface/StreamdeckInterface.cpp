@@ -183,6 +183,78 @@ void StreamdeckInterface::KeyUpForAction(const std::string &inAction,
     mVisibleContextsMutex.unlock();
 }
 
+void StreamdeckInterface::DialRotateForAction(const std::string &inAction,
+                                              const std::string &inContext,
+                                              const json &inPayload,
+                                              const std::string &inDeviceID)
+{
+    const auto payload = backwardsCompatibilityHandler(inPayload);
+
+    mVisibleContextsMutex.lock();
+    if (mVisibleContexts.count(inContext) > 0) {
+        const auto protocol = mVisibleContexts[inContext].protocol();
+        if (simConnectionManager_.is_connected(protocol)) {
+            // Get rotation ticks from payload (positive = clockwise, negative = counter-clockwise)
+            int ticks = 0;
+            if (payload.contains("ticks")) {
+                ticks = payload["ticks"].get<int>();
+            }
+            
+            // Call the encoder-specific rotation handler with direction
+            mVisibleContexts[inContext].handleEncoderRotation(
+                simConnectionManager_.get_interface(protocol), mConnectionManager, payload, ticks);
+        }
+    }
+    mVisibleContextsMutex.unlock();
+}
+
+void StreamdeckInterface::DialPressForAction(const std::string &inAction,
+                                            const std::string &inContext,
+                                            const json &inPayload,
+                                            const std::string &inDeviceID)
+{
+    const auto payload = backwardsCompatibilityHandler(inPayload);
+
+    mConnectionManager->LogMessage("[DialPress] Event received for context: " + inContext);
+
+    mVisibleContextsMutex.lock();
+    if (mVisibleContexts.count(inContext) > 0) {
+        mConnectionManager->LogMessage("[DialPress] Context found in visible contexts");
+        const auto protocol = mVisibleContexts[inContext].protocol();
+        if (simConnectionManager_.is_connected(protocol)) {
+            mConnectionManager->LogMessage("[DialPress] Simulator connected - calling handleEncoderPress");
+            mVisibleContexts[inContext].handleEncoderPress(
+                simConnectionManager_.get_interface(protocol), mConnectionManager, payload);
+        } else {
+            mConnectionManager->LogMessage("[DialPress] Simulator NOT connected");
+        }
+    } else {
+        mConnectionManager->LogMessage("[DialPress] Context NOT found in visible contexts");
+    }
+    mVisibleContextsMutex.unlock();
+}
+
+void StreamdeckInterface::TouchTapForAction(const std::string &inAction,
+                                           const std::string &inContext,
+                                           const json &inPayload,
+                                           const std::string &inDeviceID)
+{
+    const auto payload = backwardsCompatibilityHandler(inPayload);
+
+    mVisibleContextsMutex.lock();
+    if (mVisibleContexts.count(inContext) > 0) {
+        const auto protocol = mVisibleContexts[inContext].protocol();
+        if (simConnectionManager_.is_connected(protocol)) {
+            // Treat touch tap as a momentary button press
+            mVisibleContexts[inContext].handleButtonPressedEvent(
+                simConnectionManager_.get_interface(protocol), mConnectionManager, payload);
+            mVisibleContexts[inContext].handleButtonReleasedEvent(
+                simConnectionManager_.get_interface(protocol), mConnectionManager, payload);
+        }
+    }
+    mVisibleContextsMutex.unlock();
+}
+
 void StreamdeckInterface::WillAppearForAction(const std::string &inAction,
                                               const std::string &inContext,
                                               const json &inPayload,

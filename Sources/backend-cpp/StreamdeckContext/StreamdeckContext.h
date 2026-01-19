@@ -74,6 +74,30 @@ class StreamdeckContext
                                    ESDConnectionManager *mConnectionManager,
                                    const json &inPayload);
 
+    /**
+     * @brief Handles encoder rotation events.
+     *
+     * @param simulator_interface Interface to simulator containing current game state.
+     * @param mConnectionManager Interface to StreamDeck.
+     * @param payload Json payload received with encoder rotation callback.
+     * @param ticks Number of rotation ticks (positive = clockwise, negative = counter-clockwise).
+     */
+    void handleEncoderRotation(SimulatorInterface *simulator_interface,
+                              ESDConnectionManager *mConnectionManager,
+                              const json &inPayload,
+                              int ticks);
+
+    /**
+     * @brief Handles encoder press events.
+     *
+     * @param simulator_interface Interface to simulator containing current game state.
+     * @param mConnectionManager Interface to StreamDeck.
+     * @param payload Json payload received with encoder press callback.
+     */
+    void handleEncoderPress(SimulatorInterface *simulator_interface,
+                           ESDConnectionManager *mConnectionManager,
+                           const json &inPayload);
+
     static const int NUM_FRAMES_DELAY_FORCED_STATE_UPDATE = 3; // Kept public for unit testing.
 
   private:
@@ -83,6 +107,9 @@ class StreamdeckContext
     // Mutable context state.
     int current_state_ = 0;          // Stored state of the context.
     std::string current_title_ = ""; // Stored title of the context.
+    std::string last_encoder_display_value_ = ""; // Last value displayed on encoder LCD.
+    std::string last_encoder_image_path_ = ""; // Last image path set for encoder background.
+    json settings_;                  // Stored settings for this context.
 
     // Monitors.
     ImageStateMonitor comparison_monitor_{}; // Monitors DCS ID to determine the image state of Streamdeck context.

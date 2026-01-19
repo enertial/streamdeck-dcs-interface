@@ -28,12 +28,26 @@ There are currently three settings for each Streamdeck button you create:
 
 - DCS Command - Specify which button/switch you want to activate in game (allows setting of any clickable object in a cockpit).
   - Streamdeck buttons support push-button, switch, and increment (dials, levers, etc.) input types.
+  - **Stream Deck Plus rotary encoders** support rotation with separate CW/CCW increment values and encoder press for fixed values.
 - Image Change Settings - Specify a function within the DCS simulation to monitor and change the display of the Streamdeck image conditionally.
   - Examples: Lamps for Warnings/Modes, Switch states
 - Title Text Change Settings - Specify a function in the DCS simulation which will be monitored and its text is displayed as the Streamdeck button Title.
   - Examples: UFC text displays, scratchpads, radio displays
 
-Can also support multiple physical Streamdecks at once.
+Can also support multiple physical Streamdecks at once, including **Stream Deck Plus** with rotary encoder support.
+
+## Stream Deck Plus Encoder Features
+
+The plugin now supports **Stream Deck Plus rotary encoders** with the following capabilities:
+
+- **Rotation Control**: Separate clockwise (CW) and counter-clockwise (CCW) increment values per tick
+- **Press Action**: Send a fixed value when pressing the encoder button
+- **LCD Display**: Real-time display of DCS values on the encoder LCD screen
+- **Value Mapping**: Map numeric DCS values to custom text (e.g., "0.2" → "OFF", "0.8" → "ARMED")
+- **Automatic Gauge**: Visual indicator bar based on minimum/maximum value ranges
+- **Live Updates**: Changes to mappings take effect immediately without restart
+
+Configure encoders using the dedicated Property Inspector with intuitive controls for all settings.
 
 ## Detailed Documentation
 
@@ -125,4 +139,6 @@ Before running the .bat file you will need to:
 
 Running the batch script will build the Streamdeck plugin and run all unit tests, generating the plugin file at `Release/com.ctytler.dcs.streamDeckPlugin`.
 
-Current version was built with Visual Studio Community 2022.
+**Build Requirements:**
+- Visual Studio 2022 (v17.11+) or Visual Studio 2025 with Platform Toolset v145
+- The encoder support features require Visual Studio 2025 or compatible toolset
