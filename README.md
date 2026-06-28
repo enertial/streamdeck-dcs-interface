@@ -7,8 +7,12 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/enertial/streamdeck-dcs-interface/total)
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/enertial/streamdeck-dcs-interface)
 
+`DCS Interface` is a plugin for the Streamdeck that allows communication with DCS via lua UDP sockets for both receiving updates of the simulation state as well as sending commands to interact with the clickable cockpits.
+
+
 > [!NOTE]
-> ### 📢 Project Status: Paused Development / Contributions Welcome
+> ### 📢 Project Status: Stable & Usable / Paused Development (Contributions Welcome)
+> *The software is currently functional and ready to use.*
 > 
 > Thank you for visiting! This project began as a personal tool built on top of the stale **DCS-ExportScript** project. 
 > 
@@ -23,9 +27,6 @@
 > 
 > #### 🗺️ Future Development
 > To more easily support use in the future with DCS updates, the long-term goal is to transition this project away from DCS-ExportScript and rebuild it on top of **DCS-BIOS**. This change is still (aspirationally) in my backlog but will likely be >1 year away.
-
-
-`DCS Interface` is a plugin for the Streamdeck that allows communication with DCS via lua UDP sockets for both receiving updates of the simulation state as well as sending commands to interact with the clickable cockpits.
 
 - [Description](#description)
   - [Detailed Documentation](#detailed-documentation)
