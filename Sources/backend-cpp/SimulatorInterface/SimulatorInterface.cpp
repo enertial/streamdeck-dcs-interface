@@ -4,6 +4,7 @@
 
 #include "Utilities/StringUtilities.h"
 
+SimulatorAddress::SimulatorAddress() : type(AddressType::UNDEFINED) {}
 SimulatorAddress::SimulatorAddress(unsigned int address) : type(AddressType::ADDRESS_ONLY), address(address) {}
 SimulatorAddress::SimulatorAddress(unsigned int address, unsigned int mask, uint8_t shift)
     : type(AddressType::INTEGER), address(address), mask(mask), shift(shift)

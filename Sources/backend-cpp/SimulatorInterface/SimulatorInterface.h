@@ -19,7 +19,7 @@ using SimulatorConnectionSettings = struct {
     std::string multicast_address; //  UDP Multicast address group to join.
 };
 
-enum class AddressType { ADDRESS_ONLY, INTEGER, STRING };
+enum class AddressType { UNDEFINED, ADDRESS_ONLY, INTEGER, STRING };
 
 struct SimulatorAddress {
     AddressType type;
@@ -30,6 +30,7 @@ struct SimulatorAddress {
     // Only for STRING:
     unsigned int max_length;
 
+    SimulatorAddress();
     SimulatorAddress(unsigned int address);
     SimulatorAddress(unsigned int address, unsigned int mask, uint8_t shift);
     SimulatorAddress(unsigned int address, unsigned int max_length);
